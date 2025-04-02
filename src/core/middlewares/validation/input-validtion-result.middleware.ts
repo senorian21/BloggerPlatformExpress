@@ -1,20 +1,26 @@
-import { FieldValidationError, ValidationError, validationResult } from 'express-validator';
-import { NextFunction, Request, Response } from 'express';
-import { ValidationErrorType } from '../../types/validationError';
-import { HttpStatus } from '../../types/http-statuses';
-import { ValidationErrorDto } from '../../types/validationError.dto';
+import {
+  FieldValidationError,
+  ValidationError,
+  validationResult,
+} from "express-validator";
+import { NextFunction, Request, Response } from "express";
+import { ValidationErrorType } from "../../types/validationError";
+import { HttpStatus } from "../../types/http-statuses";
+import { ValidationErrorDto } from "../../types/validationError.dto";
 
-export const createErrorMessages = (errors: ValidationErrorType[]): ValidationErrorDto => {
-    return { errorMessages: errors };
+export const createErrorMessages = (
+  errors: ValidationErrorType[],
+): ValidationErrorDto => {
+  return { errorsMessages: errors };
 };
 
 const formatErrors = (error: ValidationError): ValidationErrorType => {
-    const expressError = error as unknown as FieldValidationError;
+  const expressError = error as unknown as FieldValidationError;
 
-    return {
-        field: expressError.path,
-        message: expressError.msg,
-    };
+  return {
+    field: expressError.path,
+    message: expressError.msg,
+  };
 };
 
 export const inputValidationResultMiddleware = (
@@ -22,12 +28,20 @@ export const inputValidationResultMiddleware = (
     res: Response,
     next: NextFunction,
 ) => {
-    const errors = validationResult(req).formatWith(formatErrors).array({ onlyFirstError: true });
+  const errors = validationResult(req)
+      .formatWith(formatErrors)
+      .array({ onlyFirstError: true });
 
-    if (errors.length > 0) {
-        res.status(HttpStatus.BadRequest).json({ errorMessages: errors });
-        return;
+  if (errors.length > 0) {
+
+    const isNotFoundError = errors.some((error) => error.message === "Blog ID not found");
+    if (isNotFoundError) {
+      res.sendStatus(HttpStatus.NotFound) // Отправляем 404
+    } else {
+      res.status(HttpStatus.BadRequest).json({ errorsMessages: errors }); // Отправляем 400
     }
+    return;
+  }
 
-    next();
+  next();
 };

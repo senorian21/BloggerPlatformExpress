@@ -2,7 +2,7 @@ import { Router, Request, Response } from "express";
 import { db } from "../../../db/in-memory.db";
 import { HttpStatus } from "../../../core/types/http-statuses";
 import { Post } from "../../../posts/types/post";
-import {postsRepository} from "../../repositories/posts.repository";
+import { postsRepository } from "../../repositories/posts.repository";
 
 export function createPostHandler(req: Request, res: Response) {
   const blogId = req.body.blogId;
@@ -26,10 +26,7 @@ export function createPostHandler(req: Request, res: Response) {
     blogName: blog.name,
   };
 
-
   postsRepository.createPost(newPost);
 
-
-  res.sendStatus(HttpStatus.Created);
-
+  res.status(HttpStatus.Created).send(newPost);
 }
