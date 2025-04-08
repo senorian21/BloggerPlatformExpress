@@ -1,34 +1,43 @@
 import { Blog } from "../types/blog";
-import { db } from "../../db/in-memory.db";
 import { BlogInput } from "../dto/blog.input-dto";
+import { blogCollection } from "../../db/mongo.db";
+import { ObjectId, WithId } from "mongodb";
 
 export const blogsRepositories = {
-  findAllBlogs(): Blog[] {
-    return db.blogs;
+  async findAllBlogs(): Promise<WithId<Blog>[]> {
+    return blogCollection.find().toArray();
   },
-  findById(id: string) {
-    return db.blogs.find((b) => b.id === id);
+  async findById(id: string): Promise<WithId<Blog> | null> {
+    return blogCollection.findOne({ _id: new ObjectId(id) });
   },
-  createBlog(newBlog: Blog) {
-    db.blogs.push(newBlog);
-    return newBlog;
-  },
-  updateBlog(id: string, dto: BlogInput) {
-    const indexBlog = db.blogs.findIndex((b) => b.id === id);
 
-    if (indexBlog === -1) {
+  async createBlog(newBlog: Blog) {
+    const result = await blogCollection.insertOne(newBlog);
+    return { ...newBlog, _id: result.insertedId };
+  },
+
+  async updateBlog(id: string, dto: Blog) {
+    const updateResult = await blogCollection.updateOne(
+      {
+        _id: new ObjectId(id),
+      },
+      {
+        $set: {
+          name: dto.name,
+          description: dto.description,
+          websiteUrl: dto.websiteUrl,
+          createdAt: dto.createdAt,
+          isMembership: dto.isMembership,
+        },
+      },
+    );
+  },
+  async deleteBlog(id: string) {
+    const deleteResult = await blogCollection.deleteOne({
+      _id: new ObjectId(id),
+    });
+    if (deleteResult.deletedCount < 1) {
+      throw new Error("Driver not exist");
     }
-
-    const updateBlog = {
-      ...db.blogs[indexBlog],
-      name: dto.name,
-      description: dto.description,
-      websiteUrl: dto.websiteUrl,
-    };
-    db.blogs[indexBlog] = updateBlog;
-  },
-  deleteBlog(id: string) {
-    const indexBlog = db.blogs.findIndex((b) => b.id === id);
-    db.blogs.splice(indexBlog, 1);
   },
 };

@@ -6,14 +6,6 @@ export const idValidationBlogs = param("id")
   .withMessage("ID is required")
   .isString()
   .withMessage("ID must be a string")
-  .isLength({ min: 1 })
-  .withMessage("ID must not be empty")
-  .isNumeric()
-  .withMessage("ID must be a numeric string")
-  .custom(async (value: string) => {
-    const blogIndex = db.blogs.findIndex((b) => b.id === value); // Проверка индекса
-    if (blogIndex === -1) {
-      throw new Error("Blog ID not found");
-    }
-    return true;
-  });
+  .isMongoId()
+  .withMessage("Incorrect format of ObjectId")
+

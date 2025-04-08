@@ -1,21 +1,19 @@
 import { Request, Response } from "express";
 import { db } from "../../../db/in-memory.db";
 import { HttpStatus } from "../../../core/types/http-statuses";
-import { BlogInput } from "../../../blogs/dto/blog.input-dto";
 import { Blog } from "../../types/blog";
 import { blogsRepositories } from "../../repositories/blogs.repository";
+import { mapToBlogViewModel } from "../../mappers/map-to-blog-view-model.util";
 
-export function postBlogHandler(req: Request, res: Response) {
-  const newId = db.blogs.length
-    ? (parseInt(db.blogs[db.blogs.length - 1].id) + 1).toString()
-    : "1";
-
+export async function createBlogHandler(req: Request, res: Response) {
   const newBlog: Blog = {
-    id: newId.toString(),
     name: req.body.name,
     description: req.body.description,
     websiteUrl: req.body.websiteUrl,
+    createdAt: new Date().toISOString(),
+    isMembership: false,
   };
-  blogsRepositories.createBlog(newBlog);
-  res.status(HttpStatus.Created).send(newBlog);
+  const createdBlog = await blogsRepositories.createBlog(newBlog);
+  const blogViewModel = mapToBlogViewModel(createdBlog);
+  res.status(HttpStatus.Created).send(blogViewModel);
 }
