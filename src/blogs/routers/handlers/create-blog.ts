@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { db } from "../../../db/in-memory.db";
 import { HttpStatus } from "../../../core/types/http-statuses";
 import { Blog } from "../../types/blog";
 import { blogsRepositories } from "../../repositories/blogs.repository";
@@ -10,10 +9,12 @@ export async function createBlogHandler(req: Request, res: Response) {
     name: req.body.name,
     description: req.body.description,
     websiteUrl: req.body.websiteUrl,
-    createdAt: new Date().toISOString(),
-    isMembership: false,
+    createdAt: new Date().toISOString(), // Установить текущую дату
+    isMembership: false, // Установить значение по умолчанию
   };
+
   const createdBlog = await blogsRepositories.createBlog(newBlog);
   const blogViewModel = mapToBlogViewModel(createdBlog);
   res.status(HttpStatus.Created).send(blogViewModel);
 }
+

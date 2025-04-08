@@ -1,32 +1,31 @@
-import { Router, Request, Response } from "express";
-import { db } from "../../../db/in-memory.db";
+import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/types/http-statuses";
 import { Post } from "../../../posts/types/post";
 import { postsRepository } from "../../repositories/posts.repository";
+import { blogsRepositories } from "../../../blogs/repositories/blogs.repository";
+import { mapToPostViewModel } from "../../mappers/map-to-post-view-model.util";
 
-export function createPostHandler(req: Request, res: Response) {
+
+export async function createPostHandler(req: Request, res: Response) {
   const blogId = req.body.blogId;
 
-  const blog = db.blogs.find((b) => b.id === blogId);
+  const blog = await blogsRepositories.findById(blogId);
+
   if (!blog) {
-    res.status(HttpStatus.NotFound).send({ error: "Blog not found" });
-    return;
+    return
   }
 
-  const newId = db.posts.length
-    ? (parseInt(db.posts[db.posts.length - 1].id) + 1).toString()
-    : "1";
-
   const newPost: Post = {
-    id: newId,
     title: req.body.title,
     shortDescription: req.body.shortDescription,
     content: req.body.content,
-    blogId: blog.id,
+    blogId: blog._id.toString(),
     blogName: blog.name,
+    createdAt: new Date().toISOString(),
+    isMembership: false,
   };
 
-  postsRepository.createPost(newPost);
-
-  res.status(HttpStatus.Created).send(newPost);
+  const createdPosts = await postsRepository.createPost(newPost)
+  const postViewModel = mapToPostViewModel(createdPosts);
+  res.status(HttpStatus.Created).send(postViewModel);
 }

@@ -1,5 +1,4 @@
 import { Blog } from "../types/blog";
-import { BlogInput } from "../dto/blog.input-dto";
 import { blogCollection } from "../../db/mongo.db";
 import { ObjectId, WithId } from "mongodb";
 
@@ -37,7 +36,7 @@ export const blogsRepositories = {
       _id: new ObjectId(id),
     });
     if (deleteResult.deletedCount < 1) {
-      throw new Error("Driver not exist");
+      throw new Error("Blog not exist");
     }
   },
 };

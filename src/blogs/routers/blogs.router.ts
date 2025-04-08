@@ -1,4 +1,4 @@
-import { Router, Request, Response } from "express";
+import { Router } from "express";
 import { getBlogsListHandler } from "./handlers/get-blogs-list";
 import { getBlogHandler } from "./handlers/get-blog";
 import { deleteBlogHandler } from "./handlers/delete-blog";

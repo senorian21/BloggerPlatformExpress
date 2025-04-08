@@ -1,5 +1,6 @@
 import { body } from "express-validator";
-import { db } from "../../db/in-memory.db";
+import {blogsRepositories} from "../../blogs/repositories/blogs.repository";
+
 const titleValidation = body("title")
   .isString()
   .withMessage("Title should be string")
@@ -25,8 +26,8 @@ const blogId = body("blogId")
   .isString()
   .withMessage("BlogId should be string")
   .custom(async (id: string) => {
-    const blog = await db.blogs.findIndex((b) => b.id === id);
-    if (blog === -1) {
+    const blog = await blogsRepositories.findById(id)
+    if (!blog) {
       throw new Error("ID Blog id does not exist in the database");
     }
     return true;

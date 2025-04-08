@@ -7,5 +7,4 @@ export const idValidationBlogs = param("id")
   .isString()
   .withMessage("ID must be a string")
   .isMongoId()
-  .withMessage("Incorrect format of ObjectId")
-
+  .withMessage("Incorrect format of ObjectId");
