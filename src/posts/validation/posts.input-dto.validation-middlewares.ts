@@ -24,8 +24,8 @@ const contentValidation = body("content")
 const blogId = body("blogId")
   .isString()
   .withMessage("BlogId should be string")
-  .custom(async (value: string) => {
-    const blog = await db.blogs.findIndex((b) => b.id === value);
+  .custom(async (id: string) => {
+    const blog = await db.blogs.findIndex((b) => b.id === id);
     if (blog === -1) {
       throw new Error("ID Blog id does not exist in the database");
     }

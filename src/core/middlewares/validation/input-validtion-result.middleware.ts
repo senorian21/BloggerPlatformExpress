@@ -37,9 +37,9 @@ export const inputValidationResultMiddleware = (
       (error) => error.message === "Blog ID not found",
     );
     if (isNotFoundError) {
-      res.sendStatus(HttpStatus.NotFound); // Отправляем 404
+      res.sendStatus(HttpStatus.NotFound);
     } else {
-      res.status(HttpStatus.BadRequest).json({ errorsMessages: errors }); // Отправляем 400
+      res.status(HttpStatus.BadRequest).json({ errorsMessages: errors });
     }
     return;
   }
