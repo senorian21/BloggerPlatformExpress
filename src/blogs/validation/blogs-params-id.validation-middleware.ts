@@ -1,5 +1,5 @@
 import { param } from "express-validator";
-import { db } from "../../db/in-memory.db";
+import { blogsRepositories } from "../repositories/blogs.repository";
 
 export const idValidationBlogs = param("id")
   .exists()
@@ -7,4 +7,11 @@ export const idValidationBlogs = param("id")
   .isString()
   .withMessage("ID must be a string")
   .isMongoId()
-  .withMessage("Incorrect format of ObjectId");
+  .withMessage("Incorrect format of ObjectId")
+  .custom(async (id: string) => {
+    const blog = await blogsRepositories.findById(id);
+    if (!blog) {
+      throw new Error("Blog ID not found");
+    }
+    return true;
+  });

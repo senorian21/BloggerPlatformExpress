@@ -1,5 +1,5 @@
 import { Post } from "../../posts/types/post";
-import {ObjectId, WithId} from "mongodb";
+import { ObjectId, WithId } from "mongodb";
 import { postCollection } from "../../db/mongo.db";
 
 export const postsRepository = {
@@ -8,36 +8,35 @@ export const postsRepository = {
   },
 
   async findPostById(id: string) {
-    return postCollection.findOne({_id: new ObjectId(id)});
+    return postCollection.findOne({ _id: new ObjectId(id) });
   },
 
   async createPost(newPost: Post) {
     const result = await postCollection.insertOne(newPost);
-    return {...newPost, _id: result.insertedId};
+    return { ...newPost, _id: result.insertedId };
   },
 
   async updatePost(id: string, dto: Post) {
-    const updateResult  = await postCollection.updateOne(
-        {
-          _id: new ObjectId(id)
+    const updateResult = await postCollection.updateOne(
+      {
+        _id: new ObjectId(id),
+      },
+      {
+        $set: {
+          title: dto.title,
+          shortDescription: dto.shortDescription,
+          content: dto.content,
+          blogId: dto.blogId,
+          blogName: dto.blogName,
+          createdAt: dto.createdAt,
         },
-        {
-          $set: {
-            title: dto.title,
-            shortDescription: dto.shortDescription,
-            content: dto.content,
-            blogId: dto.blogId,
-            blogName: dto.blogName,
-            createdAt: dto.createdAt,
-            isMembership: dto.isMembership,
-          }
-        }
-    )
+      },
+    );
   },
 
   async deletePost(id: string) {
     const deleteResult = await postCollection.deleteOne({
-      _id: new ObjectId(id)
+      _id: new ObjectId(id),
     });
     if (deleteResult.deletedCount < 1) {
       throw new Error("Blog not exist");

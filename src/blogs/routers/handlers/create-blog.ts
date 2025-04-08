@@ -17,4 +17,3 @@ export async function createBlogHandler(req: Request, res: Response) {
   const blogViewModel = mapToBlogViewModel(createdBlog);
   res.status(HttpStatus.Created).send(blogViewModel);
 }
-

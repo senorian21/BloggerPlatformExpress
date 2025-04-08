@@ -1,4 +1,4 @@
-import { Router} from "express";
+import { Router } from "express";
 import { getPostsListHandler } from "./handlers/get-posts-list";
 import { getPostHandler } from "./handlers/get-post";
 import { deletePostHandler } from "./handlers/delete-post";

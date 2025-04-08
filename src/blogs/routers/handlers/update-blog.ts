@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/types/http-statuses";
 import { blogsRepositories } from "../../repositories/blogs.repository";
-import {Blog} from "../../types/blog";
+import { Blog } from "../../types/blog";
 
 export async function putBlogHandler(req: Request, res: Response) {
   const id = req.params.id;

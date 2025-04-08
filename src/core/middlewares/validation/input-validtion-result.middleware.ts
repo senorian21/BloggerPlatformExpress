@@ -34,7 +34,9 @@ export const inputValidationResultMiddleware = (
 
   if (errors.length > 0) {
     const isNotFoundError = errors.some(
-      (error) => error.message === "Blog ID not found",
+      (error) =>
+        error.message === "Blog ID not found" ||
+        error.message === "Post ID not found",
     );
     if (isNotFoundError) {
       res.sendStatus(HttpStatus.NotFound);

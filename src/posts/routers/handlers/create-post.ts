@@ -5,14 +5,13 @@ import { postsRepository } from "../../repositories/posts.repository";
 import { blogsRepositories } from "../../../blogs/repositories/blogs.repository";
 import { mapToPostViewModel } from "../../mappers/map-to-post-view-model.util";
 
-
 export async function createPostHandler(req: Request, res: Response) {
   const blogId = req.body.blogId;
 
   const blog = await blogsRepositories.findById(blogId);
 
   if (!blog) {
-    return
+    return;
   }
 
   const newPost: Post = {
@@ -22,10 +21,9 @@ export async function createPostHandler(req: Request, res: Response) {
     blogId: blog._id.toString(),
     blogName: blog.name,
     createdAt: new Date().toISOString(),
-    isMembership: false,
   };
 
-  const createdPosts = await postsRepository.createPost(newPost)
+  const createdPosts = await postsRepository.createPost(newPost);
   const postViewModel = mapToPostViewModel(createdPosts);
   res.status(HttpStatus.Created).send(postViewModel);
 }
