@@ -1,7 +1,6 @@
 import { Express } from "express";
 import { blogViewModel } from "../../../../src/blogs/types/blog-view-model";
 import { BLOGS_PATH } from "../../../../src/core/paths/paths";
-import { generateBasicAuthToken } from "../generate-admin-auth-token";
 import { HttpStatus } from "../../../../src/core/types/http-statuses";
 import request from "supertest";
 

@@ -71,8 +71,6 @@ describe("Blogs API", () => {
 
     const blogsResponse = await getBlogById(app, blogCreated.id);
 
-    console.log("Updated blog response:", blogsResponse);
-
     expect(blogsResponse).toMatchObject({
       name: "1111",
       description: "1111",

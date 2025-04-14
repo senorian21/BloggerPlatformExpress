@@ -1,4 +1,3 @@
-import { postViewModel } from "../../../../src/posts/types/post-view-model";
 import { Express } from "express";
 import { HttpStatus } from "../../../../src/core/types/http-statuses";
 import request from "supertest";

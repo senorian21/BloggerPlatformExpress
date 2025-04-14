@@ -1,5 +1,4 @@
 import { Express } from "express";
-import { Blog } from "../../../../src/blogs/types/blog";
 import { blogViewModel } from "../../../../src/blogs/types/blog-view-model";
 import { getBlogsDto } from "./get-blogs-dto";
 import request from "supertest";
