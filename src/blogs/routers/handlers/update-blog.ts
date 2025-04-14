@@ -14,9 +14,9 @@ export async function putBlogHandler(req: Request, res: Response) {
 
   const dto: Blog = {
     ...blog,
-    name: req.body.name ?? blog.name,
-    description: blog.description,
-    websiteUrl: blog.websiteUrl,
+    name: req.body.name,
+    description: req.body.description,
+    websiteUrl: req.body.websiteUrl,
     createdAt: blog.createdAt,
     isMembership: blog.isMembership,
   };

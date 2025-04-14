@@ -8,6 +8,11 @@ import { HttpStatus } from "../../../src/core/types/http-statuses";
 import { BLOGS_PATH } from "../../../src/core/paths/paths";
 import { generateBasicAuthToken } from "../utils/generate-admin-auth-token";
 import { clearDb } from "../utils/clear-db";
+import { runDb } from "../../../src/db/mongo.db";
+import { createBlog } from "../utils/blogs/create-blog";
+import { getBlogsDto } from "../utils/blogs/get-blogs-dto";
+import { getBlogById } from "../utils/blogs/get-blog-by-id";
+import { updateBlog } from "../utils/blogs/update-blog";
 
 describe("Blogs API", () => {
   const app = express();
@@ -15,106 +20,75 @@ describe("Blogs API", () => {
 
   const adminToken = generateBasicAuthToken();
 
-  const testBlogsData: BlogInput = {
-    name: "string",
-    description: "string",
-    websiteUrl: "https://example.com/folder/subfolder/",
-  };
-
   beforeAll(async () => {
+    await runDb("mongodb://localhost:27017/BloggerPlatform-test");
     await clearDb(app);
   });
 
   it("should create blog; POST /blogs", async () => {
     const newBlog: BlogInput = {
-      ...testBlogsData,
+      ...getBlogsDto(),
       name: "Jaba",
       description: "qwfsddsd",
+      websiteUrl: "https://someurl.com",
     };
 
-    await request(app)
-      .post(BLOGS_PATH)
-      .set("Authorization", adminToken)
-      .send(newBlog)
-      .expect(HttpStatus.Created);
+    await createBlog(app, newBlog);
   });
 
   it("should return blogs list ; GET /blogs", async () => {
-    await request(app)
-      .post(BLOGS_PATH)
-      .set("Authorization", adminToken)
-      .send({ ...testBlogsData, name: "Blogs1" })
-      .expect(HttpStatus.Created);
+    await createBlog(app);
+    await createBlog(app);
 
-    await request(app)
-      .post(BLOGS_PATH)
-      .set("Authorization", adminToken)
-      .send({ ...testBlogsData, name: "Blogs2" })
-      .expect(HttpStatus.Created);
+    const response = await request(app).get(BLOGS_PATH).expect(HttpStatus.Ok);
 
-    const blogsLIst = await request(app).get(BLOGS_PATH).expect(HttpStatus.Ok);
-
-    expect(blogsLIst.body).toBeInstanceOf(Array);
-    expect(blogsLIst.body.length).toBeGreaterThanOrEqual(2);
+    expect(response.body).toBeInstanceOf(Array);
+    expect(response.body.length).toBeGreaterThanOrEqual(2);
   });
 
   it("should return blog by id; GET /blogs/:id", async () => {
-    const createResponse = await request(app)
-      .post(BLOGS_PATH)
-      .set("Authorization", adminToken)
-      .send({ ...testBlogsData, name: "Blog1" })
-      .expect(HttpStatus.Created);
+    const blogCreated = await createBlog(app);
 
-    const getResponse = await request(app)
-      .get(`${BLOGS_PATH}/${createResponse.body.id}`)
-      .expect(HttpStatus.Ok);
+    const blog = await getBlogById(app, blogCreated.id);
 
-    expect(getResponse.body).toEqual({
-      ...createResponse.body,
+    expect(blog).toEqual({
+      ...blogCreated,
+      id: expect.any(String),
+      createdAt: expect.any(String),
     });
   });
 
   it("should update blogs; PUT /blogs/:id", async () => {
-    const createResponse = await request(app)
-      .post(BLOGS_PATH)
-      .set("Authorization", adminToken)
-      .send({ ...testBlogsData, name: "Blog1" })
-      .expect(HttpStatus.Created);
+    const blogCreated = await createBlog(app);
 
-    const updateBlogs: BlogInput = {
-      name: "Blog1",
-      description: "qwfsddsd",
+    const blogUpdateData: BlogInput = {
+      name: "1111",
+      description: "1111",
       websiteUrl: "https://example.com/folder/subfolder/",
     };
-    await request(app)
-      .put(`${BLOGS_PATH}/${createResponse.body.id}`)
-      .set("Authorization", adminToken)
-      .send(updateBlogs)
-      .expect(HttpStatus.NoContent);
 
-    const blogsResponse = await request(app).get(
-      `${BLOGS_PATH}/${createResponse.body.id}`,
-    );
+    await updateBlog(app, blogCreated.id, blogUpdateData);
 
-    expect(blogsResponse.body).toEqual({
-      id: createResponse.body.id,
-      ...updateBlogs,
+    const blogsResponse = await getBlogById(app, blogCreated.id);
+
+    console.log("Updated blog response:", blogsResponse);
+
+    expect(blogsResponse).toMatchObject({
+      name: "1111",
+      description: "1111",
+      websiteUrl: "https://example.com/folder/subfolder/",
     });
   });
 
   it("DELETE blogs/:id and check after NOT FOUND", async () => {
-    const createResponse = await request(app)
-      .post(BLOGS_PATH)
-      .set("Authorization", adminToken)
-      .send({ ...testBlogsData, name: "Blog1" })
-      .expect(HttpStatus.Created);
+    const createResponse = await createBlog(app);
     await request(app)
-      .delete(`${BLOGS_PATH}/${createResponse.body.id}`)
+      .delete(`${BLOGS_PATH}/${createResponse.id}`)
       .set("Authorization", adminToken)
       .expect(HttpStatus.NoContent);
 
     const blogsResponse = await request(app).get(
-      `${BLOGS_PATH}/${createResponse.body.id}`,
+      `${BLOGS_PATH}/${createResponse.id}`,
     );
     expect(blogsResponse.status).toBe(HttpStatus.NotFound);
   });
