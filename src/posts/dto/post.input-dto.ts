@@ -4,8 +4,3 @@ export type PostInput = {
   content: string;
   blogId: string;
 };
-export type PostInputTest = {
-  title: string;
-  shortDescription: string;
-  content: string;
-};
