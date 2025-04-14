@@ -5,10 +5,14 @@ import { setupApp } from "../../../src/setup-app";
 import { PostInput } from "../../../src/posts/dto/post.input-dto";
 import { HttpStatus } from "../../../src/core/types/http-statuses";
 
-import { BLOGS_PATH, POSTS_PATH } from "../../../src/core/paths/paths";
+import { POSTS_PATH } from "../../../src/core/paths/paths";
 import { generateBasicAuthToken } from "../utils/generate-admin-auth-token";
 import { clearDb } from "../utils/clear-db";
-import { BlogInput } from "../../../src/blogs/dto/blog.input-dto";
+import { runDb } from "../../../src/db/mongo.db";
+import { getPostDto } from "../utils/posts/get-posts-dto";
+import { createPost } from "../utils/posts/create-post";
+import { createBlog } from "../utils/blogs/create-blog";
+import { getPostById } from "../utils/posts/get=post-by-id";
 
 describe("Posts API", () => {
   const app = express();
@@ -17,189 +21,79 @@ describe("Posts API", () => {
   const adminToken = generateBasicAuthToken();
 
   beforeAll(async () => {
+    await runDb("mongodb://localhost:27017/BloggerPlatform-test");
     await clearDb(app);
   });
 
-  const testPostData: PostInput = {
-    title: "1_1",
-    shortDescription: "1_1",
-    content: "string",
-    blogId: "1",
-  };
-
-  const testBlogsData: BlogInput = {
-    name: "string",
-    description: "string",
-    websiteUrl: "https://example.com/folder/subfolder/",
-  };
-
   it("should create post; POST /posts", async () => {
-    const newBlog: BlogInput = {
-      ...testBlogsData,
-      name: "Jaba",
-      description: "qwfsddsd",
-    };
-
-    const createBlogResponse = await request(app)
-      .post(BLOGS_PATH)
-      .set("Authorization", adminToken)
-      .send(newBlog)
-      .expect(HttpStatus.Created);
-
-    expect(createBlogResponse.body).toHaveProperty("id");
-
+    const createdBlog = await createBlog(app);
     const newPost: PostInput = {
-      ...testPostData,
+      ...getPostDto,
       title: "1_1",
-      blogId: createBlogResponse.body.id,
+      shortDescription: "ShortDescription",
+      content: "Content",
+      blogId: createdBlog.id,
     };
-
-    const createPostResponse = await request(app)
-      .post(POSTS_PATH)
-      .set("Authorization", adminToken)
-      .send(newPost)
-      .expect(HttpStatus.Created);
-
-    const getСreatePostResponse = await request(app).get(POSTS_PATH);
-
-    expect(getСreatePostResponse.body).toBeInstanceOf(Array);
-    expect(getСreatePostResponse.body.length).toBeGreaterThanOrEqual(1);
+    await createPost(app, newPost);
   });
 
   it("should return post by id; GET /get/:id", async () => {
-    const newBlog: BlogInput = {
-      ...testBlogsData,
-      name: "Jaba",
-      description: "qwfsddsd",
-      websiteUrl: "https://example.com", // Если обязательное поле
-    };
-
-    const createBlogResponse = await request(app)
-      .post(BLOGS_PATH)
-      .set("Authorization", adminToken)
-      .send(newBlog)
-      .expect(HttpStatus.Created);
-
-    expect(createBlogResponse.body).toHaveProperty("id");
-    const blogId = createBlogResponse.body.id; // Сохраняем ID блога
+    const blog = await createBlog(app);
 
     const newPost: PostInput = {
-      ...testPostData,
+      ...getPostDto,
       title: "1_1",
-      blogId,
+      shortDescription: "ShortDescription",
+      content: "Content",
+      blogId: blog.id,
     };
 
-    // Создание поста
-    const createPostResponse = await request(app)
-      .post(POSTS_PATH)
-      .set("Authorization", adminToken)
-      .send(newPost)
-      .expect(HttpStatus.Created);
+    const post = await createPost(app, newPost);
 
-    expect(createPostResponse.body).toHaveProperty("id");
-    const postId = createPostResponse.body.id; // Сохраняем ID поста
+    const PostResponse = await getPostById(app, post.id);
 
-    // Получение поста по ID
-    const PostResponse = await request(app)
-      .get(`${POSTS_PATH}/${postId}`)
-      .expect(HttpStatus.Ok);
-
-    expect(PostResponse.body).toMatchObject({
-      id: postId,
+    expect(PostResponse).toMatchObject({
       title: "1_1",
-      blogId: blogId,
-      shortDescription: testPostData.shortDescription,
-      content: testPostData.content,
+      shortDescription: "ShortDescription",
+      content: "Content",
+      blogId: blog.id,
     });
   });
   it("should delete post by id and verify NOT FOUND; DELETE /posts/:id", async () => {
-    // Данные для создания блога
-    const newBlog: BlogInput = {
-      ...testBlogsData,
-      name: "Jaba",
-      description: "qwfsddsd",
-      websiteUrl: "https://example.com", // Обязательное поле
-    };
+    const blogCreated = await createBlog(app);
 
-    // Создание нового блога
-    const createBlogResponse = await request(app)
-      .post(BLOGS_PATH)
-      .set("Authorization", adminToken)
-      .send(newBlog)
-      .expect(HttpStatus.Created);
-
-    expect(createBlogResponse.body).toHaveProperty("id");
-    const blogId = createBlogResponse.body.id;
-
-    // Данные для создания поста
     const newPost: PostInput = {
-      ...testPostData,
-      title: "Test Post",
-      blogId,
+      ...getPostDto,
+      title: "1_1",
+      shortDescription: "ShortDescription",
+      content: "Content",
+      blogId: blogCreated.id,
     };
 
-    // Создание нового поста
-    const createPostResponse = await request(app)
-      .post(POSTS_PATH)
-      .set("Authorization", adminToken)
-      .send(newPost)
-      .expect(HttpStatus.Created);
-
-    expect(createPostResponse.body).toHaveProperty("id");
-    const postId = createPostResponse.body.id;
+    const post = await createPost(app, newPost);
 
     // Удаление созданного поста
     await request(app)
-      .delete(`${POSTS_PATH}/${postId}`)
+      .delete(`${POSTS_PATH}/${post.id}`)
       .set("Authorization", adminToken)
       .expect(HttpStatus.NoContent);
 
-    // Проверка, что пост больше не существует
-    const postsResponse = await request(app)
-      .get(`${POSTS_PATH}/${postId}`)
-      .expect(HttpStatus.NotFound);
+    const postsResponse = await getPostById(app, post.id, HttpStatus.NotFound);
 
-    // Убедимся, что возвращается статус "Not Found"
-    expect(postsResponse.status).toBe(HttpStatus.NotFound);
+    expect(postsResponse).toBe(HttpStatus.NotFound);
   });
   it("should return blogs list ; GET /blogs", async () => {
-    // Данные для создания блога
-    const newBlog: BlogInput = {
-      ...testBlogsData,
-      name: "Jaba",
-      description: "qwfsddsd",
-      websiteUrl: "https://example.com", // Обязательное поле
-    };
+    const blogs = await createBlog(app);
 
-    // Создание нового блога
-    const createBlogResponse = await request(app)
-      .post(BLOGS_PATH)
-      .set("Authorization", adminToken)
-      .send(newBlog)
-      .expect(HttpStatus.Created);
-
-    expect(createBlogResponse.body).toHaveProperty("id");
-    const blogId = createBlogResponse.body.id;
-
-    // Данные для создания поста
     const newPost: PostInput = {
-      ...testPostData,
-      title: "Test Post",
-      blogId,
+      ...getPostDto,
+      title: "1_1",
+      shortDescription: "ShortDescription",
+      content: "Content",
+      blogId: blogs.id,
     };
-
-    // Создание нового поста
-    const createPostResponse = await request(app)
-      .post(POSTS_PATH)
-      .set("Authorization", adminToken)
-      .send(newPost)
-      .expect(HttpStatus.Created);
-
-    const createPostResponse1 = await request(app)
-      .post(POSTS_PATH)
-      .set("Authorization", adminToken)
-      .send({ ...newPost, title: "Test" })
-      .expect(HttpStatus.Created);
+    await createPost(app, newPost);
+    await createPost(app, newPost);
 
     const postsLIst = await request(app).get(POSTS_PATH).expect(HttpStatus.Ok);
 

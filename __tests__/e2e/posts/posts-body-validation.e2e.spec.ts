@@ -9,6 +9,7 @@ import { BLOGS_PATH, POSTS_PATH } from "../../../src/core/paths/paths";
 import { generateBasicAuthToken } from "../utils/generate-admin-auth-token";
 import { clearDb } from "../utils/clear-db";
 import { BlogInput } from "../../../src/blogs/dto/blog.input-dto";
+import { runDb } from "../../../src/db/mongo.db";
 
 describe("Posts API", () => {
   const app = express();
@@ -17,6 +18,7 @@ describe("Posts API", () => {
   const adminToken = generateBasicAuthToken();
 
   beforeAll(async () => {
+    await runDb("mongodb://localhost:27017/BloggerPlatform-test");
     await clearDb(app);
   });
 
