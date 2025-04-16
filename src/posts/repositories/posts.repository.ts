@@ -42,4 +42,8 @@ export const postsRepository = {
       throw new Error("Blog not exist");
     }
   },
+
+  async findAllPostsByBlogId(postId: string) {
+    return await postCollection.find({ blogId: postId }).toArray();
+  },
 };

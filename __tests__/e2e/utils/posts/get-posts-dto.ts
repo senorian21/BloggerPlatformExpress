@@ -1,5 +1,3 @@
-
-
 export function getPostDto(blogId: string) {
   return {
     title: "defaultTitle",

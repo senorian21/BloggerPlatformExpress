@@ -13,8 +13,8 @@ import { getPostDto } from "../utils/posts/get-posts-dto";
 import { createPost } from "../utils/posts/create-post";
 import { createBlog } from "../utils/blogs/create-blog";
 import { getPostById } from "../utils/posts/get=post-by-id";
-import {updateBlog} from "../utils/blogs/update-blog";
-import {updatePost} from "../utils/posts/update-post";
+import { updateBlog } from "../utils/blogs/update-blog";
+import { updatePost } from "../utils/posts/update-post";
 
 describe("Posts API", () => {
   const app = express();
@@ -131,6 +131,6 @@ describe("Posts API", () => {
       shortDescription: "ShortDescription",
       content: "Content",
       blogId: blogCreated.id,
-    })
-  })
+    });
+  });
 });

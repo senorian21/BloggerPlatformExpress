@@ -1,20 +1,20 @@
 import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/types/http-statuses";
 import { Post } from "../../../posts/types/post";
-import { postsRepository } from "../../repositories/posts.repository";
-import { blogsRepositories } from "../../../blogs/repositories/blogs.repository";
+import { postsService } from "../../application/posts.service";
+import { blogsService } from "../../../blogs/application/blogs.service";
 
 export async function updatePostHandler(req: Request, res: Response) {
   const id = req.params.id;
 
   const blogId = req.body.blogId;
-  const blog = await blogsRepositories.findById(blogId);
+  const blog = await blogsService.findById(blogId);
   if (!blog) {
     res.sendStatus(HttpStatus.NotFound);
     return;
   }
 
-  const post = await postsRepository.findPostById(id);
+  const post = await postsService.findPostById(id);
   if (!post) {
     res.sendStatus(HttpStatus.NotFound);
     return;
@@ -29,7 +29,7 @@ export async function updatePostHandler(req: Request, res: Response) {
     blogName: blog.name,
   };
 
-  postsRepository.updatePost(id, dto);
+  postsService.updatePost(id, dto);
 
   res.sendStatus(HttpStatus.NoContent);
 }

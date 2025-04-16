@@ -1,13 +1,13 @@
 import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/types/http-statuses";
-import { blogsRepositories } from "../../repositories/blogs.repository";
+import { blogsService } from "../../application/blogs.service";
 
 export async function deleteBlogHandler(req: Request, res: Response) {
   const id = req.params.id;
-  const blog = await blogsRepositories.findById(id);
+  const blog = await blogsService.findById(id);
   if (!blog) {
     res.sendStatus(HttpStatus.NotFound);
   }
-  blogsRepositories.deleteBlog(id);
+  blogsService.deleteBlog(id);
   res.sendStatus(HttpStatus.NoContent);
 }

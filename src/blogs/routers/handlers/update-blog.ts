@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/types/http-statuses";
-import { blogsRepositories } from "../../repositories/blogs.repository";
 import { Blog } from "../../types/blog";
+import { blogsService } from "../../application/blogs.service";
 
 export async function putBlogHandler(req: Request, res: Response) {
   const id = req.params.id;
-  const blog = await blogsRepositories.findById(id);
+  const blog = await blogsService.findById(id);
 
   if (!blog) {
     res.sendStatus(HttpStatus.NotFound);
@@ -21,6 +21,6 @@ export async function putBlogHandler(req: Request, res: Response) {
     isMembership: blog.isMembership,
   };
 
-  await blogsRepositories.updateBlog(id, dto);
+  await blogsService.updateBlog(id, dto);
   res.sendStatus(HttpStatus.NoContent);
 }
