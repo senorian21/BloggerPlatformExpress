@@ -12,10 +12,16 @@ import { getDriverRideListHandler } from "./handlers/get-blog-post-list";
 import { postsBlogInputDtoValidation } from "../../posts/validation/posts.input-dto.validation-middlewares";
 
 import { createPostByBlogHandler } from "./handlers/create-post-by-blog";
+import { paginationAndSortingValidation } from "../../core/middlewares/validation/query-pagination-sorting.validation-middleware";
 
 export const blogsRouter = Router({});
 
-blogsRouter.get("", getBlogsListHandler);
+blogsRouter.get(
+  "",
+  paginationAndSortingValidation(),
+  inputValidationResultMiddleware,
+  getBlogsListHandler,
+);
 
 blogsRouter.get(
   "/:id",
