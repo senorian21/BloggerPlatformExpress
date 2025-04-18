@@ -8,7 +8,7 @@ import { inputValidationResultMiddleware } from "../../core/middlewares/validati
 import { blogsInputDtoValidation } from "../validation/blogs.input-dto.validation-middlewares";
 import { superAdminGuardMiddleware } from "../../auth/middlewares/super-admin.guard-middleware";
 import { idValidationBlogs } from "../validation/blogs-params-id.validation-middleware";
-import { getDriverRideListHandler } from "./handlers/get-blog-post-list";
+import {getBlogPostsListHandler} from "./handlers/get-blog-post-list";
 import { postsBlogInputDtoValidation } from "../../posts/validation/posts.input-dto.validation-middlewares";
 
 import { createPostByBlogHandler } from "./handlers/create-post-by-blog";
@@ -56,12 +56,12 @@ blogsRouter.put(
 );
 
 blogsRouter.get(
-  "/:id/posts",
+  "/:blogId/posts",
   inputValidationResultMiddleware,
-  getDriverRideListHandler,
+    getBlogPostsListHandler,
 );
 blogsRouter.post(
-  "/:id/posts",
+  "/:blogId/posts",
   superAdminGuardMiddleware,
   postsBlogInputDtoValidation,
   inputValidationResultMiddleware,

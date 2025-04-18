@@ -31,7 +31,7 @@ export const postsRepository = {
   },
 
   async findPostById(id: string) {
-    return postCollection.findOne({ _id: new ObjectId(id) });
+    return await postCollection.findOne({ _id: new ObjectId(id) });
   },
 
   async createPost(newPost: Post) {
@@ -66,7 +66,7 @@ export const postsRepository = {
     }
   },
 
-  async findAllPostsByBlogId(postId: string) {
-    return await postCollection.find({ blogId: postId }).toArray();
+  async findAllPostsByBlogId(blogId: string) {
+    return await postCollection.find({ blogId: blogId }).toArray();
   },
 };

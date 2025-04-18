@@ -7,12 +7,12 @@ import { blogsService } from "../../application/blogs.service";
 import { postsService } from "../../../posts/application/posts.service";
 
 export async function createPostByBlogHandler(
-  req: Request<{ id: string }>,
+  req: Request<{ blogId: string }>,
   res: Response,
 ) {
-  const blogId = req.params.id;
+  const idBlog = req.params.blogId
 
-  const blog = await blogsService.findById(blogId);
+  const blog = await blogsService.findById(idBlog);
 
   if (!blog) {
     return;
