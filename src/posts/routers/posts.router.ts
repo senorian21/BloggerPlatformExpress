@@ -8,10 +8,16 @@ import { postsInputDtoValidation } from "../validation/posts.input-dto.validatio
 import { inputValidationResultMiddleware } from "../../core/middlewares/validation/input-validtion-result.middleware";
 import { superAdminGuardMiddleware } from "../../auth/middlewares/super-admin.guard-middleware";
 import { idValidationPosts } from "../validation/posts-params-id.validation-middleware";
+import { paginationAndSortingValidation } from "../../core/middlewares/validation/query-pagination-sorting.validation-middleware";
 
 export const postsRouter = Router({});
 
-postsRouter.get("", getPostsListHandler);
+postsRouter.get(
+  "",
+  paginationAndSortingValidation(),
+  inputValidationResultMiddleware,
+  getPostsListHandler,
+);
 
 postsRouter.get(
   "/:id",

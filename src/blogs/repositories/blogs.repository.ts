@@ -17,6 +17,7 @@ export const blogsRepositories = {
       filter.$or = [];
       filter.$or.push({ name: { $regex: searchBlogNameTerm, $options: "i" } });
     }
+
     const items = await blogCollection
       .find(filter)
 
@@ -28,7 +29,7 @@ export const blogsRepositories = {
       .skip(skip)
 
       // ограничивает количество возвращаемых документов до значения pageSize
-      .limit(pageSize)
+      .limit(+pageSize)
       .toArray();
     const totalCount = await blogCollection.countDocuments(filter);
     return { items, totalCount };

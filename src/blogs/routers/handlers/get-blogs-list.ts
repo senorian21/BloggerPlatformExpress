@@ -1,32 +1,30 @@
 import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/types/http-statuses";
-
-import { mapToBlogViewModel } from "../../mappers/map-to-blog-view-model.util";
 import { blogsService } from "../../application/blogs.service";
 import { BlogsQueryInput } from "../../types/blog-query.input";
 import { mapToBlogListPaginatedOutput } from "../../mappers/map-to-blog-list-paginated-output.util";
+import { paginationAndSortingDefault } from "../../../core/middlewares/validation/query-pagination-sorting.validation-middleware";
 
 export async function getBlogsListHandler(
   req: Request<{}, {}, {}, BlogsQueryInput>,
   res: Response,
 ) {
-  // const blog = await blogsService.findMany();
-  // const blogsViewModel = blog.map(mapToBlogViewModel);
-  // res.status(HttpStatus.Ok).send(blogsViewModel);
-  try{
-
-    const queryInput = req.query;
-    console.log(queryInput);
+  try {
+    const queryInput: BlogsQueryInput = {
+      ...paginationAndSortingDefault,
+      ...req.query,
+    };
     const { items, totalCount } = await blogsService.findMany(queryInput);
     const blogsListOutput = mapToBlogListPaginatedOutput(items, {
-      pageNumber: queryInput.pageNumber,
-      pageSize: queryInput.pageSize,
+      pageNumber: +queryInput.pageNumber,
+      pageSize: +queryInput.pageSize,
       totalCount,
     });
     res.send(blogsListOutput);
   } catch (e) {
     console.error(e);
-    res.status(HttpStatus.InternalServerError).json({ message: "Ошибка при получении списка блогов" });
+    res
+      .status(HttpStatus.InternalServerError)
+      .json({ message: "Ошибка при получении списка блогов" });
   }
-
 }

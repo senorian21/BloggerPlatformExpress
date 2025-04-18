@@ -1,10 +1,33 @@
 import { Post } from "../../posts/types/post";
 import { ObjectId, WithId } from "mongodb";
-import { postCollection } from "../../db/mongo.db";
+import { blogCollection, postCollection } from "../../db/mongo.db";
+
+import { PostQueryInput } from "../types/post-query.input";
 
 export const postsRepository = {
-  async findAllPosts(): Promise<WithId<Post>[]> {
-    return postCollection.find().toArray();
+  async findAllPosts(
+    queryDto: PostQueryInput,
+  ): Promise<{ items: WithId<Post>[]; totalCount: number }> {
+
+    const { pageNumber, pageSize, sortBy, sortDirection } = queryDto;
+    const skip = (pageNumber - 1) * pageSize;
+    const filter: any = {};
+
+    const items = await postCollection
+      .find(filter)
+
+      // "asc" (по возрастанию), то используется 1
+      // "desc" — то -1 для сортировки по убыванию. - по алфавиту от Я-А, Z-A
+      .sort({ [sortBy]: sortDirection })
+
+      // пропускаем определённое количество док. перед тем, как вернуть нужный набор данных.
+      .skip(skip)
+
+      // ограничивает количество возвращаемых документов до значения pageSize
+      .limit(+pageSize)
+      .toArray();
+    const totalCount = await postCollection.countDocuments(filter);
+    return { items, totalCount };
   },
 
   async findPostById(id: string) {
@@ -39,7 +62,7 @@ export const postsRepository = {
       _id: new ObjectId(id),
     });
     if (deleteResult.deletedCount < 1) {
-      throw new Error("Blog not exist");
+      throw new Error("Post not exist");
     }
   },
 
