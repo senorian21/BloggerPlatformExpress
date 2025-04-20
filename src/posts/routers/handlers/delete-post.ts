@@ -7,6 +7,7 @@ export async function deletePostHandler(req: Request, res: Response) {
   const post = await postsService.findPostById(id);
   if (!post) {
     res.sendStatus(HttpStatus.NotFound);
+    return;
   }
   postsService.deletePost(id);
   res.sendStatus(HttpStatus.NoContent);

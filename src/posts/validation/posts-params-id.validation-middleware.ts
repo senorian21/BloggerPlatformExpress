@@ -10,10 +10,4 @@ export const idValidationPosts = param("id")
   .withMessage("ID must not be empty")
   .isMongoId()
   .withMessage("Incorrect format of ObjectId")
-  .custom(async (id: string) => {
-    const post = await postsRepository.findPostById(id);
-    if (!post) {
-      throw new Error("Post ID not found");
-    }
-    return true;
-  });
+
