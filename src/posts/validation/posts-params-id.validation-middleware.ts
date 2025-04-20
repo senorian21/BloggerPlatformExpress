@@ -1,5 +1,5 @@
 import { param } from "express-validator";
-import { postsRepository } from "../repositories/posts.repository";
+
 
 export const idValidationPosts = param("id")
   .exists()
