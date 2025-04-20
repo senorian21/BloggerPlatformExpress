@@ -1,6 +1,6 @@
 import { Post } from "../../posts/types/post";
 import { ObjectId, WithId } from "mongodb";
-import { blogCollection, postCollection } from "../../db/mongo.db";
+import { postCollection } from "../../db/mongo.db";
 
 import { PostQueryInput } from "../types/post-query.input";
 
@@ -8,7 +8,6 @@ export const postsRepository = {
   async findAllPosts(
     queryDto: PostQueryInput,
   ): Promise<{ items: WithId<Post>[]; totalCount: number }> {
-
     const { pageNumber, pageSize, sortBy, sortDirection } = queryDto;
     const skip = (pageNumber - 1) * pageSize;
     const filter: any = {};
@@ -66,7 +65,20 @@ export const postsRepository = {
     }
   },
 
-  async findAllPostsByBlogId(blogId: string) {
-    return await postCollection.find({ blogId: blogId }).toArray();
+  async findAllPostsByBlogId(queryDto: PostQueryInput, blogId: string) {
+    const { pageNumber, pageSize, sortBy, sortDirection } = queryDto;
+    const filter = { blogId: blogId };
+    const skip = (pageNumber - 1) * pageSize;
+
+    const [items, totalCount] = await Promise.all([
+      postCollection
+        .find(filter)
+        .sort({ [sortBy]: sortDirection })
+        .skip(skip)
+        .limit(+pageSize)
+        .toArray(),
+      postCollection.countDocuments(filter),
+    ]);
+    return { items, totalCount };
   },
 };

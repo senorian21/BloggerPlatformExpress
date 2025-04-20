@@ -4,7 +4,7 @@ import { mapToBlogViewModel } from "../../mappers/map-to-blog-view-model.util";
 import { blogsService } from "../../application/blogs.service";
 
 export async function getBlogHandler(req: Request, res: Response) {
-  const id = req.params.id;
+  const id = req.params.blogId;
 
   const blog = await blogsService.findById(id);
 

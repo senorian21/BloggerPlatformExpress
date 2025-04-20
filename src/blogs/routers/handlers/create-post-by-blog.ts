@@ -10,7 +10,7 @@ export async function createPostByBlogHandler(
   req: Request<{ blogId: string }>,
   res: Response,
 ) {
-  const idBlog = req.params.blogId
+  const idBlog = req.params.blogId;
 
   const blog = await blogsService.findById(idBlog);
 

@@ -4,7 +4,7 @@ import { Blog } from "../../types/blog";
 import { blogsService } from "../../application/blogs.service";
 
 export async function putBlogHandler(req: Request, res: Response) {
-  const id = req.params.id;
+  const id = req.params.blogId;
   const blog = await blogsService.findById(id);
 
   if (!blog) {

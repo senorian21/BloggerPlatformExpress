@@ -8,7 +8,7 @@ import { inputValidationResultMiddleware } from "../../core/middlewares/validati
 import { blogsInputDtoValidation } from "../validation/blogs.input-dto.validation-middlewares";
 import { superAdminGuardMiddleware } from "../../auth/middlewares/super-admin.guard-middleware";
 import { idValidationBlogs } from "../validation/blogs-params-id.validation-middleware";
-import {getBlogPostsListHandler} from "./handlers/get-blog-post-list";
+import { getBlogPostsListHandler } from "./handlers/get-blog-post-list";
 import { postsBlogInputDtoValidation } from "../../posts/validation/posts.input-dto.validation-middlewares";
 
 import { createPostByBlogHandler } from "./handlers/create-post-by-blog";
@@ -24,14 +24,14 @@ blogsRouter.get(
 );
 
 blogsRouter.get(
-  "/:id",
+  "/:blogId",
   idValidationBlogs,
   inputValidationResultMiddleware,
   getBlogHandler,
 );
 
 blogsRouter.delete(
-  "/:id",
+  "/:blogId",
   idValidationBlogs,
   superAdminGuardMiddleware,
   inputValidationResultMiddleware,
@@ -47,7 +47,7 @@ blogsRouter.post(
 );
 
 blogsRouter.put(
-  "/:id",
+  "/:blogId",
   idValidationBlogs,
   superAdminGuardMiddleware,
   blogsInputDtoValidation,
@@ -57,12 +57,15 @@ blogsRouter.put(
 
 blogsRouter.get(
   "/:blogId/posts",
+  idValidationBlogs,
+  ...paginationAndSortingValidation(),
   inputValidationResultMiddleware,
-    getBlogPostsListHandler,
+  getBlogPostsListHandler,
 );
 blogsRouter.post(
   "/:blogId/posts",
   superAdminGuardMiddleware,
+  idValidationBlogs,
   postsBlogInputDtoValidation,
   inputValidationResultMiddleware,
   createPostByBlogHandler,

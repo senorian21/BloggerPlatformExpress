@@ -1,16 +1,45 @@
 import { Request, Response } from "express";
-
-import { mapToPostViewModel } from "../../../posts/mappers/map-to-post-view-model.util";
 import { postsService } from "../../../posts/application/posts.service";
+import { PostQueryInput } from "../../../posts/types/post-query.input";
+import {
+  paginationAndSortingDefault,
+  PostSortField
+} from "../../../core/middlewares/validation/query-pagination-sorting.validation-middleware";
+import { mapToPostListPaginatedOutput } from "../../../posts/mappers/map-to-post-list-paginated-output.util";
+import { HttpStatus } from "../../../core/types/http-statuses";
+
+
+import {SortDirection} from "../../../core/types/sort-direction"; // Предполагается, что такой файл существует
 
 export async function getBlogPostsListHandler(
-  req: Request<{ blogId: string }, {}, {}>,
-  res: Response,
+    req: Request<{ blogId: string }, {}, PostQueryInput>,
+    res: Response,
 ) {
-  const idBlog = req.params.blogId;
-  const posts = await postsService.findAllPostsByBlogId(idBlog);
-  if (Array.isArray(posts)) {
-    const postsListOutput = posts.map(mapToPostViewModel);
-    res.send(postsListOutput);
+  try {
+    const idBlog = req.params.blogId;
+
+    const queryInput: PostQueryInput = {
+      ...paginationAndSortingDefault,
+      pageNumber: parseInt(req.query.pageNumber as string, 10) || paginationAndSortingDefault.pageNumber,
+      pageSize: parseInt(req.query.pageSize as string, 10) || paginationAndSortingDefault.pageSize,
+      sortBy: (req.query.sortBy as PostSortField) || paginationAndSortingDefault.sortBy,
+      sortDirection: (req.query.sortDirection as SortDirection) || paginationAndSortingDefault.sortDirection,
+    };
+
+    const { items, totalCount } = await postsService.findAllPostsByBlogId(queryInput, idBlog);
+
+    const postListOutput = mapToPostListPaginatedOutput(items, {
+      pageNumber: queryInput.pageNumber,
+      pageSize: queryInput.pageSize,
+      totalCount,
+    });
+
+
+    res.send(postListOutput);
+  } catch (err) {
+    console.error("Error fetching blog posts:", err);
+    res.status(HttpStatus.InternalServerError).json({
+      message: "Ошибка при получении списка постов конкретного блога",
+    });
   }
 }
