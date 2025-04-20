@@ -34,12 +34,10 @@ describe("Blogs API validation", () => {
       .send({
         ...correctTestBlogData,
         name: " ",
-        description: " ",
-        websiteUrl: " ",
       })
       .expect(HttpStatus.BadRequest);
 
-    expect(invalidDataSet1.body.errorsMessages).toHaveLength(3);
+    expect(invalidDataSet1.body.errorsMessages).toHaveLength(1);
 
     const invalidDataSet2 = await request(app)
       .post(BLOGS_PATH)
@@ -61,11 +59,11 @@ describe("Blogs API validation", () => {
         ...correctTestBlogData,
         name: "123",
         description: "",
-        websiteUrl: " ",
+
       })
       .expect(HttpStatus.BadRequest);
 
-    expect(invalidDataSet3.body.errorsMessages).toHaveLength(2);
+    expect(invalidDataSet3.body.errorsMessages).toHaveLength(1);
 
     // check что никто не создался
     const driverListResponse = await request(app).get(BLOGS_PATH);

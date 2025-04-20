@@ -9,7 +9,8 @@ import { mapToPostListPaginatedOutput } from "../../../posts/mappers/map-to-post
 import { HttpStatus } from "../../../core/types/http-statuses";
 
 
-import {SortDirection} from "../../../core/types/sort-direction"; // Предполагается, что такой файл существует
+import {SortDirection} from "../../../core/types/sort-direction";
+import {blogsService} from "../../application/blogs.service"; // Предполагается, что такой файл существует
 
 export async function getBlogPostsListHandler(
     req: Request<{ blogId: string }, {}, PostQueryInput>,
@@ -17,7 +18,11 @@ export async function getBlogPostsListHandler(
 ) {
   try {
     const idBlog = req.params.blogId;
-
+    const blog = await blogsService.findById(idBlog);
+    if (!blog) {
+      res.sendStatus(HttpStatus.NotFound)
+      return
+    }
     const queryInput: PostQueryInput = {
       ...paginationAndSortingDefault,
       pageNumber: parseInt(req.query.pageNumber as string, 10) || paginationAndSortingDefault.pageNumber,

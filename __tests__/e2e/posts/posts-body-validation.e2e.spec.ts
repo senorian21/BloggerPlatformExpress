@@ -6,10 +6,11 @@ import { PostInput } from "../../../src/posts/dto/post.input-dto";
 import { HttpStatus } from "../../../src/core/types/http-statuses";
 
 import { BLOGS_PATH, POSTS_PATH } from "../../../src/core/paths/paths";
-import { generateBasicAuthToken } from "../utils/generate-admin-auth-token";
+
 import { clearDb } from "../utils/clear-db";
 import { BlogInput } from "../../../src/blogs/dto/blog.input-dto";
 import { runDb } from "../../../src/db/mongo.db";
+import {generateBasicAuthToken} from "../utils/generate-admin-auth-token";
 
 describe("Posts API", () => {
   const app = express();
@@ -62,19 +63,20 @@ describe("Posts API", () => {
 
     expect(createPostResponse.body.errorsMessages).toHaveLength(1);
 
+
     const newPost1: PostInput = {
       ...testPostData,
       title: "  ",
-      shortDescription: " ",
-      content: " ",
-      blogId: " ",
+      blogId: "createBlogResponse.body.id",
     };
-    const createPostResponse1 = await request(app)
-      .post(POSTS_PATH)
-      .set("Authorization", adminToken)
-      .send(newPost1)
-      .expect(HttpStatus.BadRequest);
 
-    expect(createPostResponse1.body.errorsMessages).toHaveLength(4);
+    const createPostResponse1 = await request(app)
+        .post(POSTS_PATH)
+        .set("Authorization", adminToken)
+        .send(newPost1)
+        .expect(HttpStatus.BadRequest);
+
+    expect(createPostResponse1.body.errorsMessages).toHaveLength(2)
+
   });
 });

@@ -18,7 +18,7 @@ export const blogsRouter = Router({});
 
 blogsRouter.get(
   "",
-  ...paginationAndSortingValidation(),
+  paginationAndSortingValidation(),
   inputValidationResultMiddleware,
   getBlogsListHandler,
 );
@@ -58,7 +58,7 @@ blogsRouter.put(
 blogsRouter.get(
   "/:blogId/posts",
   idValidationBlogs,
-  ...paginationAndSortingValidation(),
+  paginationAndSortingValidation(),
   inputValidationResultMiddleware,
   getBlogPostsListHandler,
 );

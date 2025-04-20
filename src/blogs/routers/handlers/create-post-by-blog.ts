@@ -7,16 +7,17 @@ import { blogsService } from "../../application/blogs.service";
 import { postsService } from "../../../posts/application/posts.service";
 
 export async function createPostByBlogHandler(
-  req: Request<{ blogId: string }>,
-  res: Response,
+    req: Request<{ blogId: string }>,
+    res: Response,
 ) {
   const idBlog = req.params.blogId;
 
   const blog = await blogsService.findById(idBlog);
-
   if (!blog) {
+    res.sendStatus(HttpStatus.NotFound);
     return;
   }
+
 
   const newPost: Post = {
     title: req.body.title,
@@ -31,5 +32,7 @@ export async function createPostByBlogHandler(
   if (createdPosts) {
     const postViewModel = mapToPostViewModel(createdPosts);
     res.status(HttpStatus.Created).send(postViewModel);
+  } else {
+    res.status(HttpStatus.InternalServerError).json({ message: "Ошибка при создании поста" });
   }
 }

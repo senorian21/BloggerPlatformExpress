@@ -8,6 +8,7 @@ export async function deleteBlogHandler(req: Request, res: Response) {
     const blog = await blogsService.findById(id);
     if (!blog) {
       res.sendStatus(HttpStatus.NotFound);
+      return
     }
     blogsService.deleteBlog(id);
     res.sendStatus(HttpStatus.NoContent);

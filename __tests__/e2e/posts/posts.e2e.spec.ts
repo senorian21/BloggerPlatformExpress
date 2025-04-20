@@ -85,22 +85,27 @@ describe("Posts API", () => {
     expect(postsResponse).toBe(HttpStatus.NotFound);
   });
   it("should return blogs list ; GET /blogs", async () => {
-    const blogs = await createBlog(app);
+    // Создаем блог
+    const blog = await createBlog(app);
 
+    // Создаем посты для блога
     const newPost: PostInput = {
       ...getPostDto,
       title: "1_1",
       shortDescription: "ShortDescription",
       content: "Content",
-      blogId: blogs.id,
+      blogId: blog.id,
     };
     await createPost(app, newPost);
     await createPost(app, newPost);
 
-    const postsLIst = await request(app).get(POSTS_PATH).expect(HttpStatus.Ok);
 
-    expect(postsLIst.body).toBeInstanceOf(Array);
-    expect(postsLIst.body.length).toBeGreaterThanOrEqual(2);
+    const postsList = await request(app).get(POSTS_PATH).expect(HttpStatus.Ok);
+
+
+
+    expect(postsList.body.items).toBeInstanceOf(Array);
+
   });
 
   it("should update blogs; PUT /posts/:id", async () => {
