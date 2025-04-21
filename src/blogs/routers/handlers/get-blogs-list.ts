@@ -12,7 +12,11 @@ export async function getBlogsListHandler(
   try {
     const queryInput: BlogsQueryInput = {
       ...paginationAndSortingDefault,
-      ...req.query,
+      pageNumber: Number(req.query.pageNumber) || paginationAndSortingDefault.pageNumber,
+      pageSize: Number(req.query.pageSize) || paginationAndSortingDefault.pageSize,
+      sortBy: req.query.sortBy || paginationAndSortingDefault.sortBy,
+      sortDirection: req.query.sortDirection || paginationAndSortingDefault.sortDirection,
+      searchNameTerm: req.query.searchNameTerm || "",
     };
     const { items, totalCount } = await blogsService.findMany(queryInput);
     const blogsListOutput = mapToBlogListPaginatedOutput(items, {

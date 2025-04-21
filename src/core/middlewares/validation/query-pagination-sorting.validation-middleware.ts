@@ -27,42 +27,25 @@ export function paginationAndSortingValidation() {
   return [
     query("pageNumber")
       .optional()
-      .customSanitizer((value) => {
-        if (!value) return DEFAULT_PAGE; // Если значение пустое или undefined
-        return value;
-      })
       .isInt({ min: 1 })
       .withMessage("Page number must be a positive integer")
       .toInt(),
 
     query("pageSize")
       .optional()
-      .customSanitizer((value) => {
-        if (!value) return DEFAULT_PAGE_SIZE; // Если значение пустое или undefined
-        return value;
-      })
-      .isInt({ min: 1, max: 100 })
+      .isInt({ min: 1, max: 100000 })
       .withMessage("Page size must be between 1 and 100")
       .toInt(),
 
-    query("sortBy")
-      .optional()
-      .customSanitizer((value) => {
-        if (!value) return allowedSortFields[0]; // Если значение пустое или undefined
-        return value;
-      })
-      .isIn(allowedSortFields)
-      .withMessage(
-        `Invalid sort field. Allowed values: ${allowedSortFields.join(", ")}`,
-      ),
+    // query("sortBy")
+    //   .optional()
+    //   .isIn(allowedSortFields)
+    //   .withMessage(
+    //     `Invalid sort field. Allowed values: ${allowedSortFields.join(", ")}`,
+    //   ),
 
     query("sortDirection")
       .optional()
-      //.default(DEFAULT_SORT_DIRECTION)
-      .customSanitizer((value) => {
-        if (!value) return DEFAULT_SORT_DIRECTION; // Если значение пустое или undefined
-        return value;
-      })
       .isIn(Object.values(SortDirection))
       .withMessage(
         `Sort direction must be one of: ${Object.values(SortDirection).join(", ")}`,

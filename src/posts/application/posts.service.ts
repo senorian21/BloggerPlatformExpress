@@ -1,5 +1,5 @@
 import { Post } from "../../posts/types/post";
-import { WithId } from "mongodb";
+import {ObjectId, WithId} from "mongodb";
 import { postsRepository } from "../repositories/posts.repository";
 import { PostInput } from "../dto/post.input-dto";
 import { blogsService } from "../../blogs/application/blogs.service";
@@ -13,6 +13,9 @@ export const postsService = {
   },
 
   async findPostById(id: string) {
+    if(!ObjectId.isValid(id)) {
+      return null
+    }
     return postsRepository.findPostById(id);
   },
 

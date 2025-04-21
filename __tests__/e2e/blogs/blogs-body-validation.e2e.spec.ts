@@ -65,9 +65,9 @@ describe("Blogs API validation", () => {
 
     expect(invalidDataSet3.body.errorsMessages).toHaveLength(1);
 
-    // check что никто не создался
-    const driverListResponse = await request(app).get(BLOGS_PATH);
-    expect(driverListResponse.body).toHaveLength(0);
+
+    const blogListResponse = await request(app).get(BLOGS_PATH);
+    expect(blogListResponse.body.items).toHaveLength(0);
   });
 
   it(`should not update blog when incorrect body passed; PUT /blogs'`, async () => {

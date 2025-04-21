@@ -31,6 +31,7 @@ export async function getBlogPostsListHandler(
       sortDirection: (req.query.sortDirection as SortDirection) || paginationAndSortingDefault.sortDirection,
     };
 
+
     const { items, totalCount } = await postsService.findAllPostsByBlogId(queryInput, idBlog);
 
     const postListOutput = mapToPostListPaginatedOutput(items, {

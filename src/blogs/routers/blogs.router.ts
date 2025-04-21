@@ -57,11 +57,11 @@ blogsRouter.put(
 
 blogsRouter.get(
   "/:blogId/posts",
-  idValidationBlogs,
-  paginationAndSortingValidation(),
+   paginationAndSortingValidation(),
   inputValidationResultMiddleware,
   getBlogPostsListHandler,
 );
+
 blogsRouter.post(
   "/:blogId/posts",
   superAdminGuardMiddleware,
