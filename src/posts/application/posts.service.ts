@@ -24,7 +24,7 @@ export const postsService = {
 
     const blog = await blogsService.findById(blogId);
     if (!blog) {
-      return;
+      return null;
     }
 
     const newPost: Post = {
