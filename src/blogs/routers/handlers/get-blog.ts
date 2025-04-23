@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/types/http-statuses";
-import { mapToBlogViewModel } from "../../mappers/map-to-blog-view-model.util";
 import { blogsQueryRepositories } from "../../repositories/blogs.queryRepository";
 
 export async function getBlogHandler(req: Request, res: Response) {
@@ -13,6 +12,5 @@ export async function getBlogHandler(req: Request, res: Response) {
     return;
   }
 
-  const blogViewModel = mapToBlogViewModel(blog);
-  res.status(HttpStatus.Ok).send(blogViewModel);
+  res.status(HttpStatus.Ok).send(blog);
 }

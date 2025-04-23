@@ -15,13 +15,9 @@ export async function getPostsListHandler(
       ...paginationAndSortingDefault,
       ...req.query,
     };
-    const { items, totalCount } = await postsQueryRepository.findAllPosts(queryInput);
-    const postListOutput = mapToPostListPaginatedOutput(items, {
-      pageNumber: +queryInput.pageNumber,
-      pageSize: +queryInput.pageSize,
-      totalCount,
-    });
-    res.send(postListOutput);
+    const posts = await postsQueryRepository.findAllPosts(queryInput);
+
+    res.send(posts);
   } catch (e) {
     console.error(e);
     res

@@ -3,11 +3,14 @@ import { ObjectId, WithId } from "mongodb";
 import { postCollection } from "../../db/mongo.db";
 
 import { PostQueryInput } from "../types/post-query.input";
+import {mapToPostViewModel} from "../mappers/map-to-post-view-model.util";
+import {mapToPostListPaginatedOutput} from "../mappers/map-to-post-list-paginated-output.util";
+import {postViewModel} from "../types/post-view-model";
 
 export const postsQueryRepository = {
   async findAllPosts(
     queryDto: PostQueryInput,
-  ): Promise<{ items: WithId<Post>[]; totalCount: number }> {
+  ): Promise<{ items: postViewModel[]; totalCount: number }> {
     const { pageNumber, pageSize, sortBy, sortDirection } = queryDto;
     const skip = (pageNumber - 1) * pageSize;
     const filter: any = {};
@@ -26,14 +29,22 @@ export const postsQueryRepository = {
       .limit(+pageSize)
       .toArray();
     const totalCount = await postCollection.countDocuments(filter);
-    return { items, totalCount };
+    return mapToPostListPaginatedOutput(items, {
+      pageNumber: +pageNumber,
+      pageSize: +pageSize,
+      totalCount,
+    });
   },
 
   async findPostById(id: string) {
     if (!ObjectId.isValid(id)) {
       return null;
     }
-    return await postCollection.findOne({ _id: new ObjectId(id) });
+    const post = await postCollection.findOne({ _id: new ObjectId(id) });
+    if (!post) {
+      return null;
+    }
+    return mapToPostViewModel(post)
   },
   async findAllPostsByBlogId(queryDto: PostQueryInput, blogId: string) {
     const { pageNumber, pageSize, sortBy, sortDirection } = queryDto;
@@ -49,6 +60,10 @@ export const postsQueryRepository = {
           .toArray(),
       postCollection.countDocuments(filter),
     ]);
-    return { items, totalCount };
+    return mapToPostListPaginatedOutput(items, {
+      pageNumber: +pageNumber,
+      pageSize: +pageSize,
+      totalCount,
+    });
   },
 };

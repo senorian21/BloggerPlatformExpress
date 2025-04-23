@@ -26,7 +26,7 @@ export async function updatePostHandler(req: Request, res: Response) {
     title: req.body.title,
     shortDescription: req.body.shortDescription,
     content: req.body.content,
-    blogId: blog._id.toString(),
+    blogId: blog.id.toString(),
     blogName: blog.name,
   };
 

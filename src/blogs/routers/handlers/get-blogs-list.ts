@@ -22,13 +22,9 @@ export async function getBlogsListHandler(
         req.query.sortDirection || paginationAndSortingDefault.sortDirection,
       searchNameTerm: req.query.searchNameTerm || "",
     };
-    const { items, totalCount } =
+    const blogsListOutput =
       await blogsQueryRepositories.findAllBlogs(queryInput);
-    const blogsListOutput = mapToBlogListPaginatedOutput(items, {
-      pageNumber: +queryInput.pageNumber,
-      pageSize: +queryInput.pageSize,
-      totalCount,
-    });
+
     res.send(blogsListOutput);
   } catch (e) {
     console.error(e);

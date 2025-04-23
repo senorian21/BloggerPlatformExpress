@@ -38,18 +38,13 @@ export async function getBlogPostsListHandler(
         paginationAndSortingDefault.sortDirection,
     };
 
-    const { items, totalCount } = await postsQueryRepository.findAllPostsByBlogId(
+    const postsByBlog = await postsQueryRepository.findAllPostsByBlogId(
       queryInput,
       idBlog,
     );
 
-    const postListOutput = mapToPostListPaginatedOutput(items, {
-      pageNumber: queryInput.pageNumber,
-      pageSize: queryInput.pageSize,
-      totalCount,
-    });
 
-    res.send(postListOutput);
+    res.send(postsByBlog);
   } catch (err) {
     console.error("Error fetching blog posts:", err);
     res.status(HttpStatus.InternalServerError).json({

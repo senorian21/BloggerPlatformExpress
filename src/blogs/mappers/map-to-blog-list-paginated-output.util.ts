@@ -13,7 +13,7 @@ export function mapToBlogListPaginatedOutput(
   items: blogViewModel[];
 } {
   return {
-    pagesCount: Math.ceil(meta.totalCount / meta.pageSize), // Переименовано из pageCount
+    pagesCount: Math.ceil(meta.totalCount / meta.pageSize),
     page: meta.pageNumber,
     pageSize: meta.pageSize,
     totalCount: meta.totalCount,

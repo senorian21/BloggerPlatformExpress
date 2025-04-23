@@ -1,7 +1,5 @@
 import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/types/http-statuses";
-import { mapToPostViewModel } from "../../mappers/map-to-post-view-model.util";
-import { postsService } from "../../application/posts.service";
 import {postsQueryRepository} from "../../repositories/posts.queryRepository";
 
 export async function getPostHandler(req: Request, res: Response) {
@@ -13,6 +11,5 @@ export async function getPostHandler(req: Request, res: Response) {
     return;
   }
 
-  const postViewModel = mapToPostViewModel(post);
-  res.status(HttpStatus.Ok).send(postViewModel);
+  res.status(HttpStatus.Ok).send(post);
 }
