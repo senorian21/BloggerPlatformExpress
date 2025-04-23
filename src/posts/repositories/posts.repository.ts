@@ -2,7 +2,7 @@ import { Post } from "../../posts/types/post";
 import { ObjectId, WithId } from "mongodb";
 import { postCollection } from "../../db/mongo.db";
 
-import { PostQueryInput } from "../types/post-query.input";
+
 
 export const postsRepository = {
 
