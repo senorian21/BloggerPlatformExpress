@@ -1,28 +1,18 @@
 import { Post } from "../../posts/types/post";
-import {ObjectId, WithId} from "mongodb";
+import { ObjectId, WithId } from "mongodb";
 import { postsRepository } from "../repositories/posts.repository";
 import { PostInput } from "../dto/post.input-dto";
 import { blogsService } from "../../blogs/application/blogs.service";
 import { PostQueryInput } from "../types/post-query.input";
+import { blogsQueryRepositories } from "../../blogs/repositories/blogs.queryRepository";
 
 export const postsService = {
-  async findAllPosts(
-    queryDto: PostQueryInput,
-  ): Promise<{ items: WithId<Post>[]; totalCount: number }> {
-    return postsRepository.findAllPosts(queryDto);
-  },
 
-  async findPostById(id: string) {
-    if(!ObjectId.isValid(id)) {
-      return null
-    }
-    return postsRepository.findPostById(id);
-  },
 
   async createPost(dto: PostInput) {
     const blogId = dto.blogId;
 
-    const blog = await blogsService.findById(blogId);
+    const blog = await blogsQueryRepositories.findById(blogId);
     if (!blog) {
       return null;
     }
@@ -47,7 +37,5 @@ export const postsService = {
     await postsRepository.deletePost(id);
   },
 
-  async findAllPostsByBlogId(queryDto: PostQueryInput, blogId: string) {
-    return postsRepository.findAllPostsByBlogId(queryDto, blogId);
-  },
+
 };

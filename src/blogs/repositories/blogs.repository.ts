@@ -36,6 +36,9 @@ export const blogsRepositories = {
   },
 
   async findById(id: string): Promise<WithId<Blog> | null> {
+    if (!ObjectId.isValid(id)) {
+      return null;
+    }
     return blogCollection.findOne({ _id: new ObjectId(id) });
   },
 

@@ -1,6 +1,5 @@
 import { param } from "express-validator";
 
-
 export const idValidationPosts = param("id")
   .exists()
   .withMessage("ID is required")
@@ -9,5 +8,4 @@ export const idValidationPosts = param("id")
   .isLength({ min: 1 })
   .withMessage("ID must not be empty")
   .isMongoId()
-  .withMessage("Incorrect format of ObjectId")
-
+  .withMessage("Incorrect format of ObjectId");

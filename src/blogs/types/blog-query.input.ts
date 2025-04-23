@@ -3,5 +3,5 @@ import { BlogSortField } from "../../core/middlewares/validation/query-paginatio
 
 export type BlogsQueryInput = PaginationAndSorting<BlogSortField> &
   Partial<{
-      searchNameTerm: string;
+    searchNameTerm: string;
   }>;

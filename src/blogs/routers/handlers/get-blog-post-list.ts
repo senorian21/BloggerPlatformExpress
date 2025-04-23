@@ -3,43 +3,51 @@ import { postsService } from "../../../posts/application/posts.service";
 import { PostQueryInput } from "../../../posts/types/post-query.input";
 import {
   paginationAndSortingDefault,
-  PostSortField
+  PostSortField,
 } from "../../../core/middlewares/validation/query-pagination-sorting.validation-middleware";
 import { mapToPostListPaginatedOutput } from "../../../posts/mappers/map-to-post-list-paginated-output.util";
 import { HttpStatus } from "../../../core/types/http-statuses";
-
-
-import {SortDirection} from "../../../core/types/sort-direction";
-import {blogsService} from "../../application/blogs.service"; // Предполагается, что такой файл существует
+import { SortDirection } from "../../../core/types/sort-direction";
+import { blogsQueryRepositories } from "../../repositories/blogs.queryRepository";
+import {postsQueryRepository} from "../../../posts/repositories/posts.queryRepository"; // Предполагается, что такой файл существует
 
 export async function getBlogPostsListHandler(
-    req: Request<{ blogId: string }, {}, PostQueryInput>,
-    res: Response,
+  req: Request<{ blogId: string }, {}, PostQueryInput>,
+  res: Response,
 ) {
   try {
     const idBlog = req.params.blogId;
-    const blog = await blogsService.findById(idBlog);
+    const blog = await blogsQueryRepositories.findById(idBlog);
     if (!blog) {
-      res.sendStatus(HttpStatus.NotFound)
-      return
+      res.sendStatus(HttpStatus.NotFound);
+      return;
     }
     const queryInput: PostQueryInput = {
       ...paginationAndSortingDefault,
-      pageNumber: parseInt(req.query.pageNumber as string, 10) || paginationAndSortingDefault.pageNumber,
-      pageSize: parseInt(req.query.pageSize as string, 10) || paginationAndSortingDefault.pageSize,
-      sortBy: (req.query.sortBy as PostSortField) || paginationAndSortingDefault.sortBy,
-      sortDirection: (req.query.sortDirection as SortDirection) || paginationAndSortingDefault.sortDirection,
+      pageNumber:
+        parseInt(req.query.pageNumber as string, 10) ||
+        paginationAndSortingDefault.pageNumber,
+      pageSize:
+        parseInt(req.query.pageSize as string, 10) ||
+        paginationAndSortingDefault.pageSize,
+      sortBy:
+        (req.query.sortBy as PostSortField) ||
+        paginationAndSortingDefault.sortBy,
+      sortDirection:
+        (req.query.sortDirection as SortDirection) ||
+        paginationAndSortingDefault.sortDirection,
     };
 
-
-    const { items, totalCount } = await postsService.findAllPostsByBlogId(queryInput, idBlog);
+    const { items, totalCount } = await postsQueryRepository.findAllPostsByBlogId(
+      queryInput,
+      idBlog,
+    );
 
     const postListOutput = mapToPostListPaginatedOutput(items, {
       pageNumber: queryInput.pageNumber,
       pageSize: queryInput.pageSize,
       totalCount,
     });
-
 
     res.send(postListOutput);
   } catch (err) {

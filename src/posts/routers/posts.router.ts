@@ -21,7 +21,6 @@ postsRouter.get(
 
 postsRouter.get(
   "/:id",
-  idValidationPosts,
   inputValidationResultMiddleware,
   getPostHandler,
 );

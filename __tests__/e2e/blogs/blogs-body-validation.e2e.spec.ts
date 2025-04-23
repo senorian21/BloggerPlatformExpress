@@ -59,12 +59,10 @@ describe("Blogs API validation", () => {
         ...correctTestBlogData,
         name: "123",
         description: "",
-
       })
       .expect(HttpStatus.BadRequest);
 
     expect(invalidDataSet3.body.errorsMessages).toHaveLength(1);
-
 
     const blogListResponse = await request(app).get(BLOGS_PATH);
     expect(blogListResponse.body.items).toHaveLength(0);

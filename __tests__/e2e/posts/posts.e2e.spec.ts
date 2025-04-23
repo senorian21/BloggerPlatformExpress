@@ -99,13 +99,9 @@ describe("Posts API", () => {
     await createPost(app, newPost);
     await createPost(app, newPost);
 
-
     const postsList = await request(app).get(POSTS_PATH).expect(HttpStatus.Ok);
 
-
-
     expect(postsList.body.items).toBeInstanceOf(Array);
-
   });
 
   it("should update blogs; PUT /posts/:id", async () => {

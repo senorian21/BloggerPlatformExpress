@@ -4,6 +4,7 @@ import { postsService } from "../../application/posts.service";
 import { paginationAndSortingDefault } from "../../../core/middlewares/validation/query-pagination-sorting.validation-middleware";
 import { PostQueryInput } from "../../types/post-query.input";
 import { mapToPostListPaginatedOutput } from "../../mappers/map-to-post-list-paginated-output.util";
+import {postsQueryRepository} from "../../repositories/posts.queryRepository";
 
 export async function getPostsListHandler(
   req: Request<{}, {}, {}, PostQueryInput>,
@@ -14,7 +15,7 @@ export async function getPostsListHandler(
       ...paginationAndSortingDefault,
       ...req.query,
     };
-    const { items, totalCount } = await postsService.findAllPosts(queryInput);
+    const { items, totalCount } = await postsQueryRepository.findAllPosts(queryInput);
     const postListOutput = mapToPostListPaginatedOutput(items, {
       pageNumber: +queryInput.pageNumber,
       pageSize: +queryInput.pageSize,

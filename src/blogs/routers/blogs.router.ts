@@ -23,20 +23,9 @@ blogsRouter.get(
   getBlogsListHandler,
 );
 
-blogsRouter.get(
-  "/:blogId",
-  idValidationBlogs,
-  inputValidationResultMiddleware,
-  getBlogHandler,
-);
+blogsRouter.get("/:blogId", getBlogHandler);
 
-blogsRouter.delete(
-  "/:blogId",
-  idValidationBlogs,
-  superAdminGuardMiddleware,
-  inputValidationResultMiddleware,
-  deleteBlogHandler,
-);
+blogsRouter.delete("/:blogId", superAdminGuardMiddleware, deleteBlogHandler);
 
 blogsRouter.post(
   "",
@@ -57,7 +46,7 @@ blogsRouter.put(
 
 blogsRouter.get(
   "/:blogId/posts",
-   paginationAndSortingValidation(),
+  paginationAndSortingValidation(),
   inputValidationResultMiddleware,
   getBlogPostsListHandler,
 );

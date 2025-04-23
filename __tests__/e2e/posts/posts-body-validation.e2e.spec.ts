@@ -10,7 +10,7 @@ import { BLOGS_PATH, POSTS_PATH } from "../../../src/core/paths/paths";
 import { clearDb } from "../utils/clear-db";
 import { BlogInput } from "../../../src/blogs/dto/blog.input-dto";
 import { runDb } from "../../../src/db/mongo.db";
-import {generateBasicAuthToken} from "../utils/generate-admin-auth-token";
+import { generateBasicAuthToken } from "../utils/generate-admin-auth-token";
 
 describe("Posts API", () => {
   const app = express();
@@ -63,7 +63,6 @@ describe("Posts API", () => {
 
     expect(createPostResponse.body.errorsMessages).toHaveLength(1);
 
-
     const newPost1: PostInput = {
       ...testPostData,
       title: "  ",
@@ -71,12 +70,11 @@ describe("Posts API", () => {
     };
 
     const createPostResponse1 = await request(app)
-        .post(POSTS_PATH)
-        .set("Authorization", adminToken)
-        .send(newPost1)
-        .expect(HttpStatus.BadRequest);
+      .post(POSTS_PATH)
+      .set("Authorization", adminToken)
+      .send(newPost1)
+      .expect(HttpStatus.BadRequest);
 
-    expect(createPostResponse1.body.errorsMessages).toHaveLength(2)
-
+    expect(createPostResponse1.body.errorsMessages).toHaveLength(2);
   });
 });

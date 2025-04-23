@@ -4,6 +4,7 @@ import { blogsService } from "../../application/blogs.service";
 import { BlogsQueryInput } from "../../types/blog-query.input";
 import { mapToBlogListPaginatedOutput } from "../../mappers/map-to-blog-list-paginated-output.util";
 import { paginationAndSortingDefault } from "../../../core/middlewares/validation/query-pagination-sorting.validation-middleware";
+import { blogsQueryRepositories } from "../../repositories/blogs.queryRepository";
 
 export async function getBlogsListHandler(
   req: Request<{}, {}, {}, BlogsQueryInput>,
@@ -12,13 +13,17 @@ export async function getBlogsListHandler(
   try {
     const queryInput: BlogsQueryInput = {
       ...paginationAndSortingDefault,
-      pageNumber: Number(req.query.pageNumber) || paginationAndSortingDefault.pageNumber,
-      pageSize: Number(req.query.pageSize) || paginationAndSortingDefault.pageSize,
+      pageNumber:
+        Number(req.query.pageNumber) || paginationAndSortingDefault.pageNumber,
+      pageSize:
+        Number(req.query.pageSize) || paginationAndSortingDefault.pageSize,
       sortBy: req.query.sortBy || paginationAndSortingDefault.sortBy,
-      sortDirection: req.query.sortDirection || paginationAndSortingDefault.sortDirection,
+      sortDirection:
+        req.query.sortDirection || paginationAndSortingDefault.sortDirection,
       searchNameTerm: req.query.searchNameTerm || "",
     };
-    const { items, totalCount } = await blogsService.findMany(queryInput);
+    const { items, totalCount } =
+      await blogsQueryRepositories.findAllBlogs(queryInput);
     const blogsListOutput = mapToBlogListPaginatedOutput(items, {
       pageNumber: +queryInput.pageNumber,
       pageSize: +queryInput.pageSize,
