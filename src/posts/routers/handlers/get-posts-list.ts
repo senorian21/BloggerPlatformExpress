@@ -1,9 +1,7 @@
 import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/types/http-statuses";
-import { postsService } from "../../application/posts.service";
 import { paginationAndSortingDefault } from "../../../core/middlewares/validation/query-pagination-sorting.validation-middleware";
 import { PostQueryInput } from "../../types/post-query.input";
-import { mapToPostListPaginatedOutput } from "../../mappers/map-to-post-list-paginated-output.util";
 import {postsQueryRepository} from "../../repositories/posts.queryRepository";
 
 export async function getPostsListHandler(

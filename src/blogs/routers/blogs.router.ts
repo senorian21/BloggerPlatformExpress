@@ -37,7 +37,6 @@ blogsRouter.post(
 
 blogsRouter.put(
   "/:blogId",
-  idValidationBlogs,
   superAdminGuardMiddleware,
   blogsInputDtoValidation,
   inputValidationResultMiddleware,

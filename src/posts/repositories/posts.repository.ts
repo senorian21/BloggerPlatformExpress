@@ -8,7 +8,7 @@ export const postsRepository = {
 
   async createPost(newPost: Post) {
     const result = await postCollection.insertOne(newPost);
-    return { ...newPost, _id: result.insertedId };
+    return result.insertedId.toString()
   },
 
   async updatePost(id: string, dto: Post) {

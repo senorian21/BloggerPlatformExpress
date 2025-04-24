@@ -4,6 +4,7 @@ import { mapToPostViewModel } from "../../../posts/mappers/map-to-post-view-mode
 import { postsService } from "../../../posts/application/posts.service";
 import { PostInput } from "../../../posts/dto/post.input-dto";
 import { blogsQueryRepositories } from "../../repositories/blogs.queryRepository";
+import {postsQueryRepository} from "../../../posts/repositories/posts.queryRepository";
 
 export async function createPostByBlogHandler(
   req: Request<{ blogId: string }>,
@@ -19,10 +20,14 @@ export async function createPostByBlogHandler(
     blogId: idBlog,
   };
 
-  const createdPosts = await postsService.createPost(postInput);
-  if (createdPosts) {
-    const postViewModel = mapToPostViewModel(createdPosts);
-    res.status(HttpStatus.Created).send(postViewModel);
+  const createdPostsId = await postsService.createPost(postInput);
+  if (!createdPostsId) {
+    res.sendStatus(HttpStatus.NotFound);
+    return;
+  }
+  const newPostByBlog = await postsQueryRepository.findPostById(createdPostsId)
+  if (newPostByBlog) {
+    res.status(HttpStatus.Created).send(newPostByBlog);
   } else {
     res.sendStatus(HttpStatus.NotFound);
   }
