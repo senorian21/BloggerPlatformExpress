@@ -20,6 +20,9 @@ export enum BlogSortField {
 export enum PostSortField {
   CreatedAt = "createdAt",
 }
+export enum UserSortField {
+  CreatedAt = "createdAt",
+}
 
 const allowedSortFields = Object.values(BlogSortField);
 

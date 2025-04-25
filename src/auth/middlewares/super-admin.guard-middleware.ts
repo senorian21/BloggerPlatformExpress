@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { HttpStatus } from "../../core/types/http-statuses";
+import { userQueryInput } from "../../users/types/user-query.input";
 
 // process - это глобальный объект в Node.js, который предоставляет информацию о текущем процессе Node.js
 // env — это объект, который хранит все переменные окружения текущего процесса. Переменные окружения — это значения,
@@ -9,7 +10,7 @@ export const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "admin";
 export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "qwerty";
 
 export const superAdminGuardMiddleware = (
-  req: Request,
+  req: Request<{}, {}, {}, {}>,
   res: Response,
   next: NextFunction,
 ) => {

@@ -1,15 +1,10 @@
 import { Post } from "../../posts/types/post";
-import { ObjectId, WithId } from "mongodb";
 import { postsRepository } from "../repositories/posts.repository";
 import { PostInput } from "../dto/post.input-dto";
-import { blogsService } from "../../blogs/application/blogs.service";
-import { PostQueryInput } from "../types/post-query.input";
 import { blogsQueryRepositories } from "../../blogs/repositories/blogs.queryRepository";
-import {postsQueryRepository} from "../repositories/posts.queryRepository";
+import { postsQueryRepository } from "../repositories/posts.queryRepository";
 
 export const postsService = {
-
-
   async createPost(dto: PostInput) {
     const blogId = dto.blogId;
 
@@ -51,12 +46,10 @@ export const postsService = {
     };
 
     await postsRepository.updatePost(id, postUpdated);
-    return postUpdated
+    return postUpdated;
   },
 
   async deletePost(id: string) {
     await postsRepository.deletePost(id);
   },
-
-
 };

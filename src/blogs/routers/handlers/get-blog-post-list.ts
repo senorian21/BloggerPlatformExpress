@@ -9,7 +9,7 @@ import { mapToPostListPaginatedOutput } from "../../../posts/mappers/map-to-post
 import { HttpStatus } from "../../../core/types/http-statuses";
 import { SortDirection } from "../../../core/types/sort-direction";
 import { blogsQueryRepositories } from "../../repositories/blogs.queryRepository";
-import {postsQueryRepository} from "../../../posts/repositories/posts.queryRepository"; // Предполагается, что такой файл существует
+import { postsQueryRepository } from "../../../posts/repositories/posts.queryRepository"; // Предполагается, что такой файл существует
 
 export async function getBlogPostsListHandler(
   req: Request<{ blogId: string }, {}, PostQueryInput>,
@@ -42,7 +42,6 @@ export async function getBlogPostsListHandler(
       queryInput,
       idBlog,
     );
-
 
     res.send(postsByBlog);
   } catch (err) {

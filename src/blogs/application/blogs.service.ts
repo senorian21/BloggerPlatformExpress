@@ -1,6 +1,6 @@
 import { Blog } from "../types/blog";
 import { blogsRepositories } from "../repositories/blogs.repository";
-import {BlogInput} from "../dto/blog.input-dto";
+import { BlogInput } from "../dto/blog.input-dto";
 
 export const blogsService = {
   async createBlog(dto: Blog) {

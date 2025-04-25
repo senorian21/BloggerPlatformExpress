@@ -4,12 +4,9 @@ import { ObjectId, WithId } from "mongodb";
 import { BlogsQueryInput } from "../types/blog-query.input";
 
 export const blogsRepositories = {
-
-
-
   async createBlog(newBlog: Blog) {
     const result = await blogCollection.insertOne(newBlog);
-    return result.insertedId.toString()
+    return result.insertedId.toString();
   },
 
   async updateBlog(id: string, dto: Blog) {

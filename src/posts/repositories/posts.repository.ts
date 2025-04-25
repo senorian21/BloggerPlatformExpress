@@ -2,13 +2,10 @@ import { Post } from "../../posts/types/post";
 import { ObjectId, WithId } from "mongodb";
 import { postCollection } from "../../db/mongo.db";
 
-
-
 export const postsRepository = {
-
   async createPost(newPost: Post) {
     const result = await postCollection.insertOne(newPost);
-    return result.insertedId.toString()
+    return result.insertedId.toString();
   },
 
   async updatePost(id: string, dto: Post) {
@@ -37,6 +34,4 @@ export const postsRepository = {
       throw new Error("Post not exist");
     }
   },
-
-
 };

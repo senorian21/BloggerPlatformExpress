@@ -3,7 +3,6 @@ import { HttpStatus } from "../../../core/types/http-statuses";
 import { Post } from "../../../posts/types/post";
 import { postsService } from "../../application/posts.service";
 
-
 export async function updatePostHandler(req: Request, res: Response) {
   const id = req.params.id;
 

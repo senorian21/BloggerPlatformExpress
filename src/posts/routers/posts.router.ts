@@ -19,11 +19,7 @@ postsRouter.get(
   getPostsListHandler,
 );
 
-postsRouter.get(
-  "/:id",
-  inputValidationResultMiddleware,
-  getPostHandler,
-);
+postsRouter.get("/:id", inputValidationResultMiddleware, getPostHandler);
 
 postsRouter.delete(
   "/:id",
