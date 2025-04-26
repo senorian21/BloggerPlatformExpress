@@ -5,6 +5,14 @@ import { userRepository } from "../repositories/users.repository";
 
 export const userService = {
   async createUser(dto: UserInput): Promise<string> {
+    const isLoginUnique = await userRepository.isLoginUnique(dto.login);
+    if (!isLoginUnique) {
+      return "email or login";
+    }
+    const isEmailUnique = await userRepository.isEmailUnique(dto.email);
+    if (!isEmailUnique) {
+      return "email or login";
+    }
     const hashedPassword: string = await argon2.hash(dto.password);
 
     const newUser: User = {

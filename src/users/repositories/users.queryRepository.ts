@@ -1,4 +1,4 @@
-import { ObjectId} from "mongodb";
+import { ObjectId } from "mongodb";
 import { userCollection } from "../../db/mongo.db";
 import { mapToUserViewModel } from "../mappers/map-to-user-view-model.util";
 import { userQueryInput } from "../types/user-query.input";
@@ -7,7 +7,7 @@ import { mapToUserListPaginatedOutput } from "../mappers/map-to-user-list-pagina
 
 export const userQueryRepository = {
   async findAllUser(
-      queryDto: userQueryInput,
+    queryDto: userQueryInput,
   ): Promise<{ items: userViewModel[]; totalCount: number }> {
     const {
       pageNumber,
@@ -36,11 +36,11 @@ export const userQueryRepository = {
     }
 
     const items = await userCollection
-        .find(filter)
-        .sort({ [sortBy]: sortDirection })
-        .skip(skip)
-        .limit(+pageSize)
-        .toArray();
+      .find(filter)
+      .sort({ [sortBy]: sortDirection })
+      .skip(skip)
+      .limit(+pageSize)
+      .toArray();
 
     const totalCount = await userCollection.countDocuments(filter);
     return mapToUserListPaginatedOutput(items, {

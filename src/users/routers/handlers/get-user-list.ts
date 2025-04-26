@@ -5,19 +5,19 @@ import { userQueryInput } from "../../types/user-query.input";
 import { userQueryRepository } from "../../repositories/users.queryRepository";
 
 export async function getUsersListHandler(
-    req: Request<{}, {}, {}, userQueryInput>,
-    res: Response,
+  req: Request<{}, {}, {}, userQueryInput>,
+  res: Response,
 ) {
   try {
     const queryInput: userQueryInput = {
       ...paginationAndSortingDefault,
       pageNumber:
-          Number(req.query.pageNumber) || paginationAndSortingDefault.pageNumber,
+        Number(req.query.pageNumber) || paginationAndSortingDefault.pageNumber,
       pageSize:
-          Number(req.query.pageSize) || paginationAndSortingDefault.pageSize,
+        Number(req.query.pageSize) || paginationAndSortingDefault.pageSize,
       sortBy: req.query.sortBy || paginationAndSortingDefault.sortBy,
       sortDirection:
-          req.query.sortDirection || paginationAndSortingDefault.sortDirection,
+        req.query.sortDirection || paginationAndSortingDefault.sortDirection,
       searchLoginTerm: req.query.searchLoginTerm || "",
       searchEmailTerm: req.query.searchEmailTerm || "",
     };
@@ -27,7 +27,7 @@ export async function getUsersListHandler(
   } catch (e) {
     console.error(e);
     res
-        .status(HttpStatus.InternalServerError)
-        .json({ message: "Ошибка при получении списка пользователей" });
+      .status(HttpStatus.InternalServerError)
+      .json({ message: "Ошибка при получении списка пользователей" });
   }
 }
