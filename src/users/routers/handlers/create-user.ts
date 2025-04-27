@@ -10,7 +10,9 @@ export async function createUserHandler(req: Request, res: Response) {
     return;
   } else if (createdUserId === "email or login") {
     res.status(HttpStatus.BadRequest).json({
-      errorsMessages: [{ field: 'email or login', message: 'email or login is not correct' }],
+      errorsMessages: [
+        { field: "email or login", message: "email or login is not correct" },
+      ],
     });
   }
   const createdUser = await userQueryRepository.findUserById(createdUserId);
