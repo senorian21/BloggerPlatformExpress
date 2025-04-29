@@ -1,4 +1,4 @@
-import {UserInput} from "../../../src/users/dto/user.input-dto";
+import {UserInput} from "../../../../src/users/dto/user.input-dto";
 
 export function getUserDto ():UserInput{
     return {

@@ -1,7 +1,7 @@
 import {Express} from "express";
 import {UserInput} from "../../../../src/users/dto/user.input-dto";
 import {userViewModel} from "../../../../src/users/types/user-view-model";
-import {getUserDto} from "../../users/get-user-dto";
+import {getUserDto} from "./get-user-dto";
 import request from "supertest";
 import {USERS_PATH} from "../../../../src/core/paths/paths";
 import {generateBasicAuthToken} from "../generate-admin-auth-token";
@@ -17,11 +17,11 @@ export async function createUser(
     const testUserData = {...defaultUserData, ...userDto};
 
 
-    const createdBlogRespons = await request(app)
+    const createdUserRespons = await request(app)
         .post(USERS_PATH)
         .set("Authorization", generateBasicAuthToken())
         .send(testUserData)
         .expect(HttpStatus.Created)
 
-    return createdBlogRespons.body
+    return createdUserRespons.body
 }

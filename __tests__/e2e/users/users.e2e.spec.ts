@@ -3,7 +3,7 @@ import {setupApp} from "../../../src/setup-app";
 import {generateBasicAuthToken} from "../utils/generate-admin-auth-token";
 import {runDb} from "../../../src/db/mongo.db";
 import {clearDb} from "../utils/clear-db";
-import {getUserDto} from "./get-user-dto";
+import {getUserDto} from "../utils/users/get-user-dto";
 import {UserInput} from "../../../src/users/dto/user.input-dto";
 import {createUser} from "../utils/users/create-user";
 import request from "supertest";
@@ -90,6 +90,7 @@ describe("User API", () => {
 
         const user = await createUser(app, user1);
         await createUser(app, user2);
+
         await request(app)
             .delete(`${USERS_PATH}/${user.id}`)
             .set("Authorization", adminToken)
