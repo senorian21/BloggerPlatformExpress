@@ -23,7 +23,7 @@ describe("Blogs API", () => {
   const adminToken = generateBasicAuthToken();
 
   beforeAll(async () => {
-    await runDb("mongodb://localhost:27017/BloggerPlatform-test");
+    await runDb("mongodb://localhost:27017/BloggerPlatform");
     await clearDb(app);
   });
 
@@ -39,12 +39,26 @@ describe("Blogs API", () => {
   });
 
   it("should return blogs list ; GET /blogs", async () => {
+    await clearDb(app);
     await createBlog(app);
     await createBlog(app);
 
-    const response = await request(app).get(BLOGS_PATH).expect(HttpStatus.Ok);
+    const response = await request(app)
+        .get(BLOGS_PATH)
+        .query({
+          pageNumber: 1,
+          pageSize: 10,
+          sortBy: "createdAt",
+          sortDirection: "desc",
+        })
+        .expect(HttpStatus.Ok);
 
     expect(response.body.items).toBeInstanceOf(Array);
+    expect(response.body.items.length).toBe(2);
+
+    expect(response.body.page).toBe(1);
+    expect(response.body.pageSize).toBe(10);
+
   });
 
   it("should return blog by id; GET /blogs/:id", async () => {
@@ -112,7 +126,7 @@ describe("Blogs API", () => {
         sortBy: "createdAt",
         sortDirection: "desc",
       })
-      .expect(200);
+      .expect(HttpStatus.Ok);
 
     expect(response.body.items).toHaveLength(2);
     expect(response.body.totalCount).toBe(2);
