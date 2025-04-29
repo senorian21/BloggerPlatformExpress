@@ -17,7 +17,8 @@ export const userService = {
         { type: argon2.argon2id, timeCost: 3, parallelism: 1, memoryCost: 65536 });
 
     /*
-    type: argon2.argon2id, // Тип Argon2 (рекомендуется argon2id)
+    свойтва для argon2
+            type: argon2.argon2id, // Тип Argon2 (рекомендуется argon2id)
             memoryCost: 65536,    // 64 MB памяти
             timeCost: 3,          // 3 раунда
             parallelism: 1,       // 1 поток
