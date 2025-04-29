@@ -1,6 +1,6 @@
 import { userCollection } from "../../db/mongo.db";
 import { User } from "../types/user";
-import { ObjectId } from "mongodb";
+import {ObjectId, WithId} from "mongodb";
 
 export const userRepository = {
   async isLoginUnique(login: string): Promise<boolean> {
@@ -25,4 +25,12 @@ export const userRepository = {
       throw new Error("Post not exist");
     }
   },
+  async findByLoginOrEmail(
+      loginOrEmail: string,
+  ): Promise<WithId<User> | null> {
+    const user = await userCollection.findOne({
+      $or: [{ email: loginOrEmail }, { login: loginOrEmail }],
+    });
+    return user;
+  }
 };
