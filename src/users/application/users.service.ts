@@ -4,14 +4,10 @@ import { User } from "../types/user";
 import { userRepository } from "../repositories/users.repository";
 
 export const userService = {
-  async createUser(dto: UserInput): Promise<string> {
-    const isLoginUnique = await userRepository.isLoginUnique(dto.login);
-    if (!isLoginUnique) {
-      return "email or login";
-    }
-    const isEmailUnique = await userRepository.isEmailUnique(dto.email);
-    if (!isEmailUnique) {
-      return "email or login";
+  async createUser(dto: UserInput): Promise<string | null> {
+    const isEmailAndLoginUnique = await userRepository.isEmailAndLoginUnique(dto.email, dto.login);
+    if (isEmailAndLoginUnique) {
+      return null;
     }
     const hashedPassword: string = await argon2.hash(dto.password,
         { type: argon2.argon2id, timeCost: 3, parallelism: 1, memoryCost: 65536 });

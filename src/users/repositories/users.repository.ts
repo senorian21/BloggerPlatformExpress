@@ -3,14 +3,12 @@ import { User } from "../types/user";
 import {ObjectId, WithId} from "mongodb";
 
 export const userRepository = {
-  async isLoginUnique(login: string): Promise<boolean> {
-    const user = await userCollection.findOne({ login });
-    return !user;
-  },
 
-  async isEmailUnique(email: string): Promise<boolean> {
-    const user = await userCollection.findOne({ email });
-    return !user;
+  async isEmailAndLoginUnique(email: string, login:string) {
+    const user = await userCollection.findOne({
+      $or: [{ email: email }, { login: login }],
+    });
+    return user;
   },
   async createUser(newUser: User) {
     const result = await userCollection.insertOne(newUser);

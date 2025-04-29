@@ -8,7 +8,7 @@ export async function createUserHandler(req: Request, res: Response) {
   if (!createdUserId) {
     res.sendStatus(HttpStatus.NotFound);
     return;
-  } else if (createdUserId === "email or login") {
+  } else if (!createdUserId) {
     res.status(HttpStatus.BadRequest).json({
       errorsMessages: [
         { field: "email or login", message: "email or login is not correct" },
