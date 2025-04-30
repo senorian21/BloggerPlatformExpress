@@ -2,16 +2,16 @@ import express from "express";
 import { setupApp } from "./setup-app";
 
 import { runDb } from "./db/mongo.db";
-import {appConfig, SETTINGS} from "./core/settings/settings";
+import {appConfig} from "./core/settings/settings";
 
 const bootstrap = async () => {
   const app = express();
   setupApp(app);
 
   // порт приложения
-  const PORT = SETTINGS.PORT;
+  const PORT = appConfig.PORT;
 
-  await runDb(SETTINGS.MONGO_URI);
+  await runDb(appConfig.MONGO_URI);
 
   // запуск приложения
   app.listen(PORT, () => {
