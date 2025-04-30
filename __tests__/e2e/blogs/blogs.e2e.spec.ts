@@ -44,21 +44,20 @@ describe("Blogs API", () => {
     await createBlog(app);
 
     const response = await request(app)
-        .get(BLOGS_PATH)
-        .query({
-          pageNumber: 1,
-          pageSize: 10,
-          sortBy: "createdAt",
-          sortDirection: "desc",
-        })
-        .expect(HttpStatus.Ok);
+      .get(BLOGS_PATH)
+      .query({
+        pageNumber: 1,
+        pageSize: 10,
+        sortBy: "createdAt",
+        sortDirection: "desc",
+      })
+      .expect(HttpStatus.Ok);
 
     expect(response.body.items).toBeInstanceOf(Array);
     expect(response.body.items.length).toBe(2);
 
     expect(response.body.page).toBe(1);
     expect(response.body.pageSize).toBe(10);
-
   });
 
   it("should return blog by id; GET /blogs/:id", async () => {

@@ -2,25 +2,20 @@ import { UserInput } from "../dto/user.input-dto";
 import argon2 from "argon2";
 import { User } from "../types/user";
 import { userRepository } from "../repositories/users.repository";
+import { argon2Service } from "../../auth/adapters/argon2.service";
 
 export const userService = {
   async createUser(dto: UserInput): Promise<string | null> {
-    const isEmailAndLoginUnique = await userRepository.isEmailAndLoginUnique(dto.email, dto.login);
+    const isEmailAndLoginUnique = await userRepository.isEmailAndLoginUnique(
+      dto.email,
+      dto.login,
+    );
     if (isEmailAndLoginUnique) {
       return null;
     }
-    const hashedPassword: string = await argon2.hash(dto.password,
-        { type: argon2.argon2id, timeCost: 3, parallelism: 1, memoryCost: 65536 });
-
-    /*
-    свойтва для argon2
-            type: argon2.argon2id, // Тип Argon2 (рекомендуется argon2id)
-            memoryCost: 65536,    // 64 MB памяти
-            timeCost: 3,          // 3 раунда
-            parallelism: 1,       // 1 поток
-            saltLength: 16,       // Длина соли (по умолчанию 16 байт)
-            hashLength: 32,       // Длина хэша (по умолчанию 32 байта)
-    */
+    const hashedPassword: string = await argon2Service.generateHash(
+      dto.password,
+    );
 
     const newUser: User = {
       login: dto.login,
