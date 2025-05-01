@@ -32,9 +32,10 @@ export const authService = {
   },
 
   async checkUserCredentials(
-    loginOrEmail: string,
-    password: string,
+      loginOrEmail: string,
+      password: string,
   ): Promise<Result<WithId<User> | null>> {
+
     const user = await userRepository.findByLoginOrEmail(loginOrEmail);
 
     if (!user) {
@@ -42,26 +43,24 @@ export const authService = {
         status: ResultStatus.NotFound,
         data: null,
         errorMessage: "Not Found",
-        extensions: [{ field: "loginOrEmail", message: "Not Found" }],
+        extensions: [{field: "loginOrEmail", message: "Not Found"}],
       };
     }
-    const isPassCorrect = await argon2Service.checkPassword(
-      password,
-      user.password,
-    );
 
+    const isPassCorrect = await argon2Service.checkPassword(password, user.password);
     if (!isPassCorrect) {
       return {
         status: ResultStatus.Unauthorized,
         data: null,
         errorMessage: "Bad request",
-        extensions: [{ field: "password", message: "Wrong password" }],
+        extensions: [{field: "password", message: "Wrong password"}],
       };
     }
+
     return {
       status: ResultStatus.Success,
       data: user,
       extensions: [],
     };
-  },
+  }
 };

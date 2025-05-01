@@ -14,12 +14,13 @@ export async function loginizationHandler(
 
   const result = await authService.loginUser(loginOrEmail, password);
   if (result.status !== ResultStatus.Success) {
-    res
-      .status(resultCodeToHttpException(result.status))
-      .send(result.extensions);
-    return;
+    res.sendStatus(HttpStatus.Unauthorized)
   }
 
-  res.status(HttpStatus.Ok).send({ accessToken: result.data!.accessToken });
+  if (!result.data ) {
+    return res.sendStatus(HttpStatus.NotFound);
+  }
+
+  res.status(HttpStatus.Ok).send({ accessToken: result.data.accessToken });
   return;
 }
