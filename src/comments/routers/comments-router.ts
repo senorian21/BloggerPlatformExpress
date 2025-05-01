@@ -3,9 +3,3 @@ import { commentsInputDtoValidation } from "../validation/comments.input-dto.val
 import { inputValidationResultMiddleware } from "../../core/middlewares/validation/input-validtion-result.middleware";
 
 export const commentsRouter = Router({});
-
-commentsRouter.post(
-  " ",
-  commentsInputDtoValidation,
-  inputValidationResultMiddleware,
-);

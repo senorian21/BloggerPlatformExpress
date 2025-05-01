@@ -1,9 +1,12 @@
 export type comment = {
-  id: "string";
-  content: "string";
+  postId: string;
+  content: string;
   commentatorInfo: {
-    userId: "string";
-    userLogin: "string";
+    userId: string;
+    userLogin: string;
   };
-  createdAt: "string";
+  createdAt: string;
 };
+
+
+

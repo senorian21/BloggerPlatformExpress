@@ -7,7 +7,6 @@ import { argon2Service } from "../adapters/argon2.service";
 import { jwtService } from "../adapters/jwt.service";
 
 export const authService = {
-
   async loginUser(
     loginOrEmail: string,
     password: string,

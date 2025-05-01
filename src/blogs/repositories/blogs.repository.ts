@@ -1,7 +1,7 @@
 import { Blog } from "../types/blog";
 import { blogCollection } from "../../db/mongo.db";
 import { ObjectId, WithId } from "mongodb";
-import { BlogsQueryInput } from "../types/blog-query.input";
+
 
 export const blogsRepositories = {
   async createBlog(newBlog: Blog) {

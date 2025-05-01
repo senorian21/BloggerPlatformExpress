@@ -9,6 +9,9 @@ import { inputValidationResultMiddleware } from "../../core/middlewares/validati
 import { superAdminGuardMiddleware } from "../../auth/middlewares/super-admin.guard-middleware";
 import { idValidationPosts } from "../validation/posts-params-id.validation-middleware";
 import { paginationAndSortingValidation } from "../../core/middlewares/validation/query-pagination-sorting.validation-middleware";
+import { commentsInputDtoValidation } from "../../comments/validation/comments.input-dto.validation-middlewares";
+import { createCommentHandler } from "./handlers/create-comment-by-post";
+import {getPostCommentsListHandler} from "./handlers/find-all-comments-by-posts";
 
 export const postsRouter = Router({});
 
@@ -44,4 +47,19 @@ postsRouter.put(
   postsInputDtoValidation,
   inputValidationResultMiddleware,
   updatePostHandler,
+);
+
+postsRouter.post(
+  "/:postId/comments",
+  commentsInputDtoValidation,
+  inputValidationResultMiddleware,
+  createCommentHandler,
+);
+
+
+postsRouter.get(
+    "/:postId/comments",
+    paginationAndSortingValidation(),
+    inputValidationResultMiddleware,
+    getPostCommentsListHandler
 );

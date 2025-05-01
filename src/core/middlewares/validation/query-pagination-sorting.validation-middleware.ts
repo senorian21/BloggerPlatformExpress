@@ -13,7 +13,9 @@ export const paginationAndSortingDefault: PaginationAndSorting<string> = {
   sortBy: DEFAULT_SORT_BY,
   sortDirection: DEFAULT_SORT_DIRECTION,
 };
-
+export enum commentsSortField {
+  CreatedAt = "createdAt",
+}
 export enum BlogSortField {
   CreatedAt = "createdAt",
 }

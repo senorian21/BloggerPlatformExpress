@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { postsService } from "../../../posts/application/posts.service";
 import { PostQueryInput } from "../../../posts/types/post-query.input";
 import {
   paginationAndSortingDefault,
