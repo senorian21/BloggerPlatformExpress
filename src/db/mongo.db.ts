@@ -4,7 +4,7 @@ import { Post } from "../posts/types/post";
 
 import { User } from "../users/types/user";
 import { appConfig } from "../core/settings/settings";
-import {comment} from "../comments/types/comment";
+import { comment } from "../comments/types/comment";
 
 const BLOG_COLLECTION_NAME: string = "blog";
 const POST_COLLECTION_NAME: string = "post";

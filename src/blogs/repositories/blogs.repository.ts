@@ -2,7 +2,6 @@ import { Blog } from "../types/blog";
 import { blogCollection } from "../../db/mongo.db";
 import { ObjectId, WithId } from "mongodb";
 
-
 export const blogsRepositories = {
   async createBlog(newBlog: Blog) {
     const result = await blogCollection.insertOne(newBlog);

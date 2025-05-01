@@ -5,9 +5,12 @@ import { userQueryRepository } from "../../users/repositories/users.queryReposit
 import { comment } from "../types/comment";
 import { commentsRepositories } from "../repositories/comments.Repository";
 import { Result } from "../../core/result/result.type";
+import { commentsQueryRepositories } from "../repositories/comments.queryRepository";
+import { ObjectId } from "mongodb";
+import { commentCollection } from "../../db/mongo.db";
+import { mapToBlogViewModel } from "../mappers/map-to-comment-view-model";
 
-export async function accessTokenGuard(header: string ) {
-
+export async function accessTokenGuard(header: string) {
   if (!header) {
     return {
       status: ResultStatus.Unauthorized,
@@ -40,9 +43,7 @@ export async function accessTokenGuard(header: string ) {
       status: ResultStatus.Unauthorized,
       data: null,
       errorMessage: "Token is missing",
-      extensions: [
-        { field: "token", message: "Token is required" },
-      ],
+      extensions: [{ field: "token", message: "Token is required" }],
     };
   }
 
@@ -73,7 +74,7 @@ export async function accessTokenGuard(header: string ) {
 export const commentsService = {
   async createComment(
     dto: commentInput,
-    header: any,
+    header: string,
     postId: string,
   ): Promise<Result<string | null>> {
     const result = await accessTokenGuard(header);
@@ -112,4 +113,122 @@ export const commentsService = {
 
     return commentsRepositories.createComment(newComment);
   },
+
+  async updateComment(
+    idComment: string,
+    dto: commentInput,
+    header: string,
+  ): Promise<Result<string | null>> {
+    const result = await accessTokenGuard(header);
+
+    if (result.status !== ResultStatus.Success) {
+      return {
+        status: ResultStatus.Unauthorized,
+        data: null,
+        errorMessage: "Unauthorized",
+        extensions: [],
+      };
+    }
+
+    const userId = result.data?.userId;
+
+    if (!userId) {
+      return {
+        status: ResultStatus.Unauthorized,
+        data: null,
+        errorMessage: "User not found",
+        extensions: [
+          { field: "user", message: "User with the given ID does not exist" },
+        ],
+      };
+    }
+
+    const comment = await commentsRepositories.findCommentsById(idComment);
+
+    if (!comment) {
+      return {
+        status: ResultStatus.NotFound,
+        data: null,
+        errorMessage: "Comment not found",
+        extensions: [
+          { field: "comment", message: "No such comment was found." },
+        ],
+      };
+    }
+
+    if (comment.commentatorInfo.userId !== userId) {
+      return {
+        status: ResultStatus.Unauthorized,
+        data: null,
+        errorMessage: "Unauthorized to update this comment",
+        extensions: [
+          { field: "user", message: "You are not the owner of this comment" },
+        ],
+      };
+    }
+
+    const updatedComment: comment = {
+      postId: comment.postId,
+      content: dto.content,
+      commentatorInfo: {
+        userId: comment.commentatorInfo.userId,
+        userLogin: comment.commentatorInfo.userLogin,
+      },
+      createdAt: comment.createdAt,
+    };
+
+    return await commentsRepositories.updateComment(idComment, updatedComment);
+  },
+  async deleteComment(
+      idComment: string,
+      header: string,
+  ){
+    const result = await accessTokenGuard(header);
+    if (result.status !== ResultStatus.Success) {
+      return {
+        status: ResultStatus.Unauthorized,
+        data: null,
+        errorMessage: "Unauthorized",
+        extensions: [],
+      };
+    }
+
+    const userId = result.data?.userId;
+
+    if (!userId) {
+      return {
+        status: ResultStatus.Unauthorized,
+        data: null,
+        errorMessage: "User not found",
+        extensions: [
+          { field: "user", message: "User with the given ID does not exist" },
+        ],
+      };
+    }
+
+    const comment = await commentsRepositories.findCommentsById(idComment);
+
+    if (!comment) {
+      return {
+        status: ResultStatus.NotFound,
+        data: null,
+        errorMessage: "Comment not found",
+        extensions: [
+          { field: "comment", message: "No such comment was found." },
+        ],
+      };
+    }
+
+    if (comment.commentatorInfo.userId !== userId) {
+      return {
+        status: ResultStatus.Unauthorized,
+        data: null,
+        errorMessage: "Unauthorized to update this comment",
+        extensions: [
+          { field: "user", message: "You are not the owner of this comment" },
+        ],
+      };
+    }
+    return commentsRepositories.deleteComment(idComment)
+  }
 };

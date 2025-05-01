@@ -7,6 +7,3 @@ export type comment = {
   };
   createdAt: string;
 };
-
-
-

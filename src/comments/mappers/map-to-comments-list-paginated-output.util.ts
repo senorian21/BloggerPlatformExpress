@@ -1,10 +1,9 @@
 import { WithId } from "mongodb";
-import {comment} from "../types/comment";
-import {commentViewModel} from "../types/comment-view-model";
-
+import { comment } from "../types/comment";
+import { commentViewModel } from "../types/comment-view-model";
 
 export function mapToCommentsListPaginatedOutput(
-    comment: WithId<comment>[],
+  comment: WithId<comment>[],
   meta: { pageNumber: number; pageSize: number; totalCount: number },
 ): {
   pagesCount: number;
@@ -23,7 +22,7 @@ export function mapToCommentsListPaginatedOutput(
       content: comment.content,
       commentatorInfo: {
         userId: comment.commentatorInfo.userId,
-        userLogin: comment.commentatorInfo.userLogin
+        userLogin: comment.commentatorInfo.userLogin,
       },
       createdAt: comment.createdAt,
     })),

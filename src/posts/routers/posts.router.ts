@@ -11,7 +11,7 @@ import { idValidationPosts } from "../validation/posts-params-id.validation-midd
 import { paginationAndSortingValidation } from "../../core/middlewares/validation/query-pagination-sorting.validation-middleware";
 import { commentsInputDtoValidation } from "../../comments/validation/comments.input-dto.validation-middlewares";
 import { createCommentHandler } from "./handlers/create-comment-by-post";
-import {getPostCommentsListHandler} from "./handlers/find-all-comments-by-posts";
+import { getPostCommentsListHandler } from "./handlers/find-all-comments-by-posts";
 
 export const postsRouter = Router({});
 
@@ -56,10 +56,9 @@ postsRouter.post(
   createCommentHandler,
 );
 
-
 postsRouter.get(
-    "/:postId/comments",
-    paginationAndSortingValidation(),
-    inputValidationResultMiddleware,
-    getPostCommentsListHandler
+  "/:postId/comments",
+  paginationAndSortingValidation(),
+  inputValidationResultMiddleware,
+  getPostCommentsListHandler,
 );

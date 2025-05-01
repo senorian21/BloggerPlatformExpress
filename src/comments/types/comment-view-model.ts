@@ -1,9 +1,9 @@
 export type commentViewModel = {
   id: string;
-  content:	string;
+  content: string;
   commentatorInfo: {
-    userId:	string;
+    userId: string;
     userLogin: string;
-  }
-  createdAt: string
+  };
+  createdAt: string;
 };
