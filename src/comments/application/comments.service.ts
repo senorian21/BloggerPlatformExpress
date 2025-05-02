@@ -5,12 +5,10 @@ import { userQueryRepository } from "../../users/repositories/users.queryReposit
 import { comment } from "../types/comment";
 import { commentsRepositories } from "../repositories/comments.Repository";
 import { Result } from "../../core/result/result.type";
-import { commentsQueryRepositories } from "../repositories/comments.queryRepository";
-import { ObjectId } from "mongodb";
-import { commentCollection } from "../../db/mongo.db";
-import { mapToBlogViewModel } from "../mappers/map-to-comment-view-model";
+
 
 export async function accessTokenGuard(header: string) {
+  // Проверка наличия заголовка
   if (!header) {
     return {
       status: ResultStatus.Unauthorized,
@@ -22,9 +20,9 @@ export async function accessTokenGuard(header: string) {
     };
   }
 
-  const [authType, token] = header.split(" ");
-
-  if (authType !== "Bearer") {
+  // Разбор заголовка Authorization
+  const authHeaderParts = header.split(" ");
+  if (authHeaderParts.length !== 2 || authHeaderParts[0] !== "Bearer") {
     return {
       status: ResultStatus.Unauthorized,
       data: null,
@@ -38,35 +36,24 @@ export async function accessTokenGuard(header: string) {
     };
   }
 
-  if (!token) {
-    return {
-      status: ResultStatus.Unauthorized,
-      data: null,
-      errorMessage: "Token is missing",
-      extensions: [{ field: "token", message: "Token is required" }],
-    };
-  }
+  const [, token] = authHeaderParts;
 
+  // Проверка токена
   const payload = await jwtService.verifyToken(token);
-  if (!payload) {
+  if (!payload || !payload.userId) {
     return {
       status: ResultStatus.Unauthorized,
       data: null,
       errorMessage: "Invalid or expired token",
       extensions: [
-        {
-          field: "token",
-          message: "The provided token is invalid or has expired",
-        },
+        { field: "token", message: "The provided token is invalid or has expired" },
       ],
     };
   }
 
-  const { userId } = payload;
-
   return {
     status: ResultStatus.Success,
-    data: { userId },
+    data: { userId: payload.userId },
     extensions: [],
   };
 }

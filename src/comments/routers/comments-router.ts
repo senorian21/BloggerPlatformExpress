@@ -4,12 +4,14 @@ import { inputValidationResultMiddleware } from "../../core/middlewares/validati
 import { updateCommentHandler} from "./handlers/update-comment";
 import {deleteCommentHandler} from "./handlers/delete-comment";
 import {getCommentByIdHandler} from "./handlers/get-comment-by-id";
+import {jwtTokenGuard} from "../../auth/middlewares/access.token.guard";
 
 export const commentsRouter = Router({});
 
 commentsRouter.put(
   "/:commentId",
-  commentsInputDtoValidation,
+    jwtTokenGuard,
+    commentsInputDtoValidation,
   inputValidationResultMiddleware,
     updateCommentHandler,
 );

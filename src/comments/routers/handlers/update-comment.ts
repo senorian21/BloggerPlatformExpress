@@ -10,15 +10,13 @@ export async function updateCommentHandler(req: Request, res: Response) {
   const commentInput: commentInput = {
     ...req.body,
   };
-  if (!header) {
-    res.sendStatus(HttpStatus.Unauthorized);
-    return;
-  }
+
   const upadateComments = await commentsService.updateComment(
     id,
     commentInput,
-    header,
+    header!,
   );
+
   if (upadateComments.status === ResultStatus.NotFound) {
     res.sendStatus(HttpStatus.NotFound);
     return;
