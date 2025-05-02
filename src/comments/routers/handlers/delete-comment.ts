@@ -23,5 +23,9 @@ export async function deleteCommentHandler(req: Request, res: Response) {
     res.sendStatus(HttpStatus.Unauthorized);
     return;
   }
+  if (deleteComments.status === ResultStatus.Forbidden) {
+    res.sendStatus(HttpStatus.Forbidden);
+    return;
+  }
   res.sendStatus(HttpStatus.NoContent);
 }

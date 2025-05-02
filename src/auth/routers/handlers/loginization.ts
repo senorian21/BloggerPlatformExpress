@@ -18,7 +18,8 @@ export async function loginizationHandler(
   }
 
   if (!result.data ) {
-    return res.sendStatus(HttpStatus.NotFound);
+     res.sendStatus(HttpStatus.NotFound);
+    return
   }
 
   res.status(HttpStatus.Ok).send({ accessToken: result.data.accessToken });

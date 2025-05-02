@@ -27,5 +27,9 @@ export async function updateCommentHandler(req: Request, res: Response) {
     res.sendStatus(HttpStatus.Unauthorized);
     return;
   }
+  if (upadateComments.status === ResultStatus.Forbidden) {
+    res.sendStatus(HttpStatus.Forbidden);
+    return;
+  }
   res.sendStatus(HttpStatus.NoContent);
 }

@@ -158,11 +158,11 @@ export const commentsService = {
 
     if (comment.commentatorInfo.userId !== userId) {
       return {
-        status: ResultStatus.Unauthorized,
+        status: ResultStatus.Forbidden,
         data: null,
-        errorMessage: "Unauthorized to update this comment",
+        errorMessage: "Forbidden to update this comment",
         extensions: [
-          { field: "user", message: "You are not the owner of this comment" },
+          { field: "Forbidden", message: "You are not the owner of this comment" },
         ],
       };
     }
@@ -221,7 +221,7 @@ export const commentsService = {
 
     if (comment.commentatorInfo.userId !== userId) {
       return {
-        status: ResultStatus.Unauthorized,
+        status: ResultStatus.Forbidden,
         data: null,
         errorMessage: "Unauthorized to update this comment",
         extensions: [
