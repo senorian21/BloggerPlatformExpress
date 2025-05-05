@@ -1,5 +1,5 @@
 export type aboutUserViewModel = {
-  id: string;
+  userId: string;
   login: string;
   email: string;
 };

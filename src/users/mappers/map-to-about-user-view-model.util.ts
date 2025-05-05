@@ -5,7 +5,7 @@ import {aboutUserViewModel} from "../types/about-user-view-model";
 
 export function mapToAboutUserViewModel(user: WithId<User>): aboutUserViewModel {
   return {
-    id: user._id.toString(),
+    userId: user._id.toString(),
     login: user.login,
     email: user.email,
   };
