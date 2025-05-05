@@ -4,6 +4,7 @@ import { mapToUserViewModel } from "../mappers/map-to-user-view-model.util";
 import { userQueryInput } from "../types/user-query.input";
 import { userViewModel } from "../types/user-view-model";
 import { mapToUserListPaginatedOutput } from "../mappers/map-to-user-list-paginated-output.util";
+import {mapToAboutUserViewModel} from "../mappers/map-to-about-user-view-model.util";
 
 export const userQueryRepository = {
   async findAllUser(
@@ -59,5 +60,16 @@ export const userQueryRepository = {
       return null;
     }
     return mapToUserViewModel(user);
+  },
+
+  async findUserByIdForAboutUser(id: string) {
+    if (!ObjectId.isValid(id)) {
+      return null;
+    }
+    const user = await userCollection.findOne({ _id: new ObjectId(id) });
+    if (!user) {
+      return null;
+    }
+    return mapToAboutUserViewModel(user);
   },
 };

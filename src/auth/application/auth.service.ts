@@ -5,6 +5,7 @@ import { WithId } from "mongodb";
 import { ResultStatus } from "../../core/result/resultCode";
 import { argon2Service } from "../adapters/argon2.service";
 import { jwtService } from "../adapters/jwt.service";
+import {accessTokenGuard} from "../../comments/application/comments.service";
 
 export const authService = {
   async loginUser(
@@ -60,6 +61,24 @@ export const authService = {
     return {
       status: ResultStatus.Success,
       data: user,
+      extensions: [],
+    };
+  },
+
+  async userId(header: string) {
+    const userId = await accessTokenGuard(header)
+    if (userId.status !== ResultStatus.Success) {
+      return {
+        status: ResultStatus.Unauthorized,
+        data: null,
+        errorMessage: "Unauthorized",
+        extensions: [],
+      };
+    }
+
+    return {
+      status: ResultStatus.Success,
+      data: userId.data?.userId,
       extensions: [],
     };
   }
