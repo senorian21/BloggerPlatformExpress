@@ -8,13 +8,14 @@ import { HttpStatus } from "../../../src/core/types/http-statuses";
 import { BLOGS_PATH, TESTING_PATH } from "../../../src/core/paths/paths";
 import { generateBasicAuthToken } from "../utils/generate-admin-auth-token";
 import { clearDb } from "../utils/clear-db";
-import { runDb } from "../../../src/db/mongo.db";
+import {client, runDb, setIsTestMode} from "../../../src/db/mongo.db";
 import { createBlog } from "../utils/blogs/create-blog";
 import { getBlogsDto } from "../utils/blogs/get-blogs-dto";
 import { getBlogById } from "../utils/blogs/get-blog-by-id";
 import { updateBlog } from "../utils/blogs/update-blog";
 import { PostInput } from "../../../src/posts/dto/post.input-dto";
 import { createPost } from "../utils/posts/create-post";
+import {appConfig} from "../../../src/core/settings/settings";
 
 describe("Blogs API", () => {
   const app = express();
@@ -23,8 +24,14 @@ describe("Blogs API", () => {
   const adminToken = generateBasicAuthToken();
 
   beforeAll(async () => {
-    await runDb("mongodb://localhost:27017/BloggerPlatform");
-    await clearDb(app);
+    setIsTestMode(true); // Переключаемся на тестовую базу данных
+    await runDb(appConfig.MONGO_URI); // Подключаемся к MongoDB
+  });
+
+  afterAll(async () => {
+    if (client) {
+      await client.close(); // Закрываем соединение после завершения тестов
+    }
   });
 
   it("should create blog; POST /blogs", async () => {
