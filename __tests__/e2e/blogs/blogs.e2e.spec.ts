@@ -26,6 +26,7 @@ describe("Blogs API", () => {
   beforeAll(async () => {
     setIsTestMode(true); // Переключаемся на тестовую базу данных
     await runDb(appConfig.MONGO_URI); // Подключаемся к MongoDB
+    await clearDb(app);
   });
 
   afterAll(async () => {
