@@ -22,7 +22,7 @@ const emailValidation = body("email")
   .matches(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)
   .withMessage("URL does not match the required pattern");
 
-export const blogsInputDtoValidation = [
+export const userInputDtoValidation = [
   loginValidation,
   passwordValidation,
   emailValidation,

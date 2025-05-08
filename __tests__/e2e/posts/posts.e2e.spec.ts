@@ -8,14 +8,14 @@ import { HttpStatus } from "../../../src/core/types/http-statuses";
 import { POSTS_PATH } from "../../../src/core/paths/paths";
 import { generateBasicAuthToken } from "../utils/generate-admin-auth-token";
 import { clearDb } from "../utils/clear-db";
-import {client, runDb, setIsTestMode} from "../../../src/db/mongo.db";
+import { client, runDb, setIsTestMode } from "../../../src/db/mongo.db";
 import { getPostDto } from "../utils/posts/get-posts-dto";
 import { createPost } from "../utils/posts/create-post";
 import { createBlog } from "../utils/blogs/create-blog";
 import { getPostById } from "../utils/posts/get=post-by-id";
 import { updateBlog } from "../utils/blogs/update-blog";
 import { updatePost } from "../utils/posts/update-post";
-import {appConfig} from "../../../src/core/settings/settings";
+import { appConfig } from "../../../src/core/settings/settings";
 
 describe("Posts API", () => {
   const app = express();

@@ -4,7 +4,7 @@ import { userService } from "../../application/users.service";
 import { userQueryRepository } from "../../repositories/users.queryRepository";
 
 export async function createUserHandler(req: Request, res: Response) {
-  const createdUserId = await userService.createUser(req.body);
+  const createdUserId = await userService.createUserByAdmin(req.body);
   if (!createdUserId) {
     res.sendStatus(HttpStatus.NotFound);
     return;

@@ -5,7 +5,9 @@ import { WithId } from "mongodb";
 import { ResultStatus } from "../../core/result/resultCode";
 import { argon2Service } from "../adapters/argon2.service";
 import { jwtService } from "../adapters/jwt.service";
-import {accessTokenGuard} from "../../comments/application/comments.service";
+import { accessTokenGuard } from "../../comments/application/comments.service";
+import {nodemailerService} from "../adapters/nodemailer.service";
+import {emailExamples} from "../adapters/emailExamples";
 
 export const authService = {
   async loginUser(
@@ -33,10 +35,9 @@ export const authService = {
   },
 
   async checkUserCredentials(
-      loginOrEmail: string,
-      password: string,
+    loginOrEmail: string,
+    password: string,
   ): Promise<Result<WithId<User> | null>> {
-
     const user = await userRepository.findByLoginOrEmail(loginOrEmail);
 
     if (!user) {
@@ -44,17 +45,20 @@ export const authService = {
         status: ResultStatus.NotFound,
         data: null,
         errorMessage: "Not Found",
-        extensions: [{field: "loginOrEmail", message: "Not Found"}],
+        extensions: [{ field: "loginOrEmail", message: "Not Found" }],
       };
     }
 
-    const isPassCorrect = await argon2Service.checkPassword(password, user.password);
+    const isPassCorrect = await argon2Service.checkPassword(
+      password,
+      user.passwordHash,
+    );
     if (!isPassCorrect) {
       return {
         status: ResultStatus.Unauthorized,
         data: null,
         errorMessage: "Bad request",
-        extensions: [{field: "password", message: "Wrong password"}],
+        extensions: [{ field: "password", message: "Wrong password" }],
       };
     }
 
@@ -66,7 +70,7 @@ export const authService = {
   },
 
   async userId(header: string) {
-    const userId = await accessTokenGuard(header)
+    const userId = await accessTokenGuard(header);
     if (userId.status !== ResultStatus.Success) {
       return {
         status: ResultStatus.Unauthorized,
@@ -81,5 +85,37 @@ export const authService = {
       data: userId.data?.userId,
       extensions: [],
     };
-  }
+  },
+
+  async registerUser(
+    login: string,
+    password: string,
+    email: string,
+  ): Promise<Result<string | null>> {
+    const user = await userRepository.doesExistByLoginOrEmail(login, email);
+    if (user)
+      return {
+        status: ResultStatus.BadRequest,
+        errorMessage: "Bad Request",
+        data: null,
+        extensions: [{ field: "login Or Email", message: "Already Registered" }],
+      };
+
+    const passwordHash = await argon2Service.generateHash(password);
+    const newUser = new User(login, email, passwordHash);
+    const createdUser = await userRepository.createUser(newUser);
+
+    nodemailerService.sendEmail(
+        newUser.email,
+        newUser.emailConfirmation.confirmationCode,
+        emailExamples.registrationEmail
+    ).catch(er => console.error('error in send email:', er))
+
+
+    return {
+      status: ResultStatus.Success,
+      data: createdUser,
+      extensions: [],
+    };
+  },
 };

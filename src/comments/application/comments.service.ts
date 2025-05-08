@@ -6,7 +6,6 @@ import { comment } from "../types/comment";
 import { commentsRepositories } from "../repositories/comments.Repository";
 import { Result } from "../../core/result/result.type";
 
-
 export async function accessTokenGuard(header: string) {
   // Проверка наличия заголовка
   if (!header) {
@@ -46,7 +45,10 @@ export async function accessTokenGuard(header: string) {
       data: null,
       errorMessage: "Invalid or expired token",
       extensions: [
-        { field: "token", message: "The provided token is invalid or has expired" },
+        {
+          field: "token",
+          message: "The provided token is invalid or has expired",
+        },
       ],
     };
   }
@@ -149,7 +151,10 @@ export const commentsService = {
         data: null,
         errorMessage: "Forbidden to update this comment",
         extensions: [
-          { field: "Forbidden", message: "You are not the owner of this comment" },
+          {
+            field: "Forbidden",
+            message: "You are not the owner of this comment",
+          },
         ],
       };
     }
@@ -166,10 +171,7 @@ export const commentsService = {
 
     return await commentsRepositories.updateComment(idComment, updatedComment);
   },
-  async deleteComment(
-      idComment: string,
-      header: string,
-  ){
+  async deleteComment(idComment: string, header: string) {
     const result = await accessTokenGuard(header);
     if (result.status !== ResultStatus.Success) {
       return {
@@ -216,6 +218,6 @@ export const commentsService = {
         ],
       };
     }
-    return commentsRepositories.deleteComment(idComment)
-  }
+    return commentsRepositories.deleteComment(idComment);
+  },
 };

@@ -3,7 +3,7 @@ import { User } from "../types/user";
 import { userViewModel } from "../types/user-view-model";
 
 export function mapToUserListPaginatedOutput(
-  user: WithId<User>[],
+  users: WithId<User>[],
   meta: { pageNumber: number; pageSize: number; totalCount: number },
 ): {
   pagesCount: number;
@@ -17,11 +17,11 @@ export function mapToUserListPaginatedOutput(
     page: meta.pageNumber,
     pageSize: meta.pageSize,
     totalCount: meta.totalCount,
-    items: user.map((user) => ({
-      id: user._id.toString(),
+    items: users.map((user) => ({
+      id: user._id.toString(), // Преобразуем ObjectId в строку
       email: user.email,
       login: user.login,
-      createdAt: user.createdAt,
+      createdAt: user.createdAt.toISOString(), // Преобразуем Date в строку
     })),
   };
 }

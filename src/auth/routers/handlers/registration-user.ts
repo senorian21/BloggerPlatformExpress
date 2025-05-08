@@ -5,23 +5,25 @@ import { ResultStatus } from "../../../core/result/resultCode";
 import { resultCodeToHttpException } from "../../../core/result/resultCodeToHttpException";
 import { RequestWithBody } from "../../../core/types/requests";
 import { LoginDto } from "../../types/login.dto";
+import { registrationDto } from "../../types/registration.dto";
 
-export async function loginizationHandler(
-  req: RequestWithBody<LoginDto>,
+export async function registrationUserHandler(
+  req: RequestWithBody<registrationDto>,
   res: Response,
 ) {
-  const { loginOrEmail, password } = req.body;
+  const { login, email, password } = req.body;
+  const result = await authService.registerUser(login, password, email);
 
-  const result = await authService.loginUser(loginOrEmail, password);
   if (result.status !== ResultStatus.Success) {
-    res.sendStatus(HttpStatus.Unauthorized);
-  }
-
-  if (!result.data) {
-    res.sendStatus(HttpStatus.NotFound);
+    res.status(HttpStatus.BadRequest).json({
+      errorsMessages: [
+        {
+          message: "Invalid value",
+          field: "email or login",
+        },
+      ],
+    });
     return;
   }
-
-  res.status(HttpStatus.Ok).send({ accessToken: result.data.accessToken });
-  return;
+  res.sendStatus(HttpStatus.Created);
 }

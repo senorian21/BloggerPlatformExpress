@@ -28,4 +28,13 @@ export const userRepository = {
     });
     return user;
   },
+  async doesExistByLoginOrEmail(
+    login: string,
+    email: string,
+  ): Promise<boolean> {
+    const user = await userCollection.findOne({
+      $or: [{ email }, { login }],
+    });
+    return !!user;
+  },
 };

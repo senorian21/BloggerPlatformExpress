@@ -4,7 +4,6 @@ import { ResultStatus } from "../../core/result/resultCode";
 import { Result } from "../../core/result/result.type";
 import { ObjectId } from "mongodb";
 
-
 export const commentsRepositories = {
   async createComment(newComment: comment): Promise<Result<string>> {
     const result = await commentCollection.insertOne(newComment);
@@ -77,7 +76,9 @@ export const commentsRepositories = {
         extensions: [],
       };
     }
-    const deleteComment = await commentCollection.deleteOne({ _id: new ObjectId(idComment) });
+    const deleteComment = await commentCollection.deleteOne({
+      _id: new ObjectId(idComment),
+    });
     if (deleteComment.deletedCount === 0) {
       return {
         status: ResultStatus.NotFound,
@@ -90,5 +91,5 @@ export const commentsRepositories = {
       data: null,
       extensions: [],
     };
-  }
+  },
 };

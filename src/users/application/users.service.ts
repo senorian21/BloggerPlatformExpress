@@ -17,16 +17,27 @@ export const userService = {
       dto.password,
     );
 
-    const newUser: User = {
-      login: dto.login,
-      email: dto.email,
-      password: hashedPassword,
-      createdAt: new Date().toISOString(),
-    };
+    const newUser = new User(dto.login, dto.email, hashedPassword);
 
     return userRepository.createUser(newUser);
   },
 
+  async createUserByAdmin(dto: UserInput): Promise<string | null> {
+    const isEmailAndLoginUnique = await userRepository.isEmailAndLoginUnique(
+      dto.email,
+      dto.login,
+    );
+    if (isEmailAndLoginUnique) {
+      return null;
+    }
+    const hashedPassword: string = await argon2Service.generateHash(
+      dto.password,
+    );
+
+    const newUser = new User(dto.login, dto.email, hashedPassword, true);
+
+    return userRepository.createUser(newUser);
+  },
   async deleteUser(id: string) {
     await userRepository.deleteUser(id);
   },

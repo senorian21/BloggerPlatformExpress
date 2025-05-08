@@ -1,7 +1,7 @@
 import express from "express";
 import { setupApp } from "../../../src/setup-app";
 import { generateBasicAuthToken } from "../utils/generate-admin-auth-token";
-import {client, runDb, setIsTestMode} from "../../../src/db/mongo.db";
+import { client, runDb, setIsTestMode } from "../../../src/db/mongo.db";
 import { clearDb } from "../utils/clear-db";
 import { getUserDto } from "../utils/users/get-user-dto";
 import { UserInput } from "../../../src/users/dto/user.input-dto";
@@ -9,7 +9,7 @@ import { createUser } from "../utils/users/create-user";
 import request from "supertest";
 import { USERS_PATH } from "../../../src/core/paths/paths";
 import { HttpStatus } from "../../../src/core/types/http-statuses";
-import {appConfig} from "../../../src/core/settings/settings";
+import { appConfig } from "../../../src/core/settings/settings";
 
 describe("User API", () => {
   const app = express();
