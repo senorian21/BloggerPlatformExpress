@@ -4,8 +4,9 @@ import { inputValidationResultMiddleware } from "../../core/middlewares/validati
 import { loginizationHandler } from "./handlers/loginization";
 import { aboutUserHandler } from "./handlers/about-user";
 import { userInputDtoValidation } from "../../users/validation/users.input-dto.validation-middlewares";
-import {registrationUserHandler} from "./handlers/registration-user";
-import {accessTokenGuard} from "../middlewares/access.token.guard";
+import { registrationUserHandler } from "./handlers/registration-user";
+import { accessTokenGuard } from "../middlewares/access.token.guard";
+import { registrationConfirmationUserHandler } from "./handlers/registration-confirmation";
 
 export const authRouter = express.Router({});
 
@@ -16,11 +17,16 @@ authRouter.post(
   loginizationHandler,
 );
 
-authRouter.get("/me",accessTokenGuard,accessTokenGuard, aboutUserHandler);
+authRouter.get("/me", accessTokenGuard, accessTokenGuard, aboutUserHandler);
 
 authRouter.post(
   "/registration",
   userInputDtoValidation,
   inputValidationResultMiddleware,
-    registrationUserHandler
+  registrationUserHandler,
+);
+
+authRouter.post(
+  "/registration-confirmation",
+  registrationConfirmationUserHandler,
 );

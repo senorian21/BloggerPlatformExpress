@@ -14,7 +14,7 @@ export async function updateCommentHandler(req: Request, res: Response) {
   const upadateComments = await commentsService.updateComment(
     id,
     commentInput,
-      userId!,
+    userId!,
   );
 
   if (upadateComments.status === ResultStatus.NotFound) {

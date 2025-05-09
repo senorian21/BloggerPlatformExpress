@@ -12,8 +12,7 @@ import { paginationAndSortingValidation } from "../../core/middlewares/validatio
 import { commentsInputDtoValidation } from "../../comments/validation/comments.input-dto.validation-middlewares";
 import { createCommentHandler } from "./handlers/create-comment-by-post";
 import { getPostCommentsListHandler } from "./handlers/find-all-comments-by-posts";
-import {accessTokenGuard} from "../../auth/middlewares/access.token.guard";
-
+import { accessTokenGuard } from "../../auth/middlewares/access.token.guard";
 
 export const postsRouter = Router({});
 
@@ -53,7 +52,7 @@ postsRouter.put(
 
 postsRouter.post(
   "/:postId/comments",
-    accessTokenGuard,
+  accessTokenGuard,
   commentsInputDtoValidation,
   inputValidationResultMiddleware,
   createCommentHandler,

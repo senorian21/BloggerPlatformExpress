@@ -6,10 +6,7 @@ import { userQueryRepository } from "../../../users/repositories/users.queryRepo
 export async function aboutUserHandler(req: Request, res: Response) {
   const idUser = req.user!.id;
 
-
-  const user = await userQueryRepository.findUserByIdForAboutUser(
-      idUser,
-  );
+  const user = await userQueryRepository.findUserByIdForAboutUser(idUser);
 
   res.status(HttpStatus.Ok).send(user);
 }

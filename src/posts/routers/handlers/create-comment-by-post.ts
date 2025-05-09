@@ -14,9 +14,9 @@ export async function createCommentHandler(req: Request, res: Response) {
     return;
   }
 
-
   const createdCommentId = await commentsService.createComment(
-    req.body, userId,
+    req.body,
+    userId,
     postId,
   );
   if (createdCommentId.status !== ResultStatus.Success) {

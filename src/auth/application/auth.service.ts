@@ -6,8 +6,9 @@ import { ResultStatus } from "../../core/result/resultCode";
 import { argon2Service } from "../adapters/argon2.service";
 import { jwtService } from "../adapters/jwt.service";
 
-import {nodemailerService} from "../adapters/nodemailer.service";
-import {emailExamples} from "../adapters/emailExamples";
+import { nodemailerService } from "../adapters/nodemailer.service";
+import { emailExamples } from "../adapters/emailExamples";
+import { registrationConfirmationUserHandler } from "../routers/handlers/registration-confirmation";
 
 export const authService = {
   async loginUser(
@@ -80,23 +81,83 @@ export const authService = {
         status: ResultStatus.BadRequest,
         errorMessage: "Bad Request",
         data: null,
-        extensions: [{ field: "login Or Email", message: "Already Registered" }],
+        extensions: [
+          { field: "login Or Email", message: "Already Registered" },
+        ],
       };
 
     const passwordHash = await argon2Service.generateHash(password);
     const newUser = new User(login, email, passwordHash);
     const createdUser = await userRepository.createUser(newUser);
 
-    nodemailerService.sendEmail(
+    nodemailerService
+      .sendEmail(
         newUser.email,
         newUser.emailConfirmation.confirmationCode,
-        emailExamples.registrationEmail
-    ).catch(er => console.error('error in send email:', er))
-
+        emailExamples.registrationEmail,
+      )
+      .catch((er) => console.error("error in send email:", er));
 
     return {
       status: ResultStatus.Success,
       data: createdUser,
+      extensions: [],
+    };
+  },
+
+  async registrationConfirmationUser(
+    code: string,
+  ): Promise<Result<WithId<User> | null>> {
+    const user = await userRepository.findByCode(code);
+    const userId = user!._id.toString();
+    if (!user) {
+      return {
+        status: ResultStatus.BadRequest,
+        errorMessage: "Bad Request",
+        data: null,
+        extensions: [
+          { field: "code", message: " " },
+        ],
+      };
+    }
+    if(user.emailConfirmation.isConfirmed === true){
+      return {
+        status: ResultStatus.BadRequest,
+        errorMessage: "Bad Request",
+        data: null,
+        extensions: [
+          { field: "isConfirmed", message: "Already confirmed" },
+        ],
+      };
+    }
+    if (user.emailConfirmation.expirationDate < new Date()) {
+      return {
+        status: ResultStatus.BadRequest,
+        errorMessage: "Bad Request",
+        data: null,
+        extensions: [
+          { field: "expirationDate", message: "confirmation time expired" },
+        ],
+      };
+    }
+    const confirmUser = await userRepository.registrationConfirmationUser(
+      user,
+      userId,
+    );
+    if (confirmUser.status !== ResultStatus.Success) {
+      return {
+        status: ResultStatus.BadRequest,
+        errorMessage: "Bad Request",
+        data: null,
+        extensions: [
+          { field: "expirationDate", message: " " },
+        ],
+      };
+    }
+
+    return {
+      status: ResultStatus.Success,
+      data: null,
       extensions: [],
     };
   },

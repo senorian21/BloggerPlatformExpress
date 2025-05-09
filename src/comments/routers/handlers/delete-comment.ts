@@ -8,7 +8,6 @@ export async function deleteCommentHandler(req: Request, res: Response) {
   const id = req.params.commentId;
   const userId = req.user!.id;
 
-
   const deleteComments = await commentsService.deleteComment(id, userId);
   if (deleteComments.status === ResultStatus.NotFound) {
     res.sendStatus(HttpStatus.NotFound);

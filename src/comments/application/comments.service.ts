@@ -6,15 +6,12 @@ import { comment } from "../types/comment";
 import { commentsRepositories } from "../repositories/comments.Repository";
 import { Result } from "../../core/result/result.type";
 
-
-
 export const commentsService = {
   async createComment(
     dto: commentInput,
     userId: string,
     postId: string,
   ): Promise<Result<string | null>> {
-
     const user = await userQueryRepository.findUserById(userId);
 
     if (!user) {
@@ -46,8 +43,6 @@ export const commentsService = {
     dto: commentInput,
     userId: string,
   ): Promise<Result<string | null>> {
-
-
     const comment = await commentsRepositories.findCommentsById(idComment);
 
     if (!comment) {
@@ -88,8 +83,6 @@ export const commentsService = {
     return await commentsRepositories.updateComment(idComment, updatedComment);
   },
   async deleteComment(idComment: string, userId: string) {
-
-
     const comment = await commentsRepositories.findCommentsById(idComment);
 
     if (!comment) {
