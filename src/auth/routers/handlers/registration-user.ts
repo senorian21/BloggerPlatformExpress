@@ -14,12 +14,13 @@ export async function registrationUserHandler(
   const result = await authService.registerUser(login, password, email);
 
   if (result.status === ResultStatus.BadRequest) {
-    return res.status(HttpStatus.BadRequest).json({
+     res.status(HttpStatus.BadRequest).json({
       errorsMessages: result.extensions.map((ext) => ({
         message: ext.message,
         field: ext.field,
       })),
     });
+    return
   }
 
   res.sendStatus(HttpStatus.NoContent);

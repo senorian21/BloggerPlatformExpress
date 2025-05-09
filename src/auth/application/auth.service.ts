@@ -8,6 +8,8 @@ import { jwtService } from "../adapters/jwt.service";
 import { nodemailerService } from "../adapters/nodemailer.service";
 import { emailExamples } from "../adapters/emailExamples";
 import { registrationEmailResendingUserHandler } from "../routers/handlers/registration-email-resending";
+import { randomUUID } from "crypto";
+import { add } from "date-fns";
 
 export const authService = {
   async loginUser(
@@ -169,7 +171,7 @@ export const authService = {
   },
 
   async registrationEmailResending(
-    email: string,
+      email: string,
   ): Promise<Result<string | null>> {
     const user = await userRepository.findByLoginOrEmail(email);
     if (!user) {
@@ -177,9 +179,10 @@ export const authService = {
         status: ResultStatus.BadRequest,
         errorMessage: "Bad Request",
         data: null,
-        extensions: [{ field: "email", message: "user not found" }],
+        extensions: [{ field: "email", message: "User not found" }],
       };
     }
+
     if (user.emailConfirmation.isConfirmed) {
       return {
         status: ResultStatus.BadRequest,
@@ -188,7 +191,7 @@ export const authService = {
         extensions: [
           {
             field: "emailConfirmation.isConfirmed",
-            message: "user already confirmed",
+            message: "User already confirmed",
           },
         ],
       };
@@ -202,23 +205,36 @@ export const authService = {
         extensions: [
           {
             field: "emailConfirmation.expirationDate",
-            message: "confirmation time expired",
+            message: "Confirmation time expired",
           },
         ],
       };
     }
+
+    // Генерируем новый код
+    const newConfirmationCode = randomUUID();
+    const newExpirationDate = add(new Date(), { days: 7 });
+
+    // Обновляем код и дату истечения в базе данных
+    await userRepository.updateConfirmationCodeAndExpiration(
+        user._id.toString(),
+        newConfirmationCode,
+        newExpirationDate,
+    );
+
+    // Отправляем письмо с новым кодом
     nodemailerService
-      .sendEmail(
-        user.email,
-        user.emailConfirmation.confirmationCode,
-        emailExamples.registrationEmail,
-      )
-      .catch((er) => console.error("error in send email:", er));
+        .sendEmail(
+            user.email,
+            newConfirmationCode,
+            emailExamples.registrationEmail,
+        )
+        .catch((er) => console.error("Error in send email:", er));
 
     return {
       status: ResultStatus.Success,
       data: null,
       extensions: [],
     };
-  },
+  }
 };

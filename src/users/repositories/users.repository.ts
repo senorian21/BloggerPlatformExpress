@@ -74,5 +74,19 @@ export const userRepository = {
       extensions: [],
     };
   },
-
+  async updateConfirmationCodeAndExpiration(
+      userId: string,
+      newCode: string,
+      newExpirationDate: Date,
+  ) {
+    await userCollection.updateOne(
+        { _id: new ObjectId(userId) },
+        {
+          $set: {
+            "emailConfirmation.confirmationCode": newCode,
+            "emailConfirmation.expirationDate": newExpirationDate,
+          },
+        },
+    );
+  }
 };
