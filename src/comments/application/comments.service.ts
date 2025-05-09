@@ -6,78 +6,16 @@ import { comment } from "../types/comment";
 import { commentsRepositories } from "../repositories/comments.Repository";
 import { Result } from "../../core/result/result.type";
 
-export async function accessTokenGuard(header: string) {
-  // Проверка наличия заголовка
-  if (!header) {
-    return {
-      status: ResultStatus.Unauthorized,
-      data: null,
-      errorMessage: "Header is missing",
-      extensions: [
-        { field: "header", message: "Request headers are required" },
-      ],
-    };
-  }
 
-  // Разбор заголовка Authorization
-  const authHeaderParts = header.split(" ");
-  if (authHeaderParts.length !== 2 || authHeaderParts[0] !== "Bearer") {
-    return {
-      status: ResultStatus.Unauthorized,
-      data: null,
-      errorMessage: "Invalid authorization type",
-      extensions: [
-        {
-          field: "authorization",
-          message: "Expected 'Bearer' as authorization type",
-        },
-      ],
-    };
-  }
-
-  const [, token] = authHeaderParts;
-
-  // Проверка токена
-  const payload = await jwtService.verifyToken(token);
-  if (!payload || !payload.userId) {
-    return {
-      status: ResultStatus.Unauthorized,
-      data: null,
-      errorMessage: "Invalid or expired token",
-      extensions: [
-        {
-          field: "token",
-          message: "The provided token is invalid or has expired",
-        },
-      ],
-    };
-  }
-
-  return {
-    status: ResultStatus.Success,
-    data: { userId: payload.userId },
-    extensions: [],
-  };
-}
 
 export const commentsService = {
   async createComment(
     dto: commentInput,
-    header: string,
+    userId: string,
     postId: string,
   ): Promise<Result<string | null>> {
-    const result = await accessTokenGuard(header);
 
-    if (result.status !== ResultStatus.Success) {
-      return {
-        status: ResultStatus.Unauthorized,
-        data: null,
-        errorMessage: "Unauthorized",
-        extensions: [],
-      };
-    }
-
-    const user = await userQueryRepository.findUserById(result.data!.userId);
+    const user = await userQueryRepository.findUserById(userId);
 
     if (!user) {
       return {
@@ -106,31 +44,9 @@ export const commentsService = {
   async updateComment(
     idComment: string,
     dto: commentInput,
-    header: string,
+    userId: string,
   ): Promise<Result<string | null>> {
-    const result = await accessTokenGuard(header);
 
-    if (result.status !== ResultStatus.Success) {
-      return {
-        status: ResultStatus.Unauthorized,
-        data: null,
-        errorMessage: "Unauthorized",
-        extensions: [],
-      };
-    }
-
-    const userId = result.data?.userId;
-
-    if (!userId) {
-      return {
-        status: ResultStatus.Unauthorized,
-        data: null,
-        errorMessage: "User not found",
-        extensions: [
-          { field: "user", message: "User with the given ID does not exist" },
-        ],
-      };
-    }
 
     const comment = await commentsRepositories.findCommentsById(idComment);
 
@@ -171,29 +87,8 @@ export const commentsService = {
 
     return await commentsRepositories.updateComment(idComment, updatedComment);
   },
-  async deleteComment(idComment: string, header: string) {
-    const result = await accessTokenGuard(header);
-    if (result.status !== ResultStatus.Success) {
-      return {
-        status: ResultStatus.Unauthorized,
-        data: null,
-        errorMessage: "Unauthorized",
-        extensions: [],
-      };
-    }
+  async deleteComment(idComment: string, userId: string) {
 
-    const userId = result.data?.userId;
-
-    if (!userId) {
-      return {
-        status: ResultStatus.Unauthorized,
-        data: null,
-        errorMessage: "User not found",
-        extensions: [
-          { field: "user", message: "User with the given ID does not exist" },
-        ],
-      };
-    }
 
     const comment = await commentsRepositories.findCommentsById(idComment);
 

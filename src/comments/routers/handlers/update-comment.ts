@@ -6,7 +6,7 @@ import { ResultStatus } from "../../../core/result/resultCode";
 
 export async function updateCommentHandler(req: Request, res: Response) {
   const id = req.params.commentId;
-  const header = req.headers.authorization;
+  const userId = req.user!.id;
   const commentInput: commentInput = {
     ...req.body,
   };
@@ -14,7 +14,7 @@ export async function updateCommentHandler(req: Request, res: Response) {
   const upadateComments = await commentsService.updateComment(
     id,
     commentInput,
-    header!,
+      userId!,
   );
 
   if (upadateComments.status === ResultStatus.NotFound) {

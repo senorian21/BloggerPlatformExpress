@@ -7,20 +7,16 @@ import { postsQueryRepository } from "../../repositories/posts.queryRepository";
 
 export async function createCommentHandler(req: Request, res: Response) {
   const postId = req.params.postId;
-  const header = req.headers.authorization;
+  const userId = req.user!.id;
   const post = await postsQueryRepository.findPostById(postId);
   if (!post) {
     res.sendStatus(HttpStatus.NotFound);
     return;
   }
-  if (!header) {
-    res.sendStatus(HttpStatus.Unauthorized);
-    return;
-  }
+
 
   const createdCommentId = await commentsService.createComment(
-    req.body,
-    header,
+    req.body, userId,
     postId,
   );
   if (createdCommentId.status !== ResultStatus.Success) {

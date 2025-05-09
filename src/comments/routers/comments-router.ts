@@ -4,17 +4,18 @@ import { inputValidationResultMiddleware } from "../../core/middlewares/validati
 import { updateCommentHandler } from "./handlers/update-comment";
 import { deleteCommentHandler } from "./handlers/delete-comment";
 import { getCommentByIdHandler } from "./handlers/get-comment-by-id";
-import { jwtTokenGuard } from "../../auth/middlewares/access.token.guard";
+import {accessTokenGuard} from "../../auth/middlewares/access.token.guard";
+
 
 export const commentsRouter = Router({});
 
 commentsRouter.put(
   "/:commentId",
-  jwtTokenGuard,
+    accessTokenGuard,
   commentsInputDtoValidation,
   inputValidationResultMiddleware,
   updateCommentHandler,
 );
 
-commentsRouter.delete("/:commentId", deleteCommentHandler);
+commentsRouter.delete("/:commentId",accessTokenGuard, deleteCommentHandler);
 commentsRouter.get("/:commentId", getCommentByIdHandler);
