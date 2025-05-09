@@ -13,12 +13,12 @@ export const nodemailerService = {
       secure: true, // Использовать SSL
       auth: {
         user: appConfig.YANDEX_EMAIL, // Ваш email
-        pass: appConfig.YANDEX_PASSWORD, // Ваш пароль или пароль приложения
+        pass: appConfig.YANDEX_PASSWORD // Ваш пароль или пароль приложения
       },
     });
 
     let info = await transporter.sendMail({
-      from: '"BloggerPlatform" <senorian2@yandex.by>',
+      from: 'BloggerPlatform <senorian2@yandex.by>',
       to: email,
       subject: "Registration",
       html:template(code),
