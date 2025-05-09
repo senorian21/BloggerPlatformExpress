@@ -7,7 +7,7 @@ import { argon2Service } from "../adapters/argon2.service";
 import { jwtService } from "../adapters/jwt.service";
 import { nodemailerService } from "../adapters/nodemailer.service";
 import { emailExamples } from "../adapters/emailExamples";
-
+import { registrationEmailResendingUserHandler } from "../routers/handlers/registration-email-resending";
 
 export const authService = {
   async loginUser(
@@ -70,32 +70,44 @@ export const authService = {
   },
 
   async registerUser(
-    login: string,
-    password: string,
-    email: string,
+      login: string,
+      password: string,
+      email: string,
   ): Promise<Result<string | null>> {
     const user = await userRepository.doesExistByLoginOrEmail(login, email);
-    if (user)
-      return {
-        status: ResultStatus.BadRequest,
-        errorMessage: "Bad Request",
-        data: null,
-        extensions: [
-          { field: "login Or Email", message: "Already Registered" },
-        ],
-      };
+    if (user) {
+      if (user.login === login) {
+        return {
+          status: ResultStatus.BadRequest,
+          errorMessage: "Bad Request",
+          data: null,
+          extensions: [
+            { field: "login", message: "Login is already taken" },
+          ],
+        };
+      } else {
+        return {
+          status: ResultStatus.BadRequest,
+          errorMessage: "Bad Request",
+          data: null,
+          extensions: [
+            { field: "email", message: "Email is already registered" },
+          ],
+        };
+      }
+    }
 
     const passwordHash = await argon2Service.generateHash(password);
     const newUser = new User(login, email, passwordHash);
     const createdUser = await userRepository.createUser(newUser);
 
     nodemailerService
-      .sendEmail(
-        newUser.email,
-        newUser.emailConfirmation.confirmationCode,
-        emailExamples.registrationEmail,
-      )
-      .catch((er) => console.error("error in send email:", er));
+        .sendEmail(
+            newUser.email,
+            newUser.emailConfirmation.confirmationCode,
+            emailExamples.registrationEmail,
+        )
+        .catch((er) => console.error("error in send email:", er));
 
     return {
       status: ResultStatus.Success,
@@ -108,7 +120,6 @@ export const authService = {
     code: string,
   ): Promise<Result<WithId<User> | null>> {
     const user = await userRepository.findByCode(code);
-    const userId = user!._id.toString();
     if (!user) {
       return {
         status: ResultStatus.BadRequest,
@@ -117,6 +128,8 @@ export const authService = {
         extensions: [{ field: "code", message: "there is no such code" }],
       };
     }
+    const userId = user!._id.toString();
+
     if (user.emailConfirmation.isConfirmed) {
       return {
         status: ResultStatus.BadRequest,
@@ -147,6 +160,60 @@ export const authService = {
         extensions: [{ field: "", message: "" }],
       };
     }
+
+    return {
+      status: ResultStatus.Success,
+      data: null,
+      extensions: [],
+    };
+  },
+
+  async registrationEmailResending(
+    email: string,
+  ): Promise<Result<string | null>> {
+    const user = await userRepository.findByLoginOrEmail(email);
+    if (!user) {
+      return {
+        status: ResultStatus.BadRequest,
+        errorMessage: "Bad Request",
+        data: null,
+        extensions: [{ field: "email", message: "user not found" }],
+      };
+    }
+    if (user.emailConfirmation.isConfirmed) {
+      return {
+        status: ResultStatus.BadRequest,
+        errorMessage: "Bad Request",
+        data: null,
+        extensions: [
+          {
+            field: "emailConfirmation.isConfirmed",
+            message: "user already confirmed",
+          },
+        ],
+      };
+    }
+
+    if (user.emailConfirmation.expirationDate < new Date()) {
+      return {
+        status: ResultStatus.BadRequest,
+        errorMessage: "Bad Request",
+        data: null,
+        extensions: [
+          {
+            field: "emailConfirmation.expirationDate",
+            message: "confirmation time expired",
+          },
+        ],
+      };
+    }
+    nodemailerService
+      .sendEmail(
+        user.email,
+        user.emailConfirmation.confirmationCode,
+        emailExamples.registrationEmail,
+      )
+      .catch((er) => console.error("error in send email:", er));
 
     return {
       status: ResultStatus.Success,

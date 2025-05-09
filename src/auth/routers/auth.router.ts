@@ -7,9 +7,9 @@ import { userInputDtoValidation } from "../../users/validation/users.input-dto.v
 import { registrationUserHandler } from "./handlers/registration-user";
 import { accessTokenGuard } from "../middlewares/access.token.guard";
 import { registrationConfirmationUserHandler } from "./handlers/registration-confirmation";
-import {
-    registrationConfirmationInputDtoValidation
-} from "../validation/registration-confirmation.input-dto.validation-middlewares";
+import { registrationConfirmationInputDtoValidation } from "../validation/registration-confirmation.input-dto.validation-middlewares";
+import { registrationEmailResendingInputDtoValidation } from "../validation/registration-email-resending.input-dto.validation-middlewares";
+import { registrationEmailResendingUserHandler } from "./handlers/registration-email-resending";
 
 export const authRouter = express.Router({});
 
@@ -31,7 +31,14 @@ authRouter.post(
 
 authRouter.post(
   "/registration-confirmation",
-    registrationConfirmationInputDtoValidation,
+  registrationConfirmationInputDtoValidation,
   inputValidationResultMiddleware,
   registrationConfirmationUserHandler,
+);
+
+authRouter.post(
+  "/registration-email-resending",
+  registrationEmailResendingInputDtoValidation,
+  inputValidationResultMiddleware,
+  registrationEmailResendingUserHandler,
 );

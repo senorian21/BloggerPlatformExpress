@@ -4,11 +4,7 @@ const codeValidation = body("code")
   .isString()
   .withMessage("code should be string")
   .trim()
-  .isLength({ min: 1})
+  .isLength({ min: 1 })
   .withMessage("Length of code is not correct");
 
-
-
-export const registrationConfirmationInputDtoValidation = [
-  codeValidation
-];
+export const registrationConfirmationInputDtoValidation = [codeValidation];

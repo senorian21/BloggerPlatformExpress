@@ -32,11 +32,14 @@ export const userRepository = {
   async doesExistByLoginOrEmail(
     login: string,
     email: string,
-  ): Promise<boolean> {
+  ): Promise<User | null> {
     const user = await userCollection.findOne({
       $or: [{ email }, { login }],
     });
-    return !!user;
+    if (!user){
+      return null;
+    }
+    return user;
   },
 
   async findByCode(code: string) {
@@ -71,4 +74,5 @@ export const userRepository = {
       extensions: [],
     };
   },
+
 };

@@ -6,22 +6,21 @@ import { RequestWithBody } from "../../../core/types/requests";
 import { registrationDto } from "../../types/registration.dto";
 
 export async function registrationUserHandler(
-  req: RequestWithBody<registrationDto>,
-  res: Response,
+    req: RequestWithBody<registrationDto>,
+    res: Response,
 ) {
   const { login, email, password } = req.body;
+
   const result = await authService.registerUser(login, password, email);
 
-  if (result.status !== ResultStatus.Success) {
-    res.status(HttpStatus.BadRequest).json({
-      errorsMessages: [
-        {
-          message: "Invalid value",
-          field: "email or login",
-        },
-      ],
+  if (result.status === ResultStatus.BadRequest) {
+    return res.status(HttpStatus.BadRequest).json({
+      errorsMessages: result.extensions.map((ext) => ({
+        message: ext.message,
+        field: ext.field,
+      })),
     });
-    return;
   }
-  res.sendStatus(HttpStatus.Created);
+
+  res.sendStatus(HttpStatus.NoContent);
 }
