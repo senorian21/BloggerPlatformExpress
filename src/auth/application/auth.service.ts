@@ -5,10 +5,9 @@ import { WithId } from "mongodb";
 import { ResultStatus } from "../../core/result/resultCode";
 import { argon2Service } from "../adapters/argon2.service";
 import { jwtService } from "../adapters/jwt.service";
-
 import { nodemailerService } from "../adapters/nodemailer.service";
 import { emailExamples } from "../adapters/emailExamples";
-import { registrationConfirmationUserHandler } from "../routers/handlers/registration-confirmation";
+
 
 export const authService = {
   async loginUser(
@@ -115,19 +114,15 @@ export const authService = {
         status: ResultStatus.BadRequest,
         errorMessage: "Bad Request",
         data: null,
-        extensions: [
-          { field: "code", message: " " },
-        ],
+        extensions: [{ field: "code", message: "there is no such code" }],
       };
     }
-    if(user.emailConfirmation.isConfirmed === true){
+    if (user.emailConfirmation.isConfirmed) {
       return {
         status: ResultStatus.BadRequest,
         errorMessage: "Bad Request",
         data: null,
-        extensions: [
-          { field: "isConfirmed", message: "Already confirmed" },
-        ],
+        extensions: [{ field: "isConfirmed", message: "Already confirmed" }],
       };
     }
     if (user.emailConfirmation.expirationDate < new Date()) {
@@ -149,9 +144,7 @@ export const authService = {
         status: ResultStatus.BadRequest,
         errorMessage: "Bad Request",
         data: null,
-        extensions: [
-          { field: "expirationDate", message: " " },
-        ],
+        extensions: [{ field: "", message: "" }],
       };
     }
 

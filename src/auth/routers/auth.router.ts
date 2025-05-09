@@ -7,6 +7,9 @@ import { userInputDtoValidation } from "../../users/validation/users.input-dto.v
 import { registrationUserHandler } from "./handlers/registration-user";
 import { accessTokenGuard } from "../middlewares/access.token.guard";
 import { registrationConfirmationUserHandler } from "./handlers/registration-confirmation";
+import {
+    registrationConfirmationInputDtoValidation
+} from "../validation/registration-confirmation.input-dto.validation-middlewares";
 
 export const authRouter = express.Router({});
 
@@ -28,5 +31,7 @@ authRouter.post(
 
 authRouter.post(
   "/registration-confirmation",
+    registrationConfirmationInputDtoValidation,
+  inputValidationResultMiddleware,
   registrationConfirmationUserHandler,
 );
