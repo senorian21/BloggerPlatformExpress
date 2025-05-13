@@ -130,6 +130,8 @@ export const authService = {
         extensions: [{ field: "code", message: "there is no such code" }],
       };
     }
+
+
     const userId = user!._id.toString();
 
     if (user.emailConfirmation.isConfirmed) {
@@ -211,18 +213,17 @@ export const authService = {
       };
     }
 
-    // Генерируем новый код
+
     const newConfirmationCode = randomUUID();
     const newExpirationDate = add(new Date(), { days: 7 });
 
-    // Обновляем код и дату истечения в базе данных
+
     await userRepository.updateConfirmationCodeAndExpiration(
         user._id.toString(),
         newConfirmationCode,
         newExpirationDate,
     );
 
-    // Отправляем письмо с новым кодом
     nodemailerService
         .sendEmail(
             user.email,
