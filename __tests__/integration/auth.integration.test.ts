@@ -8,6 +8,7 @@ import {MongoMemoryServer} from "mongodb-memory-server";
 import {testSeeder} from "./test.seeder";
 import {ResultStatus} from "../../src/core/result/resultCode";
 import {describe} from "node:test";
+import {createUser} from "../e2e/utils/users/create-user";
 
 
 describe('AUTH-INTEGRATION', () => {
@@ -115,6 +116,21 @@ describe('AUTH-INTEGRATION', () => {
             const result = await confirmEmailUseCase(email)
 
             expect(result.status).toBe(ResultStatus.Success);
+        });
+
+        it("there is no such mail", async () => {
+            const  email  = "ilyyyyyyaaa@gmail.com";
+
+            const result = await confirmEmailUseCase(email);
+            expect(result.status).toBe(ResultStatus.BadRequest);
+        });
+
+        it ("mail already confirmed", async () => {
+            const user = await createUser(app)
+
+            const result = await confirmEmailUseCase(user.email)
+
+            expect(result.status).toBe(ResultStatus.BadRequest);
         });
 
 

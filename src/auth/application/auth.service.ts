@@ -190,12 +190,7 @@ export const authService = {
         status: ResultStatus.BadRequest,
         errorMessage: "Bad Request",
         data: null,
-        extensions: [
-          {
-            field: "emailConfirmation.isConfirmed",
-            message: "User already confirmed",
-          },
-        ],
+        extensions: [{ field: "isConfirmed", message: "Already confirmed" }],
       };
     }
 

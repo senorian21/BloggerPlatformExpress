@@ -13,21 +13,21 @@ export class User {
   };
 
   constructor(
-    login: string,
-    email: string,
-    hash: string,
-    isAdminCreated: boolean = false,
+      login: string,
+      email: string,
+      hash: string,
+      isConfirmed: boolean = false,
+      confirmationCode: string = randomUUID(),
+      expirationDate: Date = add(new Date(), { days: 7 })
   ) {
     this.login = login;
     this.email = email;
     this.passwordHash = hash;
     this.createdAt = new Date();
     this.emailConfirmation = {
-      confirmationCode: randomUUID(),
-      expirationDate: add(new Date(), {
-        days: 7,
-      }),
-      isConfirmed: isAdminCreated,
+      confirmationCode,
+      expirationDate,
+      isConfirmed,
     };
   }
 }
