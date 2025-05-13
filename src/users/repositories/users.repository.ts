@@ -36,7 +36,7 @@ export const userRepository = {
     const user = await userCollection.findOne({
       $or: [{ email }, { login }],
     });
-    if (!user){
+    if (!user) {
       return null;
     }
     return user;
@@ -75,18 +75,18 @@ export const userRepository = {
     };
   },
   async updateConfirmationCodeAndExpiration(
-      userId: string,
-      newCode: string,
-      newExpirationDate: Date,
+    userId: string,
+    newCode: string,
+    newExpirationDate: Date,
   ) {
     await userCollection.updateOne(
-        { _id: new ObjectId(userId) },
-        {
-          $set: {
-            "emailConfirmation.confirmationCode": newCode,
-            "emailConfirmation.expirationDate": newExpirationDate,
-          },
+      { _id: new ObjectId(userId) },
+      {
+        $set: {
+          "emailConfirmation.confirmationCode": newCode,
+          "emailConfirmation.expirationDate": newExpirationDate,
         },
+      },
     );
-  }
+  },
 };

@@ -13,12 +13,12 @@ export class User {
   };
 
   constructor(
-      login: string,
-      email: string,
-      hash: string,
-      isConfirmed: boolean = false,
-      confirmationCode: string = randomUUID(),
-      expirationDate: Date = add(new Date(), { days: 7 })
+    login: string,
+    email: string,
+    hash: string,
+    isConfirmed: boolean = false,
+    confirmationCode: string = randomUUID(),
+    expirationDate: Date = add(new Date(), { days: 7 }),
   ) {
     this.login = login;
     this.email = email;

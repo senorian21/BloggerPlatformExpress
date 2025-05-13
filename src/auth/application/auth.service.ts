@@ -72,9 +72,9 @@ export const authService = {
   },
 
   async registerUser(
-      login: string,
-      password: string,
-      email: string,
+    login: string,
+    password: string,
+    email: string,
   ): Promise<Result<string | null>> {
     const user = await userRepository.doesExistByLoginOrEmail(login, email);
     if (user) {
@@ -83,9 +83,7 @@ export const authService = {
           status: ResultStatus.BadRequest,
           errorMessage: "Bad Request",
           data: null,
-          extensions: [
-            { field: "login", message: "Login is already taken" },
-          ],
+          extensions: [{ field: "login", message: "Login is already taken" }],
         };
       } else {
         return {
@@ -104,12 +102,12 @@ export const authService = {
     const createdUser = await userRepository.createUser(newUser);
 
     nodemailerService
-        .sendEmail(
-            newUser.email,
-            newUser.emailConfirmation.confirmationCode,
-            emailExamples.registrationEmail,
-        )
-        .catch((er) => console.error("error in send email:", er));
+      .sendEmail(
+        newUser.email,
+        newUser.emailConfirmation.confirmationCode,
+        emailExamples.registrationEmail,
+      )
+      .catch((er) => console.error("error in send email:", er));
 
     return {
       status: ResultStatus.Success,
@@ -130,7 +128,6 @@ export const authService = {
         extensions: [{ field: "code", message: "there is no such code" }],
       };
     }
-
 
     const userId = user!._id.toString();
 
@@ -173,7 +170,7 @@ export const authService = {
   },
 
   async registrationEmailResending(
-      email: string,
+    email: string,
   ): Promise<Result<string | null>> {
     const user = await userRepository.findByLoginOrEmail(email);
     if (!user) {
@@ -208,29 +205,27 @@ export const authService = {
       };
     }
 
-
     const newConfirmationCode = randomUUID();
     const newExpirationDate = add(new Date(), { days: 7 });
 
-
     await userRepository.updateConfirmationCodeAndExpiration(
-        user._id.toString(),
-        newConfirmationCode,
-        newExpirationDate,
+      user._id.toString(),
+      newConfirmationCode,
+      newExpirationDate,
     );
 
     nodemailerService
-        .sendEmail(
-            user.email,
-            newConfirmationCode,
-            emailExamples.registrationEmail,
-        )
-        .catch((er) => console.error("Error in send email:", er));
+      .sendEmail(
+        user.email,
+        newConfirmationCode,
+        emailExamples.registrationEmail,
+      )
+      .catch((er) => console.error("Error in send email:", er));
 
     return {
       status: ResultStatus.Success,
       data: null,
       extensions: [],
     };
-  }
+  },
 };
