@@ -21,7 +21,9 @@ export async function loginizationHandler(
     res.sendStatus(HttpStatus.NotFound);
     return;
   }
-
-  res.status(HttpStatus.Ok).send({ accessToken: result.data.accessToken });
+  res
+    .header("Set-Cookie", result.data.cookie)
+    .status(HttpStatus.Ok)
+    .send({ accessToken: result.data.accessToken });
   return;
 }

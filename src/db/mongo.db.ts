@@ -4,11 +4,13 @@ import { Post } from "../posts/types/post";
 import { User } from "../users/types/user";
 import { comment } from "../comments/types/comment";
 import { appConfig } from "../core/settings/settings";
+import {RefreshToken} from "../auth/types/refresh-token";
 
 const BLOG_COLLECTION_NAME: string = "blog";
 const POST_COLLECTION_NAME: string = "post";
 const USER_COLLECTION_NAME: string = "user";
 const COMMENT_COLLECTION_NAME: string = "comment";
+const REFRESH_TOKEN_COLLECTION_NAME: string = "refresh-token";
 
 export let client: MongoClient;
 
@@ -16,7 +18,7 @@ export let blogCollection: Collection<Blog>;
 export let postCollection: Collection<Post>;
 export let userCollection: Collection<User>;
 export let commentCollection: Collection<comment>;
-
+export let refreshTokenCollection: Collection<RefreshToken>
 // Флаг для определения режима работы (основной или тестовый)
 let isTestMode = false;
 
@@ -35,10 +37,17 @@ export async function runDb(url: string): Promise<void> {
   postCollection = db.collection<Post>(POST_COLLECTION_NAME);
   userCollection = db.collection<User>(USER_COLLECTION_NAME);
   commentCollection = db.collection<comment>(COMMENT_COLLECTION_NAME);
-
+  refreshTokenCollection = db.collection<RefreshToken>(REFRESH_TOKEN_COLLECTION_NAME)
   try {
     await client.connect();
     await db.command({ ping: 1 });
+
+    // Создание TTL-индекса (один раз)
+    await refreshTokenCollection.createIndex(
+        { createdAt: 1 },
+        { expireAfterSeconds: 60 * 60 * 24 * 7 } // 7 дней
+    );
+
     console.log(`Connected to database: ${dbName}`);
   } catch (err) {
     await client.close();

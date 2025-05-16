@@ -7,15 +7,21 @@ import { argon2Service } from "../adapters/argon2.service";
 import { jwtService } from "../adapters/jwt.service";
 import { nodemailerService } from "../adapters/nodemailer.service";
 import { emailExamples } from "../adapters/emailExamples";
-import { registrationEmailResendingUserHandler } from "../routers/handlers/registration-email-resending";
 import { randomUUID } from "crypto";
 import { add } from "date-fns";
+import { createHash } from 'crypto'
+import {authRepositories} from "../repositories/auth.Repository";
+
+export function hashToken(token: string): string {
+  return createHash('sha256').update(token).digest('hex');
+}
+
 
 export const authService = {
   async loginUser(
     loginOrEmail: string,
     password: string,
-  ): Promise<Result<{ accessToken: string } | null>> {
+  ): Promise<Result<{ accessToken: string; cookie: string } | null>> {
     const result = await this.checkUserCredentials(loginOrEmail, password);
     if (result.status !== ResultStatus.Success) {
       return {
@@ -28,10 +34,15 @@ export const authService = {
     const accessToken = await jwtService.createToken(
       result.data!._id.toString(),
     );
-
+    const { cookie } = await jwtService.createRefreshToken(
+      result.data!._id.toString(),
+    );
     return {
       status: ResultStatus.Success,
-      data: { accessToken },
+      data: {
+        accessToken,
+        cookie,
+      },
       extensions: [],
     };
   },
@@ -228,4 +239,44 @@ export const authService = {
       extensions: [],
     };
   },
+
+  async refreshToken(refreshToken: string) {
+    const payload = await jwtService.verifyRefreshToken(refreshToken);
+    if (!payload) {
+      return {
+        status: ResultStatus.Unauthorized,
+        errorMessage: "Invalid token signature or expired",
+        data: null,
+        extensions: [],
+      };
+    }
+
+    const userId = payload.userId;
+    const tokenHash = hashToken(refreshToken);
+
+    const tokenInBlacklist = await authRepositories.findTokenByBlackList(tokenHash);
+    if (tokenInBlacklist) {
+      return {
+        status: ResultStatus.Unauthorized,
+        errorMessage: "Token is blacklisted",
+        data: null,
+        extensions: [],
+      };
+    }
+
+    const newAccessToken = await jwtService.createToken(userId);
+    const { cookie } = await jwtService.createRefreshToken(userId);
+
+    await authRepositories.addRefreshTokenBlackList({
+      tokenHash,
+      userId,
+      createdAt: new Date(),
+    });
+
+    return {
+      status: ResultStatus.Success,
+      data: { newAccessToken, cookie },
+      extensions: [],
+    };
+  }
 };

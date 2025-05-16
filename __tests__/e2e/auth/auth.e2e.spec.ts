@@ -67,7 +67,6 @@ describe("Auth API", () => {
 
     expect(loginResponse.status).toBe(HttpStatus.Ok);
 
-    // Получаем токен
     const token = loginResponse.body.accessToken;
 
     const response = await request(app)
@@ -75,5 +74,46 @@ describe("Auth API", () => {
       .set("Authorization", `Bearer ${token}`);
 
     expect(response.status).toBe(HttpStatus.Ok);
+  });
+
+
+
+  it('should NOT allow reuse of refresh token after it was used once', async () => {
+    const user = await createUser(app);
+    const loginRes = await request(app)
+        .post('/auth/login')
+        .send({ loginOrEmail: user.email, password: '111111' });
+
+    expect(loginRes.status).toBe(HttpStatus.Ok);
+
+    // Извлекаем refresh token из заголовка Set-Cookie
+    const cookies = loginRes.headers['set-cookie'];
+    const cookieArray = Array.isArray(cookies) ? cookies : [cookies];
+    const refreshTokenCookie = cookieArray.find(cookie => cookie?.startsWith('refreshToken='));
+
+    if (!refreshTokenCookie) {
+      throw new Error('Refresh token not found in cookies');
+    }
+
+    const originalRefreshToken = refreshTokenCookie.split(';')[0].split('=')[1];
+
+    const accessToken = loginRes.body.accessToken;
+
+    // Первый запрос на обновление токена → должен пройти успешно
+    let refreshRes = await request(app)
+        .post('/auth/refresh-token')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .set('Cookie', `refreshToken=${originalRefreshToken}`);
+
+    expect(refreshRes.status).toBe(HttpStatus.Ok);
+    const newAccessToken = refreshRes.body.accessToken;
+
+    // Второй запрос с тем же refresh token → должен вернуть 401
+    const secondRefreshRes = await request(app)
+        .post('/auth/refresh-token')
+        .set('Authorization', `Bearer ${newAccessToken}`)
+        .set('Cookie', `refreshToken=${originalRefreshToken}`);
+
+    expect(secondRefreshRes.status).toBe(HttpStatus.Unauthorized);
   });
 });

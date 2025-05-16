@@ -60,7 +60,7 @@ export const testSeeder = {
       emailConfirmation: {
         confirmationCode: code ?? randomUUID(),
         expirationDate: expirationDate ?? add(new Date(), { minutes: 30 }),
-        isConfirmed: isConfirmed ?? false, // ← берём из параметра
+        isConfirmed: isConfirmed ?? false,
       },
     };
 

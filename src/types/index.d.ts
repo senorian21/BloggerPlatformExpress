@@ -5,6 +5,7 @@ declare global {
     interface Request {
       userId?: string; // Добавляем необязательное свойство userId
       user?: { id: string }; // Добавляем необязательное свойство user
+      refreshToken?: string;
     }
   }
 }

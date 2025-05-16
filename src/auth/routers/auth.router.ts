@@ -10,6 +10,8 @@ import { registrationConfirmationUserHandler } from "./handlers/registration-con
 import { registrationConfirmationInputDtoValidation } from "../validation/registration-confirmation.input-dto.validation-middlewares";
 import { registrationEmailResendingInputDtoValidation } from "../validation/registration-email-resending.input-dto.validation-middlewares";
 import { registrationEmailResendingUserHandler } from "./handlers/registration-email-resending";
+import { refreshTokenGuard } from "../middlewares/refresh.token.guard";
+import { refreshTokenHandler } from "./handlers/refresh-token";
 
 export const authRouter = express.Router({});
 
@@ -20,7 +22,7 @@ authRouter.post(
   loginizationHandler,
 );
 
-authRouter.get("/me", accessTokenGuard, accessTokenGuard, aboutUserHandler);
+authRouter.get("/me", accessTokenGuard, aboutUserHandler);
 
 authRouter.post(
   "/registration",
@@ -42,3 +44,5 @@ authRouter.post(
   inputValidationResultMiddleware,
   registrationEmailResendingUserHandler,
 );
+
+authRouter.post("/refresh-token", refreshTokenGuard, refreshTokenHandler);
