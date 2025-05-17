@@ -278,5 +278,39 @@ export const authService = {
       data: { newAccessToken, cookie },
       extensions: [],
     };
+  },
+
+  async logout(refreshToken: string) {
+    const payload = await jwtService.verifyRefreshToken(refreshToken);
+    if (!payload) {
+      return {
+        status: ResultStatus.Unauthorized,
+        errorMessage: "Invalid token signature or expired",
+        data: null,
+        extensions: [],
+      };
+    }
+
+    const userId = payload.userId;
+    const tokenHash = hashToken(refreshToken);
+    const tokenInBlacklist = await authRepositories.findTokenByBlackList(tokenHash);
+    if (tokenInBlacklist) {
+      return {
+        status: ResultStatus.Unauthorized,
+        errorMessage: "Token is blacklisted",
+        data: null,
+        extensions: [],
+      };
+    }
+    await authRepositories.addRefreshTokenBlackList({
+      tokenHash,
+      userId,
+      createdAt: new Date(),
+    });
+    return {
+      status: ResultStatus.Success,
+      data: null,
+      extensions: [],
+    };
   }
 };

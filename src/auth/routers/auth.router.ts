@@ -12,6 +12,7 @@ import { registrationEmailResendingInputDtoValidation } from "../validation/regi
 import { registrationEmailResendingUserHandler } from "./handlers/registration-email-resending";
 import { refreshTokenGuard } from "../middlewares/refresh.token.guard";
 import { refreshTokenHandler } from "./handlers/refresh-token";
+import {logoutHandler} from "./handlers/logout";
 
 export const authRouter = express.Router({});
 
@@ -46,3 +47,5 @@ authRouter.post(
 );
 
 authRouter.post("/refresh-token", refreshTokenGuard, refreshTokenHandler);
+
+authRouter.post("/logout", refreshTokenGuard, logoutHandler);
