@@ -6,9 +6,9 @@ export const nodemailerService = {
     email: string,
     code: string,
     template: (code: string) => string,
-  ): Promise<boolean> {
+  ) {
     const transporter = nodemailer.createTransport({
-      host: "smtp.yandex.ru", // SMTP-сервер Яндекса
+      host: appConfig.SMTP_SERVER, // SMTP-сервер Яндекса
       port: 465, // Порт для SSL
       secure: true, // Использовать SSL
       auth: {
@@ -17,13 +17,11 @@ export const nodemailerService = {
       },
     });
 
-    let info = await transporter.sendMail({
+    await transporter.sendMail({
       from: "BloggerPlatform <senorian2@yandex.by>",
       to: email,
       subject: "Registration",
       html: template(code),
     });
-
-    return !!info;
   },
 };

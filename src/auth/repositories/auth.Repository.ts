@@ -1,13 +1,12 @@
-import {RefreshToken} from "../types/refresh-token";
-import {refreshTokenCollection} from "../../db/mongo.db";
-
+import { RefreshToken } from "../types/refresh-token";
+import { refreshTokenCollection } from "../../db/mongo.db";
 
 export const authRepositories = {
-    async addRefreshTokenBlackList(refreshToken: RefreshToken) {
-        await refreshTokenCollection.insertOne(refreshToken);
-    },
+  async addRefreshTokenBlackList(refreshToken: RefreshToken) {
+    await refreshTokenCollection.insertOne(refreshToken);
+  },
 
-    async findTokenByBlackList(tokenHash: string): Promise<RefreshToken | null> {
-        return await refreshTokenCollection.findOne({ tokenHash });
-    },
+  async findTokenByBlackList(tokenHash: string): Promise<RefreshToken | null> {
+    return await refreshTokenCollection.findOne({ tokenHash });
+  },
 };

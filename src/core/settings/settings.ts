@@ -14,4 +14,5 @@ export const appConfig = {
   YANDEX_EMAIL: process.env.YANDEX_EMAIL,
   YANDEX_PASSWORD: process.env.YANDEX_PASSWORD,
   TTL_SECONDS: process.env.TTL_SECONDS as string,
+  SMTP_SERVER: process.env.SMTP_SERVER as string,
 };

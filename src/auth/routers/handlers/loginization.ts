@@ -11,8 +11,19 @@ export async function loginizationHandler(
   res: Response,
 ) {
   const { loginOrEmail, password } = req.body;
-
-  const result = await authService.loginUser(loginOrEmail, password);
+  const ip =
+    req.socket.remoteAddress ||
+    (Array.isArray(req.headers["x-forwarded-for"])
+      ? req.headers["x-forwarded-for"][0]
+      : req.headers["x-forwarded-for"]) ||
+    "unknown";
+  const userAgent = req.headers["user-agent"] || "unknown";
+  const result = await authService.loginUser(
+    loginOrEmail,
+    password,
+    ip,
+    userAgent,
+  );
   if (result.status !== ResultStatus.Success) {
     res.sendStatus(HttpStatus.Unauthorized);
   }

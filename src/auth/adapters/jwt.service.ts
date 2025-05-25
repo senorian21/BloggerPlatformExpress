@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import { appConfig } from "../../core/settings/settings";
-
-const timestamp = Date.now().toString();
+import { Token } from "../types/tokens";
+import { v4 as uuidv4 } from "uuid";
 
 export const jwtService = {
   async createToken(userId: string): Promise<string> {
@@ -12,10 +12,16 @@ export const jwtService = {
 
   async createRefreshToken(
     userId: string,
+    ip: string,
+    deviceName: string,
   ): Promise<{ token: string; cookie: string }> {
+    const deviceId = uuidv4();
     const refreshToken = jwt.sign(
       {
         userId,
+        ip,
+        deviceName,
+        deviceId,
       },
       appConfig.AC_SECRET_REFRESH_TOKEN,
       {
@@ -29,23 +35,16 @@ export const jwtService = {
     return { token: refreshToken, cookie };
   },
 
-  async verifyToken(token: string): Promise<{ userId: string } | null> {
+  async verifyJwt(token: string, secret: string): Promise<Token | null> {
     try {
-      return jwt.verify(token, appConfig.AC_SECRET_ACCESS_TOKEN) as {
-        userId: string;
-      };
-    } catch (error) {
-      console.error("Token verify some error");
-      return null;
-    }
-  },
+      const payload = jwt.verify(token, secret) as Token;
 
-  async verifyRefreshToken(token: string): Promise<{ userId: string } | null> {
-    try {
-      const payload = jwt.verify(token, appConfig.AC_SECRET_REFRESH_TOKEN) as { userId: string };
+      if (!payload || typeof payload !== "object" || !("userId" in payload)) {
+        return null;
+      }
+
       return payload;
     } catch (error: any) {
-      // Теперь видим точную причину ошибки
       console.error("JWT verification failed:", {
         message: error.message,
         name: error.name,
@@ -54,5 +53,13 @@ export const jwtService = {
 
       return null;
     }
-  }
+  },
+
+  async verifyToken(token: string) {
+    return jwtService.verifyJwt(token, appConfig.AC_SECRET_ACCESS_TOKEN);
+  },
+
+  async verifyRefreshToken(token: string) {
+    return jwtService.verifyJwt(token, appConfig.AC_SECRET_REFRESH_TOKEN);
+  },
 };

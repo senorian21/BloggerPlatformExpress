@@ -9,18 +9,19 @@ import { nodemailerService } from "../adapters/nodemailer.service";
 import { emailExamples } from "../adapters/emailExamples";
 import { randomUUID } from "crypto";
 import { add } from "date-fns";
-import { createHash } from 'crypto'
-import {authRepositories} from "../repositories/auth.Repository";
+import { createHash } from "crypto";
+import { authRepositories } from "../repositories/auth.Repository";
 
 export function hashToken(token: string): string {
-  return createHash('sha256').update(token).digest('hex');
+  return createHash("sha256").update(token).digest("hex");
 }
-
 
 export const authService = {
   async loginUser(
     loginOrEmail: string,
     password: string,
+    ip: string,
+    userAgent: string,
   ): Promise<Result<{ accessToken: string; cookie: string } | null>> {
     const result = await this.checkUserCredentials(loginOrEmail, password);
     if (result.status !== ResultStatus.Success) {
@@ -36,6 +37,8 @@ export const authService = {
     );
     const { cookie } = await jwtService.createRefreshToken(
       result.data!._id.toString(),
+      ip,
+      userAgent,
     );
     return {
       status: ResultStatus.Success,
@@ -240,7 +243,7 @@ export const authService = {
     };
   },
 
-  async refreshToken(refreshToken: string) {
+  async refreshToken(refreshToken: string, ip: string, userAgent: string) {
     const payload = await jwtService.verifyRefreshToken(refreshToken);
     if (!payload) {
       return {
@@ -254,7 +257,8 @@ export const authService = {
     const userId = payload.userId;
     const tokenHash = hashToken(refreshToken);
 
-    const tokenInBlacklist = await authRepositories.findTokenByBlackList(tokenHash);
+    const tokenInBlacklist =
+      await authRepositories.findTokenByBlackList(tokenHash);
     if (tokenInBlacklist) {
       return {
         status: ResultStatus.Unauthorized,
@@ -265,7 +269,11 @@ export const authService = {
     }
 
     const newAccessToken = await jwtService.createToken(userId);
-    const { cookie } = await jwtService.createRefreshToken(userId);
+    const { cookie } = await jwtService.createRefreshToken(
+      userId,
+      ip,
+      userAgent,
+    );
 
     await authRepositories.addRefreshTokenBlackList({
       tokenHash,
@@ -282,6 +290,7 @@ export const authService = {
 
   async logout(refreshToken: string) {
     const payload = await jwtService.verifyRefreshToken(refreshToken);
+
     if (!payload) {
       return {
         status: ResultStatus.Unauthorized,
@@ -293,7 +302,9 @@ export const authService = {
 
     const userId = payload.userId;
     const tokenHash = hashToken(refreshToken);
-    const tokenInBlacklist = await authRepositories.findTokenByBlackList(tokenHash);
+    const tokenInBlacklist =
+      await authRepositories.findTokenByBlackList(tokenHash);
+
     if (tokenInBlacklist) {
       return {
         status: ResultStatus.Unauthorized,
@@ -302,15 +313,17 @@ export const authService = {
         extensions: [],
       };
     }
+
     await authRepositories.addRefreshTokenBlackList({
       tokenHash,
       userId,
       createdAt: new Date(),
     });
+
     return {
       status: ResultStatus.Success,
       data: null,
       extensions: [],
     };
-  }
+  },
 };

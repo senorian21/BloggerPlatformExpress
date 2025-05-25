@@ -1,5 +1,5 @@
 export type RefreshToken = {
-    tokenHash: string;
-    userId: string;
-    createdAt: Date;
+  tokenHash: string;
+  userId: string;
+  createdAt: Date;
 };
