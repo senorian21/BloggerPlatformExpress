@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 
 export const jwtService = {
   async createToken(userId: string): Promise<string> {
+
     return jwt.sign({ userId }, appConfig.AC_SECRET_ACCESS_TOKEN, {
       expiresIn: appConfig.AC_TIME_ACCESS_TOKEN,
     } as jwt.SignOptions);
@@ -22,6 +23,7 @@ export const jwtService = {
         ip,
         deviceName,
         deviceId,
+
       },
       appConfig.AC_SECRET_REFRESH_TOKEN,
       {

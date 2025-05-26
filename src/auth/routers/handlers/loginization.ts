@@ -18,6 +18,7 @@ export async function loginizationHandler(
       : req.headers["x-forwarded-for"]) ||
     "unknown";
   const userAgent = req.headers["user-agent"] || "unknown";
+
   const result = await authService.loginUser(
     loginOrEmail,
     password,

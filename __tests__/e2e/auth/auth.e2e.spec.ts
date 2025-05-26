@@ -116,4 +116,41 @@ describe("Auth API", () => {
 
     expect(secondRefreshRes.status).toBe(HttpStatus.Unauthorized);
   });
+  // it('should successfully login and return access token with cookie header', async () => {
+  //   const response = await request(app)
+  //       .post('/auth/login')
+  //       .set('Content-Type', 'application/json')
+  //       .set('User-Agent', 'supertest-agent')  // указание user agent
+  //       .set('X-Forwarded-For', '127.0.0.1')     // симуляция IP-адреса
+  //       .send({
+  //         loginOrEmail: 'Nezox',
+  //         password: '8738378A'
+  //       });
+  //
+  //   // Проверяем, что статус 200
+  //   expect(response.status).toBe(200);
+  //
+  //   // Проверяем, что в теле возвращается accessToken
+  //   expect(response.body).toHaveProperty('accessToken');
+  //
+  //   // Проверяем, что в заголовках присутствует Set-Cookie
+  //   expect(response.headers['set-cookie']).toBeDefined();
+  //
+  //   // Можно добавить дополнительные проверки (например, декодировать JWT, проверить структуру cookie и т.д.)
+  // });
+
+  // it('should return 401 when credentials are invalid', async () => {
+  //   const response = await request(app)
+  //       .post('/auth/login')
+  //       .set('Content-Type', 'application/json')
+  //       .set('User-Agent', 'supertest-agent')
+  //       .set('X-Forwarded-For', '127.0.0.1')
+  //       .send({
+  //         loginOrEmail: 'InvalidUser',
+  //         password: 'WrongPassword'
+  //       });
+  //
+  //   // Ожидаем статус 401 вместо 200
+  //   expect(response.status).toBe(401);
+  // });
 });

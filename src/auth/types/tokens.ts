@@ -7,8 +7,8 @@
 
 export type accessToken = {
   userId: string;
-  iat: string;
-  exp: string;
+  iat?: number;
+  exp?: number;
 };
 
 export type RefreshToken = {
@@ -16,6 +16,8 @@ export type RefreshToken = {
   deviceId: string;
   deviceName: string;
   ip: string;
+  iat?: number;
+  exp?: number;
 };
 
 export type Token = accessToken | RefreshToken;
