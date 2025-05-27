@@ -5,18 +5,20 @@ import { ResultStatus } from "../../../core/result/resultCode";
 import { resultCodeToHttpException } from "../../../core/result/resultCodeToHttpException";
 import { RequestWithBody } from "../../../core/types/requests";
 import { LoginDto } from "../../types/login.dto";
+import {cookieService} from "../../adapters/cookie.service";
 
 export async function loginizationHandler(
   req: RequestWithBody<LoginDto>,
   res: Response,
 ) {
   const { loginOrEmail, password } = req.body;
-  const ip =
+  const ip: string =
     req.socket.remoteAddress ||
     (Array.isArray(req.headers["x-forwarded-for"])
       ? req.headers["x-forwarded-for"][0]
       : req.headers["x-forwarded-for"]) ||
     "unknown";
+
   const userAgent = req.headers["user-agent"] || "unknown";
 
   const result = await authService.loginUser(
@@ -33,6 +35,7 @@ export async function loginizationHandler(
     res.sendStatus(HttpStatus.NotFound);
     return;
   }
+
   res
     .header("Set-Cookie", result.data.cookie)
     .status(HttpStatus.Ok)

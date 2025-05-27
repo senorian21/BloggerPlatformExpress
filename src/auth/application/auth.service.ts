@@ -14,6 +14,7 @@ import { authRepositories } from "../repositories/auth.Repository";
 import {session} from "../types/session";
 import {appConfig} from "../../core/settings/settings";
 import {RefreshToken} from "../types/tokens";
+import {cookieService} from "../adapters/cookie.service";
 
 export function hashToken(token: string): string {
   return createHash("sha256").update(token).digest("hex");
@@ -58,8 +59,8 @@ export const authService = {
 
     const newSession: session = {
       userId,
-      createdAt: iat!,
-      expiresAt: exp!,
+      createdAt: iat!.toString(),
+      expiresAt: exp!.toString(),
       deviceId,
       deviceName,
       ip,
@@ -282,39 +283,53 @@ export const authService = {
       };
     }
 
-    const userId = payload.userId;
-    const tokenHash = hashToken(refreshToken);
+    const refreshTokenPayload = payload as RefreshToken;
+    const { userId, iat, exp, deviceName, deviceId } = refreshTokenPayload;
+    const session: session = {
+      userId,
+      createdAt: iat!.toString(),
+      expiresAt: exp!.toString(),
+      deviceId,
+      deviceName,
+      ip,
+    };
 
-    const tokenInBlacklist =
-      await authRepositories.findTokenByBlackList(tokenHash);
-    if (tokenInBlacklist) {
+    const sessionExists = await authRepositories.findSession(session);
+
+    if (!sessionExists) {
       return {
         status: ResultStatus.Unauthorized,
-        errorMessage: "Token is blacklisted",
+        errorMessage: "There is no such session",
         data: null,
         extensions: [],
       };
     }
 
-    const newAccessToken = await jwtService.createToken(userId);
-    const { cookie } = await jwtService.createRefreshToken(
-      userId,
-      ip,
-      userAgent,
-    );
 
-    await authRepositories.addRefreshTokenBlackList({
-      tokenHash,
-      userId,
-      createdAt: new Date(),
-    });
+    const { token: newRefreshToken, cookie } = await jwtService.createRefreshToken(userId,ip,deviceName,deviceId)
+    const token = await jwtService.verifyRefreshToken(newRefreshToken)
+
+
+    const newIssuedAt = token!.iat!.toString();
+    const newExpiresAt = token!.exp!.toString()
+    await authRepositories.updateSession(sessionExists, newIssuedAt!, newExpiresAt!);
+
+    const newAccessToken = await jwtService.createToken(userId);
+
 
     return {
       status: ResultStatus.Success,
-      data: { newAccessToken, cookie },
+      data: { newAccessToken, newRefreshToken },
       extensions: [],
     };
   },
+
+
+
+
+
+
+
 
   async logout(refreshToken: string) {
     const payload = await jwtService.verifyRefreshToken(refreshToken);

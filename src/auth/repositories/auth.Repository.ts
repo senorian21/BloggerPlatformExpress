@@ -11,10 +11,27 @@ export const authRepositories = {
     return await refreshTokenCollection.findOne({ tokenHash });
   },
 
+  async updateOrCreateSession(session: session) {
+    const existingSession = await authRepositories.findSession(session);
+    if (existingSession) {
+      await authRepositories.updateSessionByLogin(existingSession, session);
+    } else {
+      await authRepositories.createSession(session);
+    }
+  },
+
+  async updateSessionByLogin(existingSession: session, session: session) {
+    await sessionCollection.updateOne(
+        { _id: existingSession._id },
+        { $set: { createdAt: session.createdAt, expiresAt: session.expiresAt } }
+    );
+  },
+
   async createSession(session:session){
     await sessionCollection.insertOne(session);
   },
-  async updateOrCreateSession(session: session) {
+
+  async findSession(session:session) {
     const existingSession = await sessionCollection.findOne({
       userId: session.userId,
       $or: [
@@ -22,15 +39,15 @@ export const authRepositories = {
         { deviceName: session.deviceName },
       ],
     });
-    if (existingSession) {
-      await sessionCollection.updateOne(
-          { _id: existingSession._id },
-          { $set: { createdAt: session.createdAt, expiresAt: session.expiresAt } }
-      );
-    } else {
-      await authRepositories.createSession(session);
-    }
+    return existingSession;
   },
+
+  async updateSession(sessionExists: session, newIssuedAt: string, newExpiresAt: string) {
+    await sessionCollection.updateOne(
+        { _id: sessionExists._id },
+        { $set: { createdAt: newIssuedAt, expiresAt: newExpiresAt } }
+    );
+  }
 
 
 

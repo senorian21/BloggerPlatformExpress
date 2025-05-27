@@ -15,15 +15,15 @@ export const jwtService = {
     userId: string,
     ip: string,
     deviceName: string,
+    deviceId?: string,
   ): Promise<{ token: string; cookie: string }> {
-    const deviceId = uuidv4();
+    const actualDeviceId = deviceId||uuidv4();
     const refreshToken = jwt.sign(
       {
         userId,
         ip,
         deviceName,
-        deviceId,
-
+        deviceId:actualDeviceId
       },
       appConfig.AC_SECRET_REFRESH_TOKEN,
       {
@@ -31,7 +31,6 @@ export const jwtService = {
       } as jwt.SignOptions,
     );
 
-    // Формат Set-Cookie заголовка
     const cookie = `refreshToken=${refreshToken}; HttpOnly; Secure; Path=/; Max-Age=20`;
 
     return { token: refreshToken, cookie };
