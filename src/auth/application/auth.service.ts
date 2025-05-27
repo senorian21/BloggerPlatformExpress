@@ -305,7 +305,6 @@ export const authService = {
       };
     }
 
-
     const { token: newRefreshToken, cookie } = await jwtService.createRefreshToken(userId,ip,deviceName,deviceId)
     const token = await jwtService.verifyRefreshToken(newRefreshToken)
 
@@ -323,6 +322,7 @@ export const authService = {
       extensions: [],
     };
   },
+
 
 
 
