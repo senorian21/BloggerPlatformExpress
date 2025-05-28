@@ -49,3 +49,4 @@ authRouter.post(
 authRouter.post("/refresh-token", refreshTokenGuard, refreshTokenHandler);
 
 authRouter.post("/logout", refreshTokenGuard, logoutHandler);
+
