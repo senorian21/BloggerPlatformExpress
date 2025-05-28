@@ -6,7 +6,7 @@ export async function getDeviceListHandler(req: Request, res: Response) {
   const userId = req.user?.id;
 
   if (!userId) {
-    res.sendStatus(401);
+    res.sendStatus(HttpStatus.Unauthorized);
     return;
   }
   const deviceList = await authQueryRepositories.deviceSessionList(userId);

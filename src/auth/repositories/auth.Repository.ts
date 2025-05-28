@@ -48,4 +48,9 @@ export const authRepositories = {
     });
     return existingSession;
   },
+
+  async deleteSessionByDeviceId(userId: string, deviceId: string): Promise<boolean> {
+    const result = await sessionCollection.deleteOne({ userId, deviceId });
+    return result.deletedCount === 1;
+  },
 };
