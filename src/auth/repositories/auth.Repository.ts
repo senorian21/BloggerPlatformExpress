@@ -21,7 +21,7 @@ export const authRepositories = {
   async findSession(session: session) {
     const existingSession = await sessionCollection.findOne({
       userId: session.userId,
-      $or: [{ deviceId: session.deviceId }, { deviceName: session.deviceName }],
+      deviceId: session.deviceId ,
     });
     return existingSession;
   },
@@ -39,5 +39,13 @@ export const authRepositories = {
 
   async deleteSession(sessionId: string) {
     await sessionCollection.deleteOne({ _id: sessionId });
+  },
+
+  async findSessionByDeviceNameAndUserId(deviceName: string, userId: string) {
+    const existingSession = await sessionCollection.findOne({
+      userId: userId,
+      deviceName: deviceName
+    });
+    return existingSession;
   },
 };

@@ -36,15 +36,51 @@ export const authService = {
         data: null,
       };
     }
+    const userIdToken = result.data?._id;
+
+    if (!userIdToken) {
+      return {
+        status: ResultStatus.Unauthorized,
+        errorMessage: "User ID not found",
+        extensions: [{ field: "userId", message: "Invalid user ID" }],
+        data: null,
+      };
+    }
+    const existSessions = await
+        authRepositories.findSessionByDeviceNameAndUserId(userAgent, userIdToken.toString())
+    let actualDeviceId
+
+    let refreshToken;
+    let cookie;
+
+    if (existSessions) {
+      actualDeviceId = existSessions?.deviceId;
+
+      const refreshData = await jwtService.createRefreshToken(
+          result.data!._id.toString(),
+          ip,
+          userAgent,
+          actualDeviceId
+      );
+
+      refreshToken = refreshData.token;
+      cookie = refreshData.cookie;
+    } else {
+      const refreshData = await jwtService.createRefreshToken(
+          result.data!._id.toString(),
+          ip,
+          userAgent
+      );
+
+      refreshToken = refreshData.token;
+      cookie = refreshData.cookie;
+    }
+
 
     const accessToken = await jwtService.createToken(
       result.data!._id.toString(),
     );
-    const { token: refreshToken, cookie } = await jwtService.createRefreshToken(
-      result.data!._id.toString(),
-      ip,
-      userAgent,
-    );
+
 
     const verifiedToken = await jwtService.verifyRefreshToken(refreshToken);
     if (!verifiedToken) {
