@@ -1,6 +1,7 @@
 import { RefreshToken } from "../types/refresh-token";
 import {refreshTokenCollection, sessionCollection} from "../../db/mongo.db";
 import {session} from "../types/session";
+import {ObjectId} from "mongodb";
 
 export const authRepositories = {
   async addRefreshTokenBlackList(refreshToken: RefreshToken) {
@@ -47,8 +48,11 @@ export const authRepositories = {
         { _id: sessionExists._id },
         { $set: { createdAt: newIssuedAt, expiresAt: newExpiresAt } }
     );
-  }
+  },
 
+  async deleteSession(sessionId: string) {
+    await sessionCollection.deleteOne({ _id: sessionId });
+  }
 
 
 };

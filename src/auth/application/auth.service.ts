@@ -324,15 +324,8 @@ export const authService = {
   },
 
 
-
-
-
-
-
-
-
   async logout(refreshToken: string) {
-    const payload = await jwtService.verifyRefreshToken(refreshToken);
+    const payload = await jwtService.verifyRefreshToken(refreshToken) as RefreshToken;
 
     if (!payload) {
       return {
@@ -343,31 +336,28 @@ export const authService = {
       };
     }
 
-    const { userId, iat, exp } = payload;
+    const { userId, iat, exp, deviceName, deviceId, ip } = payload;
 
-    const issuedAt = iat ? new Date(iat * 1000) : new Date(); // Unix → Date
-    const expiresAt = exp ? new Date(exp * 1000) : undefined;
+    const session: session = {
+      userId,
+      createdAt: iat!.toString(),
+      expiresAt: exp!.toString(),
+      deviceId,
+      deviceName,
+      ip,
+    };
 
-
-    const tokenHash = hashToken(refreshToken);
-    const tokenInBlacklist =
-      await authRepositories.findTokenByBlackList(tokenHash);
-
-    if (tokenInBlacklist) {
+    const sessionExists = await authRepositories.findSession(session);
+    if (!sessionExists) {
       return {
         status: ResultStatus.Unauthorized,
-        errorMessage: "Token is blacklisted",
+        errorMessage: "Invalid token signature or expired",
         data: null,
         extensions: [],
       };
     }
 
-    await authRepositories.addRefreshTokenBlackList({
-      tokenHash,
-      userId,
-      createdAt: issuedAt,
-      expiresAt,
-    });
+    await authRepositories.deleteSession(sessionExists._id)
 
     return {
       status: ResultStatus.Success,
