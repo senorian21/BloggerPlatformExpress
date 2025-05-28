@@ -1,14 +1,10 @@
-
-import { sessionCollection} from "../../db/mongo.db";
-import {mapToDeviceListOutput} from "../../security/mappers/map-to-device-list-output.util";
+import { sessionCollection } from "../../db/mongo.db";
+import { mapToDeviceListOutput } from "../../security/mappers/map-to-device-list-output.util";
 
 export const authQueryRepositories = {
-    async deviceSessionList(userId: string) {
+  async deviceSessionList(userId: string) {
+    const sessions = await sessionCollection.find({ userId }).toArray();
 
-        const sessions = await sessionCollection.find({ userId }).toArray();
-
-        return mapToDeviceListOutput(sessions);
-    }
-
-
+    return mapToDeviceListOutput(sessions);
+  },
 };

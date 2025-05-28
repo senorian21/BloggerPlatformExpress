@@ -5,7 +5,7 @@ import { User } from "../users/types/user";
 import { comment } from "../comments/types/comment";
 import { appConfig } from "../core/settings/settings";
 import { RefreshToken } from "../auth/types/refresh-token";
-import {session} from "../auth/types/session";
+import { session } from "../auth/types/session";
 
 const BLOG_COLLECTION_NAME: string = "blog";
 const POST_COLLECTION_NAME: string = "post";
@@ -21,7 +21,7 @@ export let postCollection: Collection<Post>;
 export let userCollection: Collection<User>;
 export let commentCollection: Collection<comment>;
 export let refreshTokenCollection: Collection<RefreshToken>;
-export let sessionCollection: Collection<session>
+export let sessionCollection: Collection<session>;
 // Флаг для определения режима работы (основной или тестовый)
 let isTestMode = false;
 
@@ -43,7 +43,7 @@ export async function runDb(url: string): Promise<void> {
   refreshTokenCollection = db.collection<RefreshToken>(
     REFRESH_TOKEN_COLLECTION_NAME,
   );
-  sessionCollection = db.collection<session>(SESSION_COLLECTION_NAME)
+  sessionCollection = db.collection<session>(SESSION_COLLECTION_NAME);
 
   try {
     await client.connect();

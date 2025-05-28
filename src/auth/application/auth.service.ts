@@ -11,10 +11,10 @@ import { randomUUID } from "crypto";
 import { add } from "date-fns";
 import { createHash } from "crypto";
 import { authRepositories } from "../repositories/auth.Repository";
-import {session} from "../types/session";
-import {appConfig} from "../../core/settings/settings";
-import {RefreshToken} from "../types/tokens";
-import {cookieService} from "../adapters/cookie.service";
+import { session } from "../types/session";
+import { appConfig } from "../../core/settings/settings";
+import { RefreshToken } from "../types/tokens";
+import { cookieService } from "../adapters/cookie.service";
 
 export function hashToken(token: string): string {
   return createHash("sha256").update(token).digest("hex");
@@ -22,10 +22,10 @@ export function hashToken(token: string): string {
 
 export const authService = {
   async loginUser(
-      loginOrEmail: string,
-      password: string,
-      ip: string,
-      userAgent: string,
+    loginOrEmail: string,
+    password: string,
+    ip: string,
+    userAgent: string,
   ): Promise<Result<{ accessToken: string; cookie: string } | null>> {
     const result = await this.checkUserCredentials(loginOrEmail, password);
     if (result.status !== ResultStatus.Success) {
@@ -37,11 +37,13 @@ export const authService = {
       };
     }
 
-    const accessToken = await jwtService.createToken(result.data!._id.toString());
+    const accessToken = await jwtService.createToken(
+      result.data!._id.toString(),
+    );
     const { token: refreshToken, cookie } = await jwtService.createRefreshToken(
-        result.data!._id.toString(),
-        ip,
-        userAgent,
+      result.data!._id.toString(),
+      ip,
+      userAgent,
     );
 
     const verifiedToken = await jwtService.verifyRefreshToken(refreshToken);
@@ -65,7 +67,6 @@ export const authService = {
       deviceName,
       ip,
     };
-
 
     await authRepositories.updateOrCreateSession(newSession);
 
@@ -305,16 +306,19 @@ export const authService = {
       };
     }
 
-    const { token: newRefreshToken, cookie } = await jwtService.createRefreshToken(userId,ip,deviceName,deviceId)
-    const token = await jwtService.verifyRefreshToken(newRefreshToken)
-
+    const { token: newRefreshToken, cookie } =
+      await jwtService.createRefreshToken(userId, ip, deviceName, deviceId);
+    const token = await jwtService.verifyRefreshToken(newRefreshToken);
 
     const newIssuedAt = token!.iat!.toString();
-    const newExpiresAt = token!.exp!.toString()
-    await authRepositories.updateSession(sessionExists, newIssuedAt!, newExpiresAt!);
+    const newExpiresAt = token!.exp!.toString();
+    await authRepositories.updateSession(
+      sessionExists,
+      newIssuedAt!,
+      newExpiresAt!,
+    );
 
     const newAccessToken = await jwtService.createToken(userId);
-
 
     return {
       status: ResultStatus.Success,
@@ -323,9 +327,10 @@ export const authService = {
     };
   },
 
-
   async logout(refreshToken: string) {
-    const payload = await jwtService.verifyRefreshToken(refreshToken) as RefreshToken;
+    const payload = (await jwtService.verifyRefreshToken(
+      refreshToken,
+    )) as RefreshToken;
 
     if (!payload) {
       return {
@@ -357,7 +362,7 @@ export const authService = {
       };
     }
 
-    await authRepositories.deleteSession(sessionExists._id)
+    await authRepositories.deleteSession(sessionExists._id);
 
     return {
       status: ResultStatus.Success,

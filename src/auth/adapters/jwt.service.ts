@@ -5,7 +5,6 @@ import { v4 as uuidv4 } from "uuid";
 
 export const jwtService = {
   async createToken(userId: string): Promise<string> {
-
     return jwt.sign({ userId }, appConfig.AC_SECRET_ACCESS_TOKEN, {
       expiresIn: appConfig.AC_TIME_ACCESS_TOKEN,
     } as jwt.SignOptions);
@@ -17,13 +16,13 @@ export const jwtService = {
     deviceName: string,
     deviceId?: string,
   ): Promise<{ token: string; cookie: string }> {
-    const actualDeviceId = deviceId||uuidv4();
+    const actualDeviceId = deviceId || uuidv4();
     const refreshToken = jwt.sign(
       {
         userId,
         ip,
         deviceName,
-        deviceId:actualDeviceId
+        deviceId: actualDeviceId,
       },
       appConfig.AC_SECRET_REFRESH_TOKEN,
       {
@@ -63,5 +62,4 @@ export const jwtService = {
   async verifyRefreshToken(token: string) {
     return jwtService.verifyJwt(token, appConfig.AC_SECRET_REFRESH_TOKEN);
   },
-
 };

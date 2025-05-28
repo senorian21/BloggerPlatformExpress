@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/types/http-statuses";
 import { authService } from "../../application/auth.service";
 import { ResultStatus } from "../../../core/result/resultCode";
-import {cookieService} from "../../adapters/cookie.service";
+import { cookieService } from "../../adapters/cookie.service";
 
 export async function refreshTokenHandler(req: Request, res: Response) {
   const refreshToken = req.refreshToken;
@@ -25,7 +25,5 @@ export async function refreshTokenHandler(req: Request, res: Response) {
 
   cookieService.setRefreshTokenCookie(res, result.data!.newRefreshToken);
 
-  res
-    .status(HttpStatus.Ok)
-    .send({ accessToken: result.data!.newAccessToken });
+  res.status(HttpStatus.Ok).send({ accessToken: result.data!.newAccessToken });
 }

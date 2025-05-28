@@ -1,9 +1,10 @@
 import { WithId } from "mongodb";
-import {session} from "../../auth/types/session";
-import {deviceViewModel} from "../type/device-view-model";
+import { session } from "../../auth/types/session";
+import { deviceViewModel } from "../type/device-view-model";
 
-
-export function mapToDeviceListOutput(sessions: WithId<session>[]): deviceViewModel[] {
+export function mapToDeviceListOutput(
+  sessions: WithId<session>[],
+): deviceViewModel[] {
   return sessions.map((session) => ({
     ip: session.ip,
     title: session.deviceName,
