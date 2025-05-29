@@ -1,13 +1,15 @@
 import { sessionCollection } from "../../db/mongo.db";
 import { session } from "../types/session";
 
-
 export const authRepositories = {
-
   async updateOrCreateSession(session: session) {
     const existingSession = await authRepositories.findSession(session);
     if (existingSession) {
-      await authRepositories.updateSession(existingSession, session.createdAt, session.expiresAt! );
+      await authRepositories.updateSession(
+        existingSession,
+        session.createdAt,
+        session.expiresAt!,
+      );
     } else {
       await authRepositories.createSession(session);
     }
@@ -20,7 +22,7 @@ export const authRepositories = {
   async findSession(session: session) {
     const existingSession = await sessionCollection.findOne({
       userId: session.userId,
-      deviceId: session.deviceId ,
+      deviceId: session.deviceId,
     });
     return existingSession;
   },
@@ -43,22 +45,26 @@ export const authRepositories = {
   async findSessionByDeviceNameAndUserId(deviceName: string, userId: string) {
     const existingSession = await sessionCollection.findOne({
       userId: userId,
-      deviceName: deviceName
+      deviceName: deviceName,
     });
     return existingSession;
   },
 
-  async deleteSessionByDeviceId(userId: string, deviceId: string): Promise<boolean> {
+  async findSessionByDeviceId(deviceId: string) {
+    return await sessionCollection.findOne({ deviceId: deviceId });
+  },
+
+  async deleteSessionByDeviceId(
+    userId: string,
+    deviceId: string,
+  ): Promise<boolean> {
     const result = await sessionCollection.deleteOne({ userId, deviceId });
     return result.deletedCount === 1;
   },
 
-  async deleteDevice(deviceId: string , userId: string) {
+  async deleteDevice(deviceId: string, userId: string) {
     await sessionCollection.deleteMany({
-      $and: [
-        { userId: userId },
-        { deviceId: { $ne: deviceId } }
-      ]
+      $and: [{ userId: userId }, { deviceId: { $ne: deviceId } }],
     });
-  }
+  },
 };

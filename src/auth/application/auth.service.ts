@@ -46,9 +46,12 @@ export const authService = {
         data: null,
       };
     }
-    const existSessions = await
-        authRepositories.findSessionByDeviceNameAndUserId(userAgent, userIdToken.toString())
-    let actualDeviceId
+    const existSessions =
+      await authRepositories.findSessionByDeviceNameAndUserId(
+        userAgent,
+        userIdToken.toString(),
+      );
+    let actualDeviceId;
 
     let refreshToken;
     let cookie;
@@ -57,30 +60,28 @@ export const authService = {
       actualDeviceId = existSessions?.deviceId;
 
       const refreshData = await jwtService.createRefreshToken(
-          result.data!._id.toString(),
-          ip,
-          userAgent,
-          actualDeviceId
+        result.data!._id.toString(),
+        ip,
+        userAgent,
+        actualDeviceId,
       );
 
       refreshToken = refreshData.token;
       cookie = refreshData.cookie;
     } else {
       const refreshData = await jwtService.createRefreshToken(
-          result.data!._id.toString(),
-          ip,
-          userAgent
+        result.data!._id.toString(),
+        ip,
+        userAgent,
       );
 
       refreshToken = refreshData.token;
       cookie = refreshData.cookie;
     }
 
-
     const accessToken = await jwtService.createToken(
       result.data!._id.toString(),
     );
-
 
     const verifiedToken = await jwtService.verifyRefreshToken(refreshToken);
     if (!verifiedToken) {

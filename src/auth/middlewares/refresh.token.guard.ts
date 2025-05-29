@@ -1,6 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import { jwtService } from "../adapters/jwt.service";
 import { IdType } from "../../core/types/id";
+import { RefreshToken } from "../types/tokens";
+import { authRepositories } from "../repositories/auth.Repository";
+import { session } from "../types/session";
 
 export const refreshTokenGuard = async (
   req: Request,
@@ -28,8 +31,26 @@ export const refreshTokenGuard = async (
     return;
   }
 
-  const payload = await jwtService.verifyRefreshToken(refreshToken);
+  const payload = (await jwtService.verifyRefreshToken(
+    refreshToken,
+  )) as RefreshToken;
   if (!payload || !payload.userId) {
+    res.sendStatus(401);
+    return;
+  }
+
+  const expirationTime = payload.iat?.toString();
+
+  const foundSession = await authRepositories.findSessionByDeviceNameAndUserId(
+    payload.deviceName,
+    payload.userId,
+  );
+  if (!foundSession) {
+    res.sendStatus(401);
+    return;
+  }
+
+  if (expirationTime !== foundSession.createdAt) {
     res.sendStatus(401);
     return;
   }

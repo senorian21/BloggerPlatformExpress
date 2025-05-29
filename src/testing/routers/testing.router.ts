@@ -3,7 +3,9 @@ import { HttpStatus } from "../../core/types/http-statuses";
 import {
   blogCollection,
   commentCollection,
-  postCollection, sessionCollection,
+  postCollection,
+  rateCollection,
+  sessionCollection,
   userCollection,
 } from "../../db/mongo.db";
 
@@ -15,7 +17,8 @@ testingRouter.delete("/all-data", async (request: Request, res: Response) => {
     postCollection.deleteMany(),
     userCollection.deleteMany(),
     commentCollection.deleteMany(),
-      sessionCollection.deleteMany(),
+    sessionCollection.deleteMany(),
+    rateCollection.deleteMany(),
   ]);
   res.sendStatus(HttpStatus.NoContent);
 });

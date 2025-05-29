@@ -19,7 +19,7 @@ export const authRouter = express.Router({});
 
 authRouter.post(
   "/login",
-    rateLimiter,
+  rateLimiter,
   authInputDtoValidation,
   inputValidationResultMiddleware,
   loginizationHandler,
@@ -29,7 +29,7 @@ authRouter.get("/me", accessTokenGuard, aboutUserHandler);
 
 authRouter.post(
   "/registration",
-    rateLimiter,
+  rateLimiter,
   userInputDtoValidation,
   inputValidationResultMiddleware,
   registrationUserHandler,
@@ -37,7 +37,7 @@ authRouter.post(
 
 authRouter.post(
   "/registration-confirmation",
-    rateLimiter,
+  rateLimiter,
   registrationConfirmationInputDtoValidation,
   inputValidationResultMiddleware,
   registrationConfirmationUserHandler,
@@ -45,7 +45,7 @@ authRouter.post(
 
 authRouter.post(
   "/registration-email-resending",
-    rateLimiter,
+  rateLimiter,
   registrationEmailResendingInputDtoValidation,
   inputValidationResultMiddleware,
   registrationEmailResendingUserHandler,

@@ -1,18 +1,14 @@
-import {jwtService} from "../../auth/adapters/jwt.service";
-import {ResultStatus} from "../../core/result/resultCode";
-import {RefreshToken} from "../../auth/types/tokens";
-import {authRepositories} from "../../auth/repositories/auth.Repository";
-import {session} from "../../auth/types/session";
-
-
+import { jwtService } from "../../auth/adapters/jwt.service";
+import { ResultStatus } from "../../core/result/resultCode";
+import { RefreshToken } from "../../auth/types/tokens";
+import { authRepositories } from "../../auth/repositories/auth.Repository";
+import { session } from "../../auth/types/session";
 
 export const securityService = {
-  async deleteSessionsByDeviceId(
-      refreshToken: string,
-      deleteDeviceId: string
-  ){
-
-    const payload = (await jwtService.verifyRefreshToken(refreshToken)) as RefreshToken;
+  async deleteSessionsByDeviceId(refreshToken: string, deleteDeviceId: string) {
+    const payload = (await jwtService.verifyRefreshToken(
+      refreshToken,
+    )) as RefreshToken;
 
     if (!payload) {
       return {
@@ -25,9 +21,10 @@ export const securityService = {
 
     const { userId } = payload;
 
-    const deleted = await authRepositories.deleteSessionByDeviceId(userId, deleteDeviceId);
+    const foundSession =
+      await authRepositories.findSessionByDeviceId(deleteDeviceId);
 
-    if (!deleted) {
+    if (!foundSession) {
       return {
         status: ResultStatus.NotFound,
         errorMessage: "Session not found",
@@ -35,6 +32,17 @@ export const securityService = {
         extensions: [],
       };
     }
+
+    if (foundSession.userId !== userId) {
+      return {
+        status: ResultStatus.Forbidden,
+        errorMessage: "Session not found",
+        data: null,
+        extensions: [],
+      };
+    }
+
+    await authRepositories.deleteSessionByDeviceId(userId, deleteDeviceId);
 
     return {
       status: ResultStatus.Success,
@@ -44,22 +52,21 @@ export const securityService = {
     };
   },
 
-  async deleteAllDeviceExceptTheActiveOne (refreshToken: string) {
-    const payload = (await jwtService.verifyRefreshToken(refreshToken)) as RefreshToken;
+  async deleteAllDeviceExceptTheActiveOne(refreshToken: string) {
+    const payload = (await jwtService.verifyRefreshToken(
+      refreshToken,
+    )) as RefreshToken;
     if (!payload) {
       return {
         status: ResultStatus.Unauthorized,
         errorMessage: "Session not found",
         data: null,
         extensions: [],
-      }
+      };
     }
     const { userId, deviceId } = payload;
 
-    await authRepositories.deleteDevice(deviceId, userId)
-
-
-
+    await authRepositories.deleteDevice(deviceId, userId);
 
     return {
       status: ResultStatus.Success,
@@ -67,5 +74,5 @@ export const securityService = {
       data: null,
       extensions: [],
     };
-  }
+  },
 };
