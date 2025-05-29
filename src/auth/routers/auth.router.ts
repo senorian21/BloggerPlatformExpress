@@ -13,11 +13,13 @@ import { registrationEmailResendingUserHandler } from "./handlers/registration-e
 import { refreshTokenGuard } from "../middlewares/refresh.token.guard";
 import { refreshTokenHandler } from "./handlers/refresh-token";
 import { logoutHandler } from "./handlers/logout";
+import rateLimiter from "../middlewares/rate.limited.guard";
 
 export const authRouter = express.Router({});
 
 authRouter.post(
   "/login",
+    rateLimiter,
   authInputDtoValidation,
   inputValidationResultMiddleware,
   loginizationHandler,
@@ -27,6 +29,7 @@ authRouter.get("/me", accessTokenGuard, aboutUserHandler);
 
 authRouter.post(
   "/registration",
+    rateLimiter,
   userInputDtoValidation,
   inputValidationResultMiddleware,
   registrationUserHandler,
@@ -34,6 +37,7 @@ authRouter.post(
 
 authRouter.post(
   "/registration-confirmation",
+    rateLimiter,
   registrationConfirmationInputDtoValidation,
   inputValidationResultMiddleware,
   registrationConfirmationUserHandler,
@@ -41,6 +45,7 @@ authRouter.post(
 
 authRouter.post(
   "/registration-email-resending",
+    rateLimiter,
   registrationEmailResendingInputDtoValidation,
   inputValidationResultMiddleware,
   registrationEmailResendingUserHandler,

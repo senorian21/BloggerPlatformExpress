@@ -7,7 +7,7 @@ import { appConfig } from "./core/settings/settings";
 const bootstrap = async () => {
   const app = express();
   setupApp(app);
-
+  app.set('trust proxy', true)
   // порт приложения
   const PORT = appConfig.PORT;
 

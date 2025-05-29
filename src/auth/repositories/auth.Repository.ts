@@ -1,7 +1,6 @@
-import { RefreshToken } from "../types/refresh-token";
-import { refreshTokenCollection, sessionCollection } from "../../db/mongo.db";
+import { sessionCollection } from "../../db/mongo.db";
 import { session } from "../types/session";
-import { ObjectId } from "mongodb";
+
 
 export const authRepositories = {
 
