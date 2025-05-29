@@ -11,7 +11,7 @@ export const securityService = {
       refreshToken: string,
       deleteDeviceId: string
   ){
-    // Проверяем refreshToken
+
     const payload = (await jwtService.verifyRefreshToken(refreshToken)) as RefreshToken;
 
     if (!payload) {
@@ -23,10 +23,8 @@ export const securityService = {
       };
     }
 
-    // Извлекаем userId из payload
     const { userId } = payload;
 
-    // Вызываем репозиторий для удаления сессии
     const deleted = await authRepositories.deleteSessionByDeviceId(userId, deleteDeviceId);
 
     if (!deleted) {
@@ -45,4 +43,29 @@ export const securityService = {
       extensions: [],
     };
   },
+
+  async deleteAllDeviceExceptTheActiveOne (refreshToken: string) {
+    const payload = (await jwtService.verifyRefreshToken(refreshToken)) as RefreshToken;
+    if (!payload) {
+      return {
+        status: ResultStatus.Unauthorized,
+        errorMessage: "Session not found",
+        data: null,
+        extensions: [],
+      }
+    }
+    const { userId, deviceId } = payload;
+
+    await authRepositories.deleteDevice(deviceId, userId)
+
+
+
+
+    return {
+      status: ResultStatus.Success,
+      errorMessage: "",
+      data: null,
+      extensions: [],
+    };
+  }
 };

@@ -53,4 +53,13 @@ export const authRepositories = {
     const result = await sessionCollection.deleteOne({ userId, deviceId });
     return result.deletedCount === 1;
   },
+
+  async deleteDevice(deviceId: string , userId: string) {
+    await sessionCollection.deleteMany({
+      $and: [
+        { userId: userId },
+        { deviceId: { $ne: deviceId } }
+      ]
+    });
+  }
 };
