@@ -12,7 +12,6 @@ import { createUser } from "../utils/users/create-user";
 import request from "supertest";
 import {AUTH_PATH, COMMENTS_PATH, POSTS_PATH} from "../../../src/core/paths/paths";
 import { HttpStatus } from "../../../src/core/types/http-statuses";
-import { before, beforeEach } from "node:test";
 import { UserInput } from "../../../src/users/dto/user.input-dto";
 
 describe("Comments API", () => {

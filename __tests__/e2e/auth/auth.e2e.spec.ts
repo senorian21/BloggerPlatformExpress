@@ -9,6 +9,9 @@ import { AUTH_PATH } from "../../../src/core/paths/paths";
 import { HttpStatus } from "../../../src/core/types/http-statuses";
 import { UserInput } from "../../../src/users/dto/user.input-dto";
 import { getUserDto } from "../utils/users/get-user-dto";
+import {authRepositories} from "../../../src/auth/repositories/auth.Repository";
+import {jwtService} from "../../../src/auth/adapters/jwt.service";
+import {RefreshToken} from "../../../src/auth/types/tokens";
 
 describe("Auth API", () => {
   const app = express();
@@ -76,81 +79,84 @@ describe("Auth API", () => {
     expect(response.status).toBe(HttpStatus.Ok);
   });
 
-  // it("should NOT allow reuse of refresh token after it was used once", async () => {
-  //   const user = await createUser(app);
-  //   const loginRes = await request(app)
-  //     .post("/auth/login")
-  //     .send({ loginOrEmail: user.email, password: "111111" });
-  //
-  //   expect(loginRes.status).toBe(HttpStatus.Ok);
-  //
-  //   // Извлекаем refresh token из заголовка Set-Cookie
-  //   const cookies = loginRes.headers["set-cookie"];
-  //   const cookieArray = Array.isArray(cookies) ? cookies : [cookies];
-  //   const refreshTokenCookie = cookieArray.find((cookie) =>
-  //     cookie?.startsWith("refreshToken="),
-  //   );
-  //
-  //   if (!refreshTokenCookie) {
-  //     throw new Error("Refresh token not found in cookies");
-  //   }
-  //
-  //   const originalRefreshToken = refreshTokenCookie.split(";")[0].split("=")[1];
-  //
-  //   const accessToken = loginRes.body.accessToken;
-  //
-  //   // Первый запрос на обновление токена → должен пройти успешно
-  //   let refreshRes = await request(app)
-  //     .post("/auth/refresh-token")
-  //     .set("Authorization", `Bearer ${accessToken}`)
-  //     .set("Cookie", `refreshToken=${originalRefreshToken}`);
-  //
-  //   expect(refreshRes.status).toBe(HttpStatus.Ok);
-  //   const newAccessToken = refreshRes.body.accessToken;
-  //
-  //   // Второй запрос с тем же refresh token → должен вернуть 401
-  //   const secondRefreshRes = await request(app)
-  //     .post("/auth/refresh-token")
-  //     .set("Authorization", `Bearer ${newAccessToken}`)
-  //     .set("Cookie", `refreshToken=${originalRefreshToken}`);
-  //
-  //   expect(secondRefreshRes.status).toBe(HttpStatus.Unauthorized);
-  // });
-  // it('should successfully login and return access token with cookie header', async () => {
-  //   const response = await request(app)
-  //       .post('/auth/login')
-  //       .set('Content-Type', 'application/json')
-  //       .set('User-Agent', 'supertest-agent')  // указание user agent
-  //       .set('X-Forwarded-For', '127.0.0.1')     // симуляция IP-адреса
-  //       .send({
-  //         loginOrEmail: 'Nezox',
-  //         password: '8738378A'
-  //       });
-  //
-  //   // Проверяем, что статус 200
-  //   expect(response.status).toBe(200);
-  //
-  //   // Проверяем, что в теле возвращается accessToken
-  //   expect(response.body).toHaveProperty('accessToken');
-  //
-  //   // Проверяем, что в заголовках присутствует Set-Cookie
-  //   expect(response.headers['set-cookie']).toBeDefined();
-  //
-  //   // Можно добавить дополнительные проверки (например, декодировать JWT, проверить структуру cookie и т.д.)
-  // });
+  it('should successfully login and return access token with cookie header', async () => {
+    const newUser: UserInput = {
+      ...getUserDto(),
+      login: "admin123",
+      password: "1234567",
+      email: "admin1@example1.com",
+    };
+
+    const user = await createUser(app, newUser);
+    const response = await request(app)
+        .post('/auth/login')
+        .set('User-Agent', 'supertest-agent')  // указание user agent
+        .send({
+          loginOrEmail: newUser.login,
+          password: newUser.password
+        });
+
+    expect(response.status).toBe(HttpStatus.Ok);
+
+    expect(response.body).toHaveProperty('accessToken');
+
+    expect(response.headers['set-cookie']).toBeDefined();
+
+  });
 
   it("should return 401 when credentials are invalid", async () => {
     const response = await request(app)
-      .post("/auth/login")
-      .set("Content-Type", "application/json")
+      .post(`${AUTH_PATH}/login`)
       .set("User-Agent", "supertest-agent")
-      .set("X-Forwarded-For", "127.0.0.1")
       .send({
         loginOrEmail: "InvalidUser",
         password: "WrongPassword",
       });
 
-    // Ожидаем статус 401 вместо 200
-    expect(response.status).toBe(401);
+    expect(response.status).toBe(HttpStatus.Unauthorized);
   });
+
+  it("Checking the querial limit is expected to be an error 429", async () => {
+    const newUser: UserInput = {
+      ...getUserDto(),
+      login: "admin",
+      password: "123456",
+      email: "admin@example.com",
+    };
+    await createUser(app, newUser);
+
+    const loginResponse1 = await request(app)
+        .post(`${AUTH_PATH}/login`)
+        .set("User-Agent", "supertest-agent1")
+        .send({ loginOrEmail: newUser.email, password: newUser.password })
+        .expect(HttpStatus.Ok);
+
+    const loginResponse2 = await request(app)
+        .post(`${AUTH_PATH}/login`)
+        .set("User-Agent", "supertest-agent2")
+        .send({ loginOrEmail: newUser.email, password: newUser.password })
+        .expect(HttpStatus.Ok);
+
+    const loginResponse3 = await request(app)
+        .post(`${AUTH_PATH}/login`)
+        .set("User-Agent", "supertest-agent3")
+        .send({ loginOrEmail: newUser.email, password: newUser.password })
+        .expect(HttpStatus.Ok);
+
+    const loginResponse4 = await request(app)
+        .post(`${AUTH_PATH}/login`)
+        .set("User-Agent", "supertest-agent4")
+        .send({ loginOrEmail: newUser.email, password: newUser.password })
+        .expect(HttpStatus.Ok);
+    const loginResponse5 = await request(app)
+        .post(`${AUTH_PATH}/login`)
+        .set("User-Agent", "supertest-agent4")
+        .send({ loginOrEmail: newUser.email, password: newUser.password })
+        .expect(HttpStatus.Ok);
+    const loginResponse6 = await request(app)
+        .post(`${AUTH_PATH}/login`)
+        .set("User-Agent", "supertest-agent4")
+        .send({ loginOrEmail: newUser.email, password: newUser.password })
+        .expect(HttpStatus.TooManyRequests);
+  })
 });
