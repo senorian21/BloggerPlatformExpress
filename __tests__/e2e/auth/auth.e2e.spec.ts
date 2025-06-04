@@ -9,9 +9,9 @@ import { AUTH_PATH } from "../../../src/core/paths/paths";
 import { HttpStatus } from "../../../src/core/types/http-statuses";
 import { UserInput } from "../../../src/users/dto/user.input-dto";
 import { getUserDto } from "../utils/users/get-user-dto";
-import {authRepositories} from "../../../src/auth/repositories/auth.Repository";
-import {jwtService} from "../../../src/auth/adapters/jwt.service";
-import {RefreshToken} from "../../../src/auth/types/tokens";
+import { authRepositories } from "../../../src/auth/repositories/auth.Repository";
+import { jwtService } from "../../../src/auth/adapters/jwt.service";
+import { RefreshToken } from "../../../src/auth/types/tokens";
 
 describe("Auth API", () => {
   const app = express();
@@ -79,7 +79,7 @@ describe("Auth API", () => {
     expect(response.status).toBe(HttpStatus.Ok);
   });
 
-  it('should successfully login and return access token with cookie header', async () => {
+  it("should successfully login and return access token with cookie header", async () => {
     const newUser: UserInput = {
       ...getUserDto(),
       login: "admin123",
@@ -89,19 +89,18 @@ describe("Auth API", () => {
 
     const user = await createUser(app, newUser);
     const response = await request(app)
-        .post('/auth/login')
-        .set('User-Agent', 'supertest-agent')  // указание user agent
-        .send({
-          loginOrEmail: newUser.login,
-          password: newUser.password
-        });
+      .post("/auth/login")
+      .set("User-Agent", "supertest-agent") // указание user agent
+      .send({
+        loginOrEmail: newUser.login,
+        password: newUser.password,
+      });
 
     expect(response.status).toBe(HttpStatus.Ok);
 
-    expect(response.body).toHaveProperty('accessToken');
+    expect(response.body).toHaveProperty("accessToken");
 
-    expect(response.headers['set-cookie']).toBeDefined();
-
+    expect(response.headers["set-cookie"]).toBeDefined();
   });
 
   it("should return 401 when credentials are invalid", async () => {
@@ -126,37 +125,37 @@ describe("Auth API", () => {
     await createUser(app, newUser);
 
     const loginResponse1 = await request(app)
-        .post(`${AUTH_PATH}/login`)
-        .set("User-Agent", "supertest-agent1")
-        .send({ loginOrEmail: newUser.email, password: newUser.password })
-        .expect(HttpStatus.Ok);
+      .post(`${AUTH_PATH}/login`)
+      .set("User-Agent", "supertest-agent1")
+      .send({ loginOrEmail: newUser.email, password: newUser.password })
+      .expect(HttpStatus.Ok);
 
     const loginResponse2 = await request(app)
-        .post(`${AUTH_PATH}/login`)
-        .set("User-Agent", "supertest-agent2")
-        .send({ loginOrEmail: newUser.email, password: newUser.password })
-        .expect(HttpStatus.Ok);
+      .post(`${AUTH_PATH}/login`)
+      .set("User-Agent", "supertest-agent2")
+      .send({ loginOrEmail: newUser.email, password: newUser.password })
+      .expect(HttpStatus.Ok);
 
     const loginResponse3 = await request(app)
-        .post(`${AUTH_PATH}/login`)
-        .set("User-Agent", "supertest-agent3")
-        .send({ loginOrEmail: newUser.email, password: newUser.password })
-        .expect(HttpStatus.Ok);
+      .post(`${AUTH_PATH}/login`)
+      .set("User-Agent", "supertest-agent3")
+      .send({ loginOrEmail: newUser.email, password: newUser.password })
+      .expect(HttpStatus.Ok);
 
     const loginResponse4 = await request(app)
-        .post(`${AUTH_PATH}/login`)
-        .set("User-Agent", "supertest-agent4")
-        .send({ loginOrEmail: newUser.email, password: newUser.password })
-        .expect(HttpStatus.Ok);
+      .post(`${AUTH_PATH}/login`)
+      .set("User-Agent", "supertest-agent4")
+      .send({ loginOrEmail: newUser.email, password: newUser.password })
+      .expect(HttpStatus.Ok);
     const loginResponse5 = await request(app)
-        .post(`${AUTH_PATH}/login`)
-        .set("User-Agent", "supertest-agent4")
-        .send({ loginOrEmail: newUser.email, password: newUser.password })
-        .expect(HttpStatus.Ok);
+      .post(`${AUTH_PATH}/login`)
+      .set("User-Agent", "supertest-agent4")
+      .send({ loginOrEmail: newUser.email, password: newUser.password })
+      .expect(HttpStatus.Ok);
     const loginResponse6 = await request(app)
-        .post(`${AUTH_PATH}/login`)
-        .set("User-Agent", "supertest-agent4")
-        .send({ loginOrEmail: newUser.email, password: newUser.password })
-        .expect(HttpStatus.TooManyRequests);
-  })
+      .post(`${AUTH_PATH}/login`)
+      .set("User-Agent", "supertest-agent4")
+      .send({ loginOrEmail: newUser.email, password: newUser.password })
+      .expect(HttpStatus.TooManyRequests);
+  });
 });

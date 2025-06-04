@@ -15,7 +15,7 @@ import { session } from "../types/session";
 import { appConfig } from "../../core/settings/settings";
 import { RefreshToken } from "../types/tokens";
 import { cookieService } from "../adapters/cookie.service";
-
+import { passwordRecoveryHandler } from "../routers/handlers/password-recovery";
 
 export const authService = {
   async loginUser(
@@ -43,11 +43,10 @@ export const authService = {
         data: null,
       };
     }
-    const existSessions =
-      await authRepositories.findSession({
-        userId: userIdToken.toString(),
-        deviceName: userAgent,
-      });
+    const existSessions = await authRepositories.findSession({
+      userId: userIdToken.toString(),
+      deviceName: userAgent,
+    });
     let actualDeviceId;
 
     let refreshToken;
@@ -375,10 +374,12 @@ export const authService = {
       };
     }
 
-    const { userId,  deviceId} = payload;
+    const { userId, deviceId } = payload;
 
-
-    const sessionExists = await authRepositories.findSession({userId, deviceId});
+    const sessionExists = await authRepositories.findSession({
+      userId,
+      deviceId,
+    });
     if (!sessionExists || !sessionExists._id) {
       return {
         status: ResultStatus.Unauthorized,
@@ -389,6 +390,41 @@ export const authService = {
     }
 
     await authRepositories.deleteSession(sessionExists._id);
+
+    return {
+      status: ResultStatus.Success,
+      data: null,
+      extensions: [],
+    };
+  },
+
+  async passwordRecovery(email: string) {
+    const user = await userRepository.findByLoginOrEmail(email);
+    if (!user) {
+      return {
+        status: ResultStatus.Unauthorized,
+        errorMessage: "There is no such user",
+        data: null,
+        extensions: [],
+      };
+    }
+
+    const newConfirmationCode = randomUUID();
+    const newExpirationDate = add(new Date(), { days: 7 });
+
+    await userRepository.updateConfirmationCodeAndExpiration(
+      user._id.toString(),
+      newConfirmationCode,
+      newExpirationDate,
+    );
+
+    nodemailerService
+      .sendEmail(
+        user.email,
+        newConfirmationCode,
+        emailExamples.passwordRecovery,
+      )
+      .catch((er) => console.error("Error in send email:", er));
 
     return {
       status: ResultStatus.Success,

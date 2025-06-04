@@ -14,6 +14,7 @@ import { refreshTokenGuard } from "../middlewares/refresh.token.guard";
 import { refreshTokenHandler } from "./handlers/refresh-token";
 import { logoutHandler } from "./handlers/logout";
 import rateLimiter from "../middlewares/rate.limited.guard";
+import { passwordRecoveryHandler } from "./handlers/password-recovery";
 
 export const authRouter = express.Router({});
 
@@ -52,5 +53,13 @@ authRouter.post(
 );
 
 authRouter.post("/refresh-token", refreshTokenGuard, refreshTokenHandler);
+
+authRouter.post(
+  "/password-recovery",
+  rateLimiter,
+  registrationEmailResendingInputDtoValidation,
+  inputValidationResultMiddleware,
+  passwordRecoveryHandler,
+);
 
 authRouter.post("/logout", refreshTokenGuard, logoutHandler);

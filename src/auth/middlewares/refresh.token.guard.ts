@@ -3,42 +3,42 @@ import { jwtService } from "../adapters/jwt.service";
 import { IdType } from "../../core/types/id";
 import { RefreshToken } from "../types/tokens";
 import { authRepositories } from "../repositories/auth.Repository";
-import { session } from "../types/session";
-import {HttpStatus} from "../../core/types/http-statuses";
+import { HttpStatus } from "../../core/types/http-statuses";
 
 export const refreshTokenGuard = async (
-    req: Request,
-    res: Response,
-    next: NextFunction,
+  req: Request,
+  res: Response,
+  next: NextFunction,
 ): Promise<void> => {
   const cookieHeader = req.headers.cookie;
   if (!cookieHeader) {
-    res.sendStatus(401);
+    res.sendStatus(HttpStatus.Unauthorized);
     return;
   }
 
   const cookies = cookieHeader.split(";").reduce(
-      (acc, cookie) => {
-        const [key, value] = cookie.trim().split("=");
-        acc[key] = value;
-        return acc;
-      },
-      {} as Record<string, string>,
+    (acc, cookie) => {
+      const [key, value] = cookie.trim().split("=");
+      acc[key] = value;
+      return acc;
+    },
+    {} as Record<string, string>,
   );
 
   const refreshToken = cookies["refreshToken"];
   if (!refreshToken) {
-    res.sendStatus(401);
+    res.sendStatus(HttpStatus.Unauthorized);
     return;
   }
 
   try {
-    const payload = await jwtService.verifyRefreshToken(refreshToken) as RefreshToken;
+    const payload = (await jwtService.verifyRefreshToken(
+      refreshToken,
+    )) as RefreshToken;
     if (!payload || !payload.userId || !payload.deviceName) {
-      res.sendStatus(401);
+      res.sendStatus(HttpStatus.Unauthorized);
       return;
     }
-
 
     const foundSession = await authRepositories.findSession({
       deviceName: payload.deviceName,
@@ -55,8 +55,7 @@ export const refreshTokenGuard = async (
     const sessionCreatedAt = foundSession.createdAt.toString();
 
     if (tokenIat !== sessionCreatedAt) {
-      console.log("Mismatch:", { tokenIat, sessionCreatedAt });
-      res.sendStatus(401);
+      res.sendStatus(HttpStatus.Unauthorized);
       return;
     }
 
@@ -66,6 +65,6 @@ export const refreshTokenGuard = async (
 
     next();
   } catch (error) {
-    res.sendStatus(401);
+    res.sendStatus(HttpStatus.Unauthorized);
   }
 };

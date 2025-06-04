@@ -10,7 +10,11 @@ import { PostInput } from "../../../src/posts/dto/post.input-dto";
 import { getPostDto } from "../utils/posts/get-posts-dto";
 import { createUser } from "../utils/users/create-user";
 import request from "supertest";
-import {AUTH_PATH, COMMENTS_PATH, POSTS_PATH} from "../../../src/core/paths/paths";
+import {
+  AUTH_PATH,
+  COMMENTS_PATH,
+  POSTS_PATH,
+} from "../../../src/core/paths/paths";
 import { HttpStatus } from "../../../src/core/types/http-statuses";
 import { UserInput } from "../../../src/users/dto/user.input-dto";
 
@@ -159,7 +163,6 @@ describe("Comments API", () => {
     const originalComment = createCommentResponse.body;
     expect(originalComment).toHaveProperty("id");
 
-
     const updatedContent = "Updated comment content.";
     const updateCommentResponse = await request(app)
       .put(`${COMMENTS_PATH}/${originalComment.id}`)
@@ -194,36 +197,36 @@ describe("Comments API", () => {
     };
     const user = await createUser(app, newUser);
     const loginResponse = await request(app)
-        .post(`${AUTH_PATH}/login`)
-        .send({
-          loginOrEmail: user.login,
-          password: newUser.password,
-        })
-        .expect(HttpStatus.Ok);
+      .post(`${AUTH_PATH}/login`)
+      .send({
+        loginOrEmail: user.login,
+        password: newUser.password,
+      })
+      .expect(HttpStatus.Ok);
 
     const accessToken = loginResponse.body.accessToken;
     expect(accessToken).toBeDefined();
 
     const createCommentResponse = await request(app)
-        .post(`${POSTS_PATH}/${post.id}/comments`)
-        .set("Authorization", `Bearer ${accessToken}`)
-        .send({
-          content: "Original comment content.",
-        })
-        .expect(HttpStatus.Created);
+      .post(`${POSTS_PATH}/${post.id}/comments`)
+      .set("Authorization", `Bearer ${accessToken}`)
+      .send({
+        content: "Original comment content.",
+      })
+      .expect(HttpStatus.Created);
 
     const originalComment = createCommentResponse.body;
     expect(originalComment).toHaveProperty("id");
 
     const deleteCommentResponse = await request(app)
-        .delete(`${COMMENTS_PATH}/${originalComment.id}`)
-        .set("Authorization", `Bearer ${accessToken}`)
-        .expect(HttpStatus.NoContent);
+      .delete(`${COMMENTS_PATH}/${originalComment.id}`)
+      .set("Authorization", `Bearer ${accessToken}`)
+      .expect(HttpStatus.NoContent);
 
     const getCommentResponse = await request(app)
-        .get(`${COMMENTS_PATH}/${originalComment.id}`)
-        .set("Authorization", `Bearer ${accessToken}`)
-        .expect(HttpStatus.NotFound);
+      .get(`${COMMENTS_PATH}/${originalComment.id}`)
+      .set("Authorization", `Bearer ${accessToken}`)
+      .expect(HttpStatus.NotFound);
   });
   it("Get existing comment by id, GET /comments/{id}", async () => {
     const blog = await createBlog(app);
@@ -243,37 +246,38 @@ describe("Comments API", () => {
     };
     const user = await createUser(app, newUser);
     const loginResponse = await request(app)
-        .post(`${AUTH_PATH}/login`)
-        .send({
-          loginOrEmail: user.login,
-          password: newUser.password,
-        })
-        .expect(HttpStatus.Ok);
+      .post(`${AUTH_PATH}/login`)
+      .send({
+        loginOrEmail: user.login,
+        password: newUser.password,
+      })
+      .expect(HttpStatus.Ok);
 
     const accessToken = loginResponse.body.accessToken;
     expect(accessToken).toBeDefined();
 
     const createCommentResponse = await request(app)
-        .post(`${POSTS_PATH}/${post.id}/comments`)
-        .set("Authorization", `Bearer ${accessToken}`)
-        .send({
-          content: "Original comment content.",
-        })
-        .expect(HttpStatus.Created);
+      .post(`${POSTS_PATH}/${post.id}/comments`)
+      .set("Authorization", `Bearer ${accessToken}`)
+      .send({
+        content: "Original comment content.",
+      })
+      .expect(HttpStatus.Created);
 
     const originalComment = createCommentResponse.body;
     expect(originalComment).toHaveProperty("id");
 
-
     const getCommentResponse = await request(app)
-        .get(`${COMMENTS_PATH}/${originalComment.id}`)
-        .set("Authorization", `Bearer ${accessToken}`)
-        .expect(HttpStatus.Ok);
-
+      .get(`${COMMENTS_PATH}/${originalComment.id}`)
+      .set("Authorization", `Bearer ${accessToken}`)
+      .expect(HttpStatus.Ok);
 
     const retrievedComment = getCommentResponse.body;
     expect(retrievedComment).toHaveProperty("id");
-    expect(retrievedComment).toHaveProperty("content", "Original comment content.");
+    expect(retrievedComment).toHaveProperty(
+      "content",
+      "Original comment content.",
+    );
     expect(retrievedComment).toHaveProperty("commentatorInfo.userId");
     expect(retrievedComment).toHaveProperty("commentatorInfo.userLogin");
     expect(retrievedComment).toHaveProperty("createdAt");

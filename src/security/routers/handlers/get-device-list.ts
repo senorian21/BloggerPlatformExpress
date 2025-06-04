@@ -4,7 +4,6 @@ import { HttpStatus } from "../../../core/types/http-statuses";
 
 export async function getDeviceListHandler(req: Request, res: Response) {
   const userId = req.user?.id;
-  console.log(userId);
   if (!userId) {
     res.sendStatus(HttpStatus.Unauthorized);
     return;

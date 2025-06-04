@@ -34,7 +34,6 @@ export function setIsTestMode(mode: boolean): void {
 export async function runDb(url: string): Promise<void> {
   client = new MongoClient(url);
 
-  // Выбор базы данных в зависимости от режима
   const dbName = isTestMode ? appConfig.DB_NAME_TEST : appConfig.DB_NAME;
   const db: Db = client.db(dbName);
 
@@ -49,11 +48,22 @@ export async function runDb(url: string): Promise<void> {
     await client.connect();
     await db.command({ ping: 1 });
 
-    await sessionCollection.createIndex(
-      { createdAt: 1 },
-      { expireAfterSeconds: 60 * 60 * 24 * 7 }, // 7 дней
+    await rateCollection.createIndex(
+      { date: 1 },
+      {
+        expireAfterSeconds: 60 * 60 * 24 * 7, // 7 дней
+        name: "ttl_index_for_rate",
+      },
     );
 
+    await userCollection.createIndex(
+      { ttlAt: 1 },
+      {
+        expireAfterSeconds: 60 * 60 * 24 * 7, // 7 дней
+        partialFilterExpression: { isConfirmed: false },
+        name: "ttl_index_for_unconfirmed_users",
+      },
+    );
     console.log(`Connected to database: ${dbName}`);
   } catch (err) {
     await client.close();

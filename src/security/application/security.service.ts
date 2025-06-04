@@ -21,8 +21,9 @@ export const securityService = {
 
     const { userId } = payload;
 
-    const foundSession =
-      await authRepositories.findSession({deviceId: deleteDeviceId});
+    const foundSession = await authRepositories.findSession({
+      deviceId: deleteDeviceId,
+    });
 
     if (!foundSession) {
       return {

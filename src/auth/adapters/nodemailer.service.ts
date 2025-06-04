@@ -5,8 +5,10 @@ export const nodemailerService = {
   async sendEmail(
     email: string,
     code: string,
-    template: (code: string) => string,
+    template: (code: string) => { html: string; subject: string },
   ) {
+    const { html, subject } = template(code); // Извлекаем тему и HTML из шаблона
+
     const transporter = nodemailer.createTransport({
       host: appConfig.SMTP_SERVER, // SMTP-сервер Яндекса
       port: 465, // Порт для SSL
@@ -20,8 +22,8 @@ export const nodemailerService = {
     await transporter.sendMail({
       from: "BloggerPlatform <senorian2@yandex.by>",
       to: email,
-      subject: "Registration",
-      html: template(code),
+      subject,
+      html,
     });
   },
 };
