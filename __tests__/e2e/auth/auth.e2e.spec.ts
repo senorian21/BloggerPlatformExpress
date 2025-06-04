@@ -158,4 +158,34 @@ describe("Auth API", () => {
       .send({ loginOrEmail: newUser.email, password: newUser.password })
       .expect(HttpStatus.TooManyRequests);
   });
+  it("Should not allow multiple refreshes with the same token", async () => {
+    const user = await createUser(app);
+    const loginRes = await request(app)
+      .post(`${AUTH_PATH}/login`)
+      .send({ loginOrEmail: user.email, password: "111111" })
+      .expect(HttpStatus.Ok);
+
+    const cookiesHeader = loginRes.headers["set-cookie"];
+
+    const cookies = Array.isArray(cookiesHeader)
+      ? cookiesHeader
+      : [cookiesHeader];
+
+    const refreshTokenCookie = cookies.find((cookie) =>
+      cookie.startsWith("refreshToken="),
+    );
+
+    const originalRefreshToken = refreshTokenCookie.split(";")[0].split("=")[1];
+
+    await request(app)
+      .post(`${AUTH_PATH}/refresh-token`)
+      .set("Cookie", `refreshToken=${originalRefreshToken}`)
+      .expect(HttpStatus.Ok);
+
+    // Второй refresh с тем же токеном — ожидаем 401
+    await request(app)
+      .post(`${AUTH_PATH}/refresh-token`)
+      .set("Cookie", `refreshToken=${originalRefreshToken}`)
+      .expect(HttpStatus.Unauthorized);
+  });
 });

@@ -41,7 +41,7 @@ export const refreshTokenGuard = async (
     }
 
     const foundSession = await authRepositories.findSession({
-      deviceName: payload.deviceName,
+      deviceId: payload.deviceId,
       userId: payload.userId,
     });
 
@@ -50,16 +50,15 @@ export const refreshTokenGuard = async (
       return;
     }
 
-    // Сравниваем время создания токена и сессии
-    const tokenIat = payload.iat?.toString();
-    const sessionCreatedAt = foundSession.createdAt.toString();
+    const tokenIat = payload.iat;
+
+    const sessionCreatedAt = parseInt(foundSession.createdAt);
 
     if (tokenIat !== sessionCreatedAt) {
       res.sendStatus(HttpStatus.Unauthorized);
       return;
     }
 
-    // Если всё ок — продолжаем
     req.user = { id: payload.userId } as IdType;
     req.refreshToken = refreshToken;
 

@@ -341,10 +341,12 @@ export const authService = {
 
     const { token: newRefreshToken, cookie } =
       await jwtService.createRefreshToken(userId, ip, deviceName, deviceId);
-    const token = await jwtService.verifyRefreshToken(newRefreshToken);
+    const token = (await jwtService.verifyRefreshToken(
+      newRefreshToken,
+    )) as RefreshToken;
 
-    const newIssuedAt = token!.iat!.toString();
-    const newExpiresAt = token!.exp!.toString();
+    const newIssuedAt = token.iat!.toString();
+    const newExpiresAt = token.exp!.toString();
     await authRepositories.updateSession(
       sessionExists,
       newIssuedAt!,
