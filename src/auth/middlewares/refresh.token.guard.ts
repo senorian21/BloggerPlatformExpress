@@ -4,6 +4,7 @@ import { IdType } from "../../core/types/id";
 import { RefreshToken } from "../types/tokens";
 import { authRepositories } from "../repositories/auth.Repository";
 import { session } from "../types/session";
+import {HttpStatus} from "../../core/types/http-statuses";
 
 export const refreshTokenGuard = async (
     req: Request,
@@ -40,12 +41,12 @@ export const refreshTokenGuard = async (
     }
 
 
-    const foundSession = await authRepositories.findSessionByDeviceNameAndUserId(
-        payload.deviceName,
-        payload.userId,
-    );
+    const foundSession = await authRepositories.findSession({
+      deviceName: payload.deviceName,
+      userId: payload.userId,
+    });
     if (!foundSession) {
-      res.sendStatus(401);
+      res.sendStatus(HttpStatus.Unauthorized);
       return;
     }
 

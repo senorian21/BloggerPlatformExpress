@@ -22,7 +22,7 @@ export const securityService = {
     const { userId } = payload;
 
     const foundSession =
-      await authRepositories.findSessionByDeviceId(deleteDeviceId);
+      await authRepositories.findSession({deviceId: deleteDeviceId});
 
     if (!foundSession) {
       return {

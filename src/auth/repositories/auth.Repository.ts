@@ -1,9 +1,10 @@
 import { sessionCollection } from "../../db/mongo.db";
 import { session } from "../types/session";
+import {ObjectId} from "mongodb";
 
 export const authRepositories = {
   async updateOrCreateSession(session: session) {
-    const existingSession = await authRepositories.findSession(session);
+    const existingSession = await authRepositories.findSession({userId: session.userId, deviceId: session.deviceId});
     if (existingSession) {
       await authRepositories.updateSession(
         existingSession,
@@ -34,24 +35,22 @@ export const authRepositories = {
     await sessionCollection.deleteOne({ _id: sessionId });
   },
 
-  async findSession(session: session) {
-    const existingSession = await sessionCollection.findOne({
-      userId: session.userId,
-      deviceId: session.deviceId,
-    });
-    return existingSession;
-  },
+  async findSession(
+      filters: {
+        userId?: string;
+        deviceId?: string;
+        deviceName?: string;
+      }
+  ): Promise<session | null> {
+    const query: any = {};
 
-  async findSessionByDeviceNameAndUserId(deviceName: string, userId: string) {
-    const existingSession = await sessionCollection.findOne({
-      userId: userId,
-      deviceName: deviceName,
-    });
-    return existingSession;
-  },
+    if (filters.userId) {
+      query.userId = new ObjectId(filters.userId);
+    }
+    if (filters.deviceId) query.deviceId = filters.deviceId;
+    if (filters.deviceName) query.deviceName = filters.deviceName;
 
-  async findSessionByDeviceId(deviceId: string) {
-    return await sessionCollection.findOne({ deviceId: deviceId });
+    return await sessionCollection.findOne(query);
   },
 
   async deleteSessionByDeviceId(

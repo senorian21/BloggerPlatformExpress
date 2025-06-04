@@ -16,9 +16,6 @@ import { appConfig } from "../../core/settings/settings";
 import { RefreshToken } from "../types/tokens";
 import { cookieService } from "../adapters/cookie.service";
 
-export function hashToken(token: string): string {
-  return createHash("sha256").update(token).digest("hex");
-}
 
 export const authService = {
   async loginUser(
@@ -47,10 +44,10 @@ export const authService = {
       };
     }
     const existSessions =
-      await authRepositories.findSessionByDeviceNameAndUserId(
-        userAgent,
-        userIdToken.toString(),
-      );
+      await authRepositories.findSession({
+        userId: userIdToken.toString(),
+        deviceName: userAgent,
+      });
     let actualDeviceId;
 
     let refreshToken;
@@ -378,19 +375,11 @@ export const authService = {
       };
     }
 
-    const { userId, iat, exp, deviceName, deviceId, ip } = payload;
+    const { userId,  deviceId} = payload;
 
-    const session: session = {
-      userId,
-      createdAt: iat!.toString(),
-      expiresAt: exp!.toString(),
-      deviceId,
-      deviceName,
-      ip,
-    };
 
-    const sessionExists = await authRepositories.findSession(session);
-    if (!sessionExists) {
+    const sessionExists = await authRepositories.findSession({userId, deviceId});
+    if (!sessionExists || !sessionExists._id) {
       return {
         status: ResultStatus.Unauthorized,
         errorMessage: "Invalid token signature or expired",
