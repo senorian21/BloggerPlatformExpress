@@ -11,7 +11,6 @@ export const refreshTokenGuard = async (
     res: Response,
     next: NextFunction,
 ): Promise<void> => {
-  // Извлекаем refresh-токен из кукис
   const cookieHeader = req.headers.cookie;
   if (!cookieHeader) {
     res.sendStatus(401);
@@ -45,6 +44,7 @@ export const refreshTokenGuard = async (
       deviceName: payload.deviceName,
       userId: payload.userId,
     });
+
     if (!foundSession) {
       res.sendStatus(HttpStatus.Unauthorized);
       return;

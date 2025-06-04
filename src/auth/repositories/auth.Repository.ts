@@ -45,7 +45,7 @@ export const authRepositories = {
     const query: any = {};
 
     if (filters.userId) {
-      query.userId = new ObjectId(filters.userId);
+      query.userId = filters.userId;
     }
     if (filters.deviceId) query.deviceId = filters.deviceId;
     if (filters.deviceName) query.deviceName = filters.deviceName;
