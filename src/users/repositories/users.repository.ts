@@ -89,4 +89,14 @@ export const userRepository = {
       },
     );
   },
+  async updatePasswordUser(userId: string, newPasswordHash: string) {
+    await userCollection.updateOne(
+      { _id: new ObjectId(userId) },
+      {
+        $set: {
+          passwordHash: newPasswordHash,
+        },
+      },
+    );
+  },
 };

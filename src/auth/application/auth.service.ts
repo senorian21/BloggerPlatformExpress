@@ -432,4 +432,26 @@ export const authService = {
       extensions: [],
     };
   },
+  async newPassword(newPassword: string, recoveryCode: string) {
+    const user = await userRepository.findByCode(recoveryCode);
+    if (!user) {
+      return {
+        status: ResultStatus.BadRequest,
+        errorMessage: "There is no such user",
+        data: null,
+        extensions: [],
+      };
+    }
+    const newPasswordHash = await argon2Service.generateHash(newPassword);
+    await userRepository.updatePasswordUser(
+      user._id.toString(),
+      newPasswordHash,
+    );
+
+    return {
+      status: ResultStatus.Success,
+      data: null,
+      extensions: [],
+    };
+  },
 };
