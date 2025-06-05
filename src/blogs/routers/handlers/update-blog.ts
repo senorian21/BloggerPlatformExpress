@@ -1,8 +1,10 @@
 import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/types/http-statuses";
-import { blogsService } from "../../application/blogs.service";
 import { BlogInput } from "../../dto/blog.input-dto";
-import { blogsQueryRepositories } from "../../repositories/blogs.queryRepository";
+import {
+  blogsQueryRepositories,
+  blogsService,
+} from "../../../composition-root";
 
 export async function putBlogHandler(req: Request, res: Response) {
   const id = req.params.blogId;

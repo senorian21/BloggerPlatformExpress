@@ -10,6 +10,7 @@ import request from "supertest";
 import { USERS_PATH } from "../../../src/core/paths/paths";
 import { HttpStatus } from "../../../src/core/types/http-statuses";
 import { appConfig } from "../../../src/core/settings/settings";
+import { beforeEach } from "node:test";
 
 describe("User API", () => {
   const app = express();
@@ -27,6 +28,9 @@ describe("User API", () => {
     if (client) {
       await client.close(); // Закрываем соединение после завершения тестов
     }
+  });
+  beforeEach(async () => {
+    await clearDb(app);
   });
 
   it("should create user; POST /users", async () => {

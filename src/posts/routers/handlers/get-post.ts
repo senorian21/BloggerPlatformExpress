@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/types/http-statuses";
-import { postsQueryRepository } from "../../repositories/posts.queryRepository";
+import { postsQueryRepository } from "../../../composition-root";
 
 export async function getPostHandler(req: Request, res: Response) {
   const id = req.params.id;

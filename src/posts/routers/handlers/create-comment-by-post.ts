@@ -1,9 +1,11 @@
 import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/types/http-statuses";
-import { commentsService } from "../../../comments/application/comments.service";
 import { commentsQueryRepositories } from "../../../comments/repositories/comments.queryRepository";
 import { ResultStatus } from "../../../core/result/resultCode";
-import { postsQueryRepository } from "../../repositories/posts.queryRepository";
+import {
+  commentsService,
+  postsQueryRepository,
+} from "../../../composition-root";
 
 export async function createCommentHandler(req: Request, res: Response) {
   const postId = req.params.postId;

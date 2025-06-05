@@ -1,12 +1,15 @@
-import { jwtService } from "../../auth/adapters/jwt.service";
 import { ResultStatus } from "../../core/result/resultCode";
 import { RefreshToken } from "../../auth/types/tokens";
-import { authRepositories } from "../../auth/repositories/auth.Repository";
-import { session } from "../../auth/types/session";
+import { JwtService } from "../../auth/adapters/jwt.service";
+import { AuthRepositories } from "../../auth/repositories/auth.Repository";
 
-export const securityService = {
+export class SecurityService {
+  constructor(
+    public jwtService: JwtService,
+    public authRepositories: AuthRepositories,
+  ) {}
   async deleteSessionsByDeviceId(refreshToken: string, deleteDeviceId: string) {
-    const payload = (await jwtService.verifyRefreshToken(
+    const payload = (await this.jwtService.verifyRefreshToken(
       refreshToken,
     )) as RefreshToken;
 
@@ -21,7 +24,7 @@ export const securityService = {
 
     const { userId } = payload;
 
-    const foundSession = await authRepositories.findSession({
+    const foundSession = await this.authRepositories.findSession({
       deviceId: deleteDeviceId,
     });
 
@@ -43,7 +46,7 @@ export const securityService = {
       };
     }
 
-    await authRepositories.deleteSessionByDeviceId(userId, deleteDeviceId);
+    await this.authRepositories.deleteSessionByDeviceId(userId, deleteDeviceId);
 
     return {
       status: ResultStatus.Success,
@@ -51,10 +54,10 @@ export const securityService = {
       data: null,
       extensions: [],
     };
-  },
+  }
 
   async deleteAllDeviceExceptTheActiveOne(refreshToken: string) {
-    const payload = (await jwtService.verifyRefreshToken(
+    const payload = (await this.jwtService.verifyRefreshToken(
       refreshToken,
     )) as RefreshToken;
     if (!payload) {
@@ -67,7 +70,7 @@ export const securityService = {
     }
     const { userId, deviceId } = payload;
 
-    await authRepositories.deleteDevice(deviceId, userId);
+    await this.authRepositories.deleteDevice(deviceId, userId);
 
     return {
       status: ResultStatus.Success,
@@ -75,5 +78,5 @@ export const securityService = {
       data: null,
       extensions: [],
     };
-  },
-};
+  }
+}

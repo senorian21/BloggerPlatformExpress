@@ -4,7 +4,7 @@ import { ResultStatus } from "../../core/result/resultCode";
 import { Result } from "../../core/result/result.type";
 import { ObjectId } from "mongodb";
 
-export const commentsRepositories = {
+export class CommentsRepositories {
   async createComment(newComment: comment): Promise<Result<string>> {
     const result = await commentCollection.insertOne(newComment);
     return {
@@ -12,7 +12,7 @@ export const commentsRepositories = {
       data: result.insertedId.toString(),
       extensions: [],
     };
-  },
+  }
   async findCommentsById(id: string) {
     if (!ObjectId.isValid(id)) {
       return null;
@@ -24,7 +24,7 @@ export const commentsRepositories = {
     }
 
     return comment;
-  },
+  }
   async updateComment(idComment: string, dto: comment): Promise<Result> {
     if (!ObjectId.isValid(idComment)) {
       return {
@@ -66,7 +66,7 @@ export const commentsRepositories = {
       data: null,
       extensions: [],
     };
-  },
+  }
   async deleteComment(idComment: string): Promise<Result> {
     if (!ObjectId.isValid(idComment)) {
       return {
@@ -91,5 +91,5 @@ export const commentsRepositories = {
       data: null,
       extensions: [],
     };
-  },
-};
+  }
+}

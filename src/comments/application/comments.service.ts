@@ -1,18 +1,21 @@
 import { commentInput } from "../dto/comment.input-dto";
-import { jwtService } from "../../auth/adapters/jwt.service";
 import { ResultStatus } from "../../core/result/resultCode";
-import { userQueryRepository } from "../../users/repositories/users.queryRepository";
+import { UserQueryRepository } from "../../users/repositories/users.queryRepository";
 import { comment } from "../types/comment";
-import { commentsRepositories } from "../repositories/comments.Repository";
+import { CommentsRepositories } from "../repositories/comments.Repository";
 import { Result } from "../../core/result/result.type";
 
-export const commentsService = {
+export class CommentsService {
+  constructor(
+    public userQueryRepository: UserQueryRepository,
+    public commentsRepositories: CommentsRepositories,
+  ) {}
   async createComment(
     dto: commentInput,
     userId: string,
     postId: string,
   ): Promise<Result<string | null>> {
-    const user = await userQueryRepository.findUserById(userId);
+    const user = await this.userQueryRepository.findUserById(userId);
 
     if (!user) {
       return {
@@ -35,15 +38,15 @@ export const commentsService = {
       createdAt: new Date().toISOString(),
     };
 
-    return commentsRepositories.createComment(newComment);
-  },
+    return this.commentsRepositories.createComment(newComment);
+  }
 
   async updateComment(
     idComment: string,
     dto: commentInput,
     userId: string,
   ): Promise<Result<string | null>> {
-    const comment = await commentsRepositories.findCommentsById(idComment);
+    const comment = await this.commentsRepositories.findCommentsById(idComment);
 
     if (!comment) {
       return {
@@ -80,10 +83,13 @@ export const commentsService = {
       createdAt: comment.createdAt,
     };
 
-    return await commentsRepositories.updateComment(idComment, updatedComment);
-  },
+    return await this.commentsRepositories.updateComment(
+      idComment,
+      updatedComment,
+    );
+  }
   async deleteComment(idComment: string, userId: string) {
-    const comment = await commentsRepositories.findCommentsById(idComment);
+    const comment = await this.commentsRepositories.findCommentsById(idComment);
 
     if (!comment) {
       return {
@@ -106,6 +112,6 @@ export const commentsService = {
         ],
       };
     }
-    return commentsRepositories.deleteComment(idComment);
-  },
-};
+    return this.commentsRepositories.deleteComment(idComment);
+  }
+}

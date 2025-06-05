@@ -1,8 +1,8 @@
 import { Response } from "express";
-import { authService } from "../../application/auth.service";
 import { HttpStatus } from "../../../core/types/http-statuses";
 import { RequestWithBody } from "../../../core/types/requests";
 import { ResultStatus } from "../../../core/result/resultCode";
+import { authService } from "../../../composition-root";
 
 export async function registrationEmailResendingUserHandler(
   req: RequestWithBody<{ email: string }>,

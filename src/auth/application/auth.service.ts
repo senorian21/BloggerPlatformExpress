@@ -1,23 +1,26 @@
-import { userRepository } from "../../users/repositories/users.repository";
 import { User } from "../../users/types/user";
 import { Result } from "../../core/result/result.type";
 import { WithId } from "mongodb";
 import { ResultStatus } from "../../core/result/resultCode";
-import { argon2Service } from "../adapters/argon2.service";
-import { jwtService } from "../adapters/jwt.service";
-import { nodemailerService } from "../adapters/nodemailer.service";
 import { emailExamples } from "../adapters/emailExamples";
 import { randomUUID } from "crypto";
 import { add } from "date-fns";
-import { createHash } from "crypto";
-import { authRepositories } from "../repositories/auth.Repository";
 import { session } from "../types/session";
-import { appConfig } from "../../core/settings/settings";
 import { RefreshToken } from "../types/tokens";
-import { cookieService } from "../adapters/cookie.service";
-import { passwordRecoveryHandler } from "../routers/handlers/password-recovery";
+import { AuthRepositories } from "../repositories/auth.Repository";
+import { JwtService } from "../adapters/jwt.service";
+import { UserRepository } from "../../users/repositories/users.repository";
+import { Argon2Service } from "../adapters/argon2.service";
+import { NodemailerService } from "../adapters/nodemailer.service";
 
-export const authService = {
+export class AuthService {
+  constructor(
+    public authRepositories: AuthRepositories,
+    public jwtService: JwtService,
+    public userRepository: UserRepository,
+    public argon2Service: Argon2Service,
+    public nodemailerService: NodemailerService,
+  ) {}
   async loginUser(
     loginOrEmail: string,
     password: string,
@@ -43,7 +46,7 @@ export const authService = {
         data: null,
       };
     }
-    const existSessions = await authRepositories.findSession({
+    const existSessions = await this.authRepositories.findSession({
       userId: userIdToken.toString(),
       deviceName: userAgent,
     });
@@ -55,7 +58,7 @@ export const authService = {
     if (existSessions) {
       actualDeviceId = existSessions?.deviceId;
 
-      const refreshData = await jwtService.createRefreshToken(
+      const refreshData = await this.jwtService.createRefreshToken(
         result.data!._id.toString(),
         ip,
         userAgent,
@@ -65,7 +68,7 @@ export const authService = {
       refreshToken = refreshData.token;
       cookie = refreshData.cookie;
     } else {
-      const refreshData = await jwtService.createRefreshToken(
+      const refreshData = await this.jwtService.createRefreshToken(
         result.data!._id.toString(),
         ip,
         userAgent,
@@ -75,11 +78,12 @@ export const authService = {
       cookie = refreshData.cookie;
     }
 
-    const accessToken = await jwtService.createToken(
+    const accessToken = await this.jwtService.createToken(
       result.data!._id.toString(),
     );
 
-    const verifiedToken = await jwtService.verifyRefreshToken(refreshToken);
+    const verifiedToken =
+      await this.jwtService.verifyRefreshToken(refreshToken);
     if (!verifiedToken) {
       return {
         status: ResultStatus.Unauthorized,
@@ -101,7 +105,7 @@ export const authService = {
       ip,
     };
 
-    await authRepositories.updateOrCreateSession(newSession);
+    await this.authRepositories.updateOrCreateSession(newSession);
 
     return {
       status: ResultStatus.Success,
@@ -111,13 +115,13 @@ export const authService = {
       },
       extensions: [],
     };
-  },
+  }
 
   async checkUserCredentials(
     loginOrEmail: string,
     password: string,
   ): Promise<Result<WithId<User> | null>> {
-    const user = await userRepository.findByLoginOrEmail(loginOrEmail);
+    const user = await this.userRepository.findByLoginOrEmail(loginOrEmail);
 
     if (!user) {
       return {
@@ -128,7 +132,7 @@ export const authService = {
       };
     }
 
-    const isPassCorrect = await argon2Service.checkPassword(
+    const isPassCorrect = await this.argon2Service.checkPassword(
       password,
       user.passwordHash,
     );
@@ -146,14 +150,17 @@ export const authService = {
       data: user,
       extensions: [],
     };
-  },
+  }
 
   async registerUser(
     login: string,
     password: string,
     email: string,
   ): Promise<Result<string | null>> {
-    const user = await userRepository.doesExistByLoginOrEmail(login, email);
+    const user = await this.userRepository.doesExistByLoginOrEmail(
+      login,
+      email,
+    );
     if (user) {
       if (user.login === login) {
         return {
@@ -174,11 +181,11 @@ export const authService = {
       }
     }
 
-    const passwordHash = await argon2Service.generateHash(password);
+    const passwordHash = await this.argon2Service.generateHash(password);
     const newUser = new User(login, email, passwordHash);
-    const createdUser = await userRepository.createUser(newUser);
+    const createdUser = await this.userRepository.createUser(newUser);
 
-    nodemailerService
+    this.nodemailerService
       .sendEmail(
         newUser.email,
         newUser.emailConfirmation.confirmationCode,
@@ -191,12 +198,12 @@ export const authService = {
       data: createdUser,
       extensions: [],
     };
-  },
+  }
 
   async registrationConfirmationUser(
     code: string,
   ): Promise<Result<WithId<User> | null>> {
-    const user = await userRepository.findByCode(code);
+    const user = await this.userRepository.findByCode(code);
     if (!user) {
       return {
         status: ResultStatus.BadRequest,
@@ -226,7 +233,7 @@ export const authService = {
         ],
       };
     }
-    const confirmUser = await userRepository.registrationConfirmationUser(
+    const confirmUser = await this.userRepository.registrationConfirmationUser(
       user,
       userId,
     );
@@ -244,12 +251,12 @@ export const authService = {
       data: null,
       extensions: [],
     };
-  },
+  }
 
   async registrationEmailResending(
     email: string,
   ): Promise<Result<string | null>> {
-    const user = await userRepository.findByLoginOrEmail(email);
+    const user = await this.userRepository.findByLoginOrEmail(email);
     if (!user) {
       return {
         status: ResultStatus.BadRequest,
@@ -285,13 +292,13 @@ export const authService = {
     const newConfirmationCode = randomUUID();
     const newExpirationDate = add(new Date(), { days: 7 });
 
-    await userRepository.updateConfirmationCodeAndExpiration(
+    await this.userRepository.updateConfirmationCodeAndExpiration(
       user._id.toString(),
       newConfirmationCode,
       newExpirationDate,
     );
 
-    nodemailerService
+    this.nodemailerService
       .sendEmail(
         user.email,
         newConfirmationCode,
@@ -304,10 +311,10 @@ export const authService = {
       data: null,
       extensions: [],
     };
-  },
+  }
 
   async refreshToken(refreshToken: string, ip: string, userAgent: string) {
-    const payload = await jwtService.verifyRefreshToken(refreshToken);
+    const payload = await this.jwtService.verifyRefreshToken(refreshToken);
     if (!payload) {
       return {
         status: ResultStatus.Unauthorized,
@@ -328,7 +335,7 @@ export const authService = {
       ip,
     };
 
-    const sessionExists = await authRepositories.findSession(session);
+    const sessionExists = await this.authRepositories.findSession(session);
 
     if (!sessionExists) {
       return {
@@ -340,30 +347,35 @@ export const authService = {
     }
 
     const { token: newRefreshToken, cookie } =
-      await jwtService.createRefreshToken(userId, ip, deviceName, deviceId);
-    const token = (await jwtService.verifyRefreshToken(
+      await this.jwtService.createRefreshToken(
+        userId,
+        ip,
+        deviceName,
+        deviceId,
+      );
+    const token = (await this.jwtService.verifyRefreshToken(
       newRefreshToken,
     )) as RefreshToken;
 
     const newIssuedAt = token.iat!.toString();
     const newExpiresAt = token.exp!.toString();
-    await authRepositories.updateSession(
+    await this.authRepositories.updateSession(
       sessionExists,
       newIssuedAt!,
       newExpiresAt!,
     );
 
-    const newAccessToken = await jwtService.createToken(userId);
+    const newAccessToken = await this.jwtService.createToken(userId);
 
     return {
       status: ResultStatus.Success,
       data: { newAccessToken, newRefreshToken },
       extensions: [],
     };
-  },
+  }
 
   async logout(refreshToken: string) {
-    const payload = (await jwtService.verifyRefreshToken(
+    const payload = (await this.jwtService.verifyRefreshToken(
       refreshToken,
     )) as RefreshToken;
 
@@ -378,7 +390,7 @@ export const authService = {
 
     const { userId, deviceId } = payload;
 
-    const sessionExists = await authRepositories.findSession({
+    const sessionExists = await this.authRepositories.findSession({
       userId,
       deviceId,
     });
@@ -391,17 +403,17 @@ export const authService = {
       };
     }
 
-    await authRepositories.deleteSession(sessionExists._id);
+    await this.authRepositories.deleteSession(sessionExists._id);
 
     return {
       status: ResultStatus.Success,
       data: null,
       extensions: [],
     };
-  },
+  }
 
   async passwordRecovery(email: string) {
-    const user = await userRepository.findByLoginOrEmail(email);
+    const user = await this.userRepository.findByLoginOrEmail(email);
     if (!user) {
       return {
         status: ResultStatus.Unauthorized,
@@ -414,13 +426,13 @@ export const authService = {
     const newConfirmationCode = randomUUID();
     const newExpirationDate = add(new Date(), { days: 7 });
 
-    await userRepository.updateConfirmationCodeAndExpiration(
+    await this.userRepository.updateConfirmationCodeAndExpiration(
       user._id.toString(),
       newConfirmationCode,
       newExpirationDate,
     );
 
-    nodemailerService
+    this.nodemailerService
       .sendEmail(
         user.email,
         newConfirmationCode,
@@ -433,9 +445,9 @@ export const authService = {
       data: null,
       extensions: [],
     };
-  },
+  }
   async newPassword(newPassword: string, recoveryCode: string) {
-    const user = await userRepository.findByCode(recoveryCode);
+    const user = await this.userRepository.findByCode(recoveryCode);
     if (!user) {
       return {
         status: ResultStatus.BadRequest,
@@ -444,8 +456,8 @@ export const authService = {
         extensions: [],
       };
     }
-    const newPasswordHash = await argon2Service.generateHash(newPassword);
-    await userRepository.updatePasswordUser(
+    const newPasswordHash = await this.argon2Service.generateHash(newPassword);
+    await this.userRepository.updatePasswordUser(
       user._id.toString(),
       newPasswordHash,
     );
@@ -455,5 +467,5 @@ export const authService = {
       data: null,
       extensions: [],
     };
-  },
-};
+  }
+}

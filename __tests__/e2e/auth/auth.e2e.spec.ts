@@ -9,9 +9,6 @@ import { AUTH_PATH } from "../../../src/core/paths/paths";
 import { HttpStatus } from "../../../src/core/types/http-statuses";
 import { UserInput } from "../../../src/users/dto/user.input-dto";
 import { getUserDto } from "../utils/users/get-user-dto";
-import { authRepositories } from "../../../src/auth/repositories/auth.Repository";
-import { jwtService } from "../../../src/auth/adapters/jwt.service";
-import { RefreshToken } from "../../../src/auth/types/tokens";
 
 describe("Auth API", () => {
   const app = express();

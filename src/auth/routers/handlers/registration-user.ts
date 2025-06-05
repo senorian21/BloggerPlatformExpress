@@ -1,9 +1,9 @@
 import { Response } from "express";
-import { authService } from "../../application/auth.service";
 import { HttpStatus } from "../../../core/types/http-statuses";
 import { ResultStatus } from "../../../core/result/resultCode";
 import { RequestWithBody } from "../../../core/types/requests";
 import { registrationDto } from "../../types/registration.dto";
+import { authService } from "../../../composition-root";
 
 export async function registrationUserHandler(
   req: RequestWithBody<registrationDto>,

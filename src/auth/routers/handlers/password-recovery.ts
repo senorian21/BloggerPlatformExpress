@@ -1,7 +1,7 @@
 import { Response } from "express";
-import { authService } from "../../application/auth.service";
 import { HttpStatus } from "../../../core/types/http-statuses";
 import { RequestWithBody } from "../../../core/types/requests";
+import { authService } from "../../../composition-root";
 
 export async function passwordRecoveryHandler(
   req: RequestWithBody<{ email: string }>,

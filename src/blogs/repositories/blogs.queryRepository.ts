@@ -5,7 +5,7 @@ import { mapToBlogViewModel } from "../mappers/map-to-blog-view-model.util";
 import { blogViewModel } from "../types/blog-view-model";
 import { mapToBlogListPaginatedOutput } from "../mappers/map-to-blog-list-paginated-output.util";
 
-export const blogsQueryRepositories = {
+export class BlogsQueryRepositories {
   async findAllBlogs(
     queryDto: BlogsQueryInput,
   ): Promise<{ items: blogViewModel[]; totalCount: number }> {
@@ -33,7 +33,7 @@ export const blogsQueryRepositories = {
       pageSize: +pageSize,
       totalCount,
     });
-  },
+  }
 
   async findById(id: string): Promise<blogViewModel | null> {
     if (!ObjectId.isValid(id)) {
@@ -44,5 +44,5 @@ export const blogsQueryRepositories = {
       return null;
     }
     return mapToBlogViewModel(blog);
-  },
-};
+  }
+}

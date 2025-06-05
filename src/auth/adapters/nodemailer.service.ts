@@ -1,7 +1,7 @@
 import nodemailer from "nodemailer";
 import { appConfig } from "../../core/settings/settings";
 
-export const nodemailerService = {
+export class NodemailerService {
   async sendEmail(
     email: string,
     code: string,
@@ -25,5 +25,5 @@ export const nodemailerService = {
       subject,
       html,
     });
-  },
-};
+  }
+}

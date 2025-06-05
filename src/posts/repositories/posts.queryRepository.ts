@@ -1,4 +1,3 @@
-import { Post } from "../../posts/types/post";
 import { ObjectId, WithId } from "mongodb";
 import { postCollection } from "../../db/mongo.db";
 
@@ -7,7 +6,7 @@ import { mapToPostViewModel } from "../mappers/map-to-post-view-model.util";
 import { mapToPostListPaginatedOutput } from "../mappers/map-to-post-list-paginated-output.util";
 import { postViewModel } from "../types/post-view-model";
 
-export const postsQueryRepository = {
+export class PostsQueryRepository {
   async findAllPosts(
     queryDto: PostQueryInput,
   ): Promise<{ items: postViewModel[]; totalCount: number }> {
@@ -34,7 +33,7 @@ export const postsQueryRepository = {
       pageSize: +pageSize,
       totalCount,
     });
-  },
+  }
 
   async findPostById(id: string) {
     if (!ObjectId.isValid(id)) {
@@ -45,7 +44,7 @@ export const postsQueryRepository = {
       return null;
     }
     return mapToPostViewModel(post);
-  },
+  }
   async findAllPostsByBlogId(queryDto: PostQueryInput, blogId: string) {
     const { pageNumber, pageSize, sortBy, sortDirection } = queryDto;
     const filter = { blogId: blogId };
@@ -65,5 +64,5 @@ export const postsQueryRepository = {
       pageSize: +pageSize,
       totalCount,
     });
-  },
-};
+  }
+}

@@ -1,6 +1,6 @@
 import argon2 from "argon2";
 
-export const argon2Service = {
+export class Argon2Service {
   async generateHash(password: string) {
     const hashedPassword: string = await argon2.hash(password, {
       type: argon2.argon2id,
@@ -18,8 +18,8 @@ export const argon2Service = {
             */
     });
     return hashedPassword;
-  },
+  }
   async checkPassword(password: string, hash: string) {
     return await argon2.verify(hash, password);
-  },
-};
+  }
+}

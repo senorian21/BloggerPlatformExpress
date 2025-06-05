@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/types/http-statuses";
-import { securityService } from "../../application/security.service";
 import { ResultStatus } from "../../../core/result/resultCode";
+import { securityService } from "../../../composition-root";
 
 export async function deleteDeviceHandler(
   req: Request,

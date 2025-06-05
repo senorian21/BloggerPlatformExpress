@@ -1,8 +1,9 @@
 import { Blog } from "../types/blog";
-import { blogsRepositories } from "../repositories/blogs.repository";
+import { BlogsRepositories } from "../repositories/blogs.repository";
 import { BlogInput } from "../dto/blog.input-dto";
 
-export const blogsService = {
+export class BlogsService {
+  constructor(public blogsRepositories: BlogsRepositories) {}
   async createBlog(dto: Blog) {
     const newBlog: Blog = {
       name: dto.name,
@@ -11,8 +12,8 @@ export const blogsService = {
       createdAt: new Date().toISOString(),
       isMembership: false,
     };
-    return blogsRepositories.createBlog(newBlog);
-  },
+    return this.blogsRepositories.createBlog(newBlog);
+  }
 
   async updateBlog(id: string, blogInput: BlogInput, blog: Blog) {
     const dto: Blog = {
@@ -23,9 +24,9 @@ export const blogsService = {
       createdAt: blog.createdAt,
       isMembership: blog.isMembership,
     };
-    await blogsRepositories.updateBlog(id, dto);
-  },
+    await this.blogsRepositories.updateBlog(id, dto);
+  }
   async deleteBlog(id: string) {
-    await blogsRepositories.deleteBlog(id);
-  },
-};
+    await this.blogsRepositories.deleteBlog(id);
+  }
+}

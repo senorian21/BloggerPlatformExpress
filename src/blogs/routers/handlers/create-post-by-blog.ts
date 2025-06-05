@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/types/http-statuses";
-import { mapToPostViewModel } from "../../../posts/mappers/map-to-post-view-model.util";
-import { postsService } from "../../../posts/application/posts.service";
 import { PostInput } from "../../../posts/dto/post.input-dto";
-import { blogsQueryRepositories } from "../../repositories/blogs.queryRepository";
-import { postsQueryRepository } from "../../../posts/repositories/posts.queryRepository";
+import {
+  blogsQueryRepositories,
+  postsQueryRepository,
+  postsService,
+} from "../../../composition-root";
 
 export async function createPostByBlogHandler(
   req: Request<{ blogId: string }>,

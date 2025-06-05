@@ -1,7 +1,9 @@
 import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/types/http-statuses";
-import { blogsService } from "../../application/blogs.service";
-import { blogsQueryRepositories } from "../../repositories/blogs.queryRepository";
+import {
+  blogsQueryRepositories,
+  blogsService,
+} from "../../../composition-root";
 
 export async function createBlogHandler(req: Request, res: Response) {
   const createdBlogId = await blogsService.createBlog(req.body);

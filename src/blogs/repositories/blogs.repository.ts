@@ -2,11 +2,11 @@ import { Blog } from "../types/blog";
 import { blogCollection } from "../../db/mongo.db";
 import { ObjectId, WithId } from "mongodb";
 
-export const blogsRepositories = {
+export class BlogsRepositories {
   async createBlog(newBlog: Blog) {
     const result = await blogCollection.insertOne(newBlog);
     return result.insertedId.toString();
-  },
+  }
 
   async updateBlog(id: string, dto: Blog) {
     const updateResult = await blogCollection.updateOne(
@@ -23,7 +23,7 @@ export const blogsRepositories = {
         },
       },
     );
-  },
+  }
   async deleteBlog(id: string) {
     const deleteResult = await blogCollection.deleteOne({
       _id: new ObjectId(id),
@@ -31,5 +31,5 @@ export const blogsRepositories = {
     if (deleteResult.deletedCount < 1) {
       throw new Error("Blog not exist");
     }
-  },
-};
+  }
+}

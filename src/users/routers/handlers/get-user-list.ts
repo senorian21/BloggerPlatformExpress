@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/types/http-statuses";
 import { paginationAndSortingDefault } from "../../../core/middlewares/validation/query-pagination-sorting.validation-middleware";
 import { userQueryInput } from "../../types/user-query.input";
-import { userQueryRepository } from "../../repositories/users.queryRepository";
+import { userQueryRepository } from "../../../composition-root";
 
 export async function getUsersListHandler(
   req: Request<{}, {}, {}, userQueryInput>,

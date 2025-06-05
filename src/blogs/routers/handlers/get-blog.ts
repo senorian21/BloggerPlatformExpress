@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/types/http-statuses";
-import { blogsQueryRepositories } from "../../repositories/blogs.queryRepository";
+import { blogsQueryRepositories } from "../../../composition-root";
 
 export async function getBlogHandler(req: Request, res: Response) {
   const id = req.params.blogId;

@@ -6,7 +6,7 @@ import { userViewModel } from "../types/user-view-model";
 import { mapToUserListPaginatedOutput } from "../mappers/map-to-user-list-paginated-output.util";
 import { mapToAboutUserViewModel } from "../mappers/map-to-about-user-view-model.util";
 
-export const userQueryRepository = {
+export class UserQueryRepository {
   async findAllUser(
     queryDto: userQueryInput,
   ): Promise<{ items: userViewModel[]; totalCount: number }> {
@@ -49,7 +49,7 @@ export const userQueryRepository = {
       pageSize: +pageSize,
       totalCount,
     });
-  },
+  }
 
   async findUserById(id: string) {
     if (!ObjectId.isValid(id)) {
@@ -60,7 +60,7 @@ export const userQueryRepository = {
       return null;
     }
     return mapToUserViewModel(user);
-  },
+  }
 
   async findUserByIdForAboutUser(id: string) {
     if (!ObjectId.isValid(id)) {
@@ -71,5 +71,5 @@ export const userQueryRepository = {
       return null;
     }
     return mapToAboutUserViewModel(user);
-  },
-};
+  }
+}

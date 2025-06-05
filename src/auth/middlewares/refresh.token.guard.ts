@@ -1,9 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-import { jwtService } from "../adapters/jwt.service";
 import { IdType } from "../../core/types/id";
 import { RefreshToken } from "../types/tokens";
-import { authRepositories } from "../repositories/auth.Repository";
 import { HttpStatus } from "../../core/types/http-statuses";
+import { authRepositories, jwtService } from "../../composition-root";
 
 export const refreshTokenGuard = async (
   req: Request,

@@ -2,11 +2,11 @@ import { Post } from "../../posts/types/post";
 import { ObjectId, WithId } from "mongodb";
 import { postCollection } from "../../db/mongo.db";
 
-export const postsRepository = {
+export class PostsRepository {
   async createPost(newPost: Post) {
     const result = await postCollection.insertOne(newPost);
     return result.insertedId.toString();
-  },
+  }
 
   async updatePost(id: string, dto: Post) {
     const updateResult = await postCollection.updateOne(
@@ -24,7 +24,7 @@ export const postsRepository = {
         },
       },
     );
-  },
+  }
 
   async deletePost(id: string) {
     const deleteResult = await postCollection.deleteOne({
@@ -33,5 +33,5 @@ export const postsRepository = {
     if (deleteResult.deletedCount < 1) {
       throw new Error("Post not exist");
     }
-  },
-};
+  }
+}

@@ -3,12 +3,12 @@ import { appConfig } from "../../core/settings/settings";
 import { Token } from "../types/tokens";
 import { v4 as uuidv4 } from "uuid";
 
-export const jwtService = {
+export class JwtService {
   async createToken(userId: string): Promise<string> {
     return jwt.sign({ userId }, appConfig.AC_SECRET_ACCESS_TOKEN, {
       expiresIn: appConfig.AC_TIME_ACCESS_TOKEN,
     } as jwt.SignOptions);
-  },
+  }
 
   async createRefreshToken(
     userId: string,
@@ -33,7 +33,7 @@ export const jwtService = {
     const cookie = `refreshToken=${refreshToken}; HttpOnly; Secure; Path=/; Max-Age=20`;
 
     return { token: refreshToken, cookie };
-  },
+  }
 
   async verifyJwt(token: string, secret: string): Promise<Token | null> {
     try {
@@ -53,13 +53,13 @@ export const jwtService = {
 
       return null;
     }
-  },
+  }
 
   async verifyToken(token: string) {
-    return jwtService.verifyJwt(token, appConfig.AC_SECRET_ACCESS_TOKEN);
-  },
+    return this.verifyJwt(token, appConfig.AC_SECRET_ACCESS_TOKEN);
+  }
 
   async verifyRefreshToken(token: string) {
-    return jwtService.verifyJwt(token, appConfig.AC_SECRET_REFRESH_TOKEN);
-  },
-};
+    return this.verifyJwt(token, appConfig.AC_SECRET_REFRESH_TOKEN);
+  }
+}

@@ -1,8 +1,6 @@
 import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/types/http-statuses";
-
-import { postsService } from "../../application/posts.service";
-import { postsQueryRepository } from "../../repositories/posts.queryRepository";
+import { postsQueryRepository, postsService } from "../../../composition-root";
 
 export async function createPostHandler(req: Request, res: Response) {
   const createdPostsId = await postsService.createPost(req.body);

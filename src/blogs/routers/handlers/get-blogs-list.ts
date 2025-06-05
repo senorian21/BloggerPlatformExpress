@@ -1,10 +1,8 @@
 import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/types/http-statuses";
-import { blogsService } from "../../application/blogs.service";
 import { BlogsQueryInput } from "../../types/blog-query.input";
-import { mapToBlogListPaginatedOutput } from "../../mappers/map-to-blog-list-paginated-output.util";
 import { paginationAndSortingDefault } from "../../../core/middlewares/validation/query-pagination-sorting.validation-middleware";
-import { blogsQueryRepositories } from "../../repositories/blogs.queryRepository";
+import { blogsQueryRepositories } from "../../../composition-root";
 
 export async function getBlogsListHandler(
   req: Request<{}, {}, {}, BlogsQueryInput>,

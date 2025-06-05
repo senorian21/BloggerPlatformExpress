@@ -4,11 +4,12 @@ import {
   paginationAndSortingDefault,
   PostSortField,
 } from "../../../core/middlewares/validation/query-pagination-sorting.validation-middleware";
-import { mapToPostListPaginatedOutput } from "../../../posts/mappers/map-to-post-list-paginated-output.util";
 import { HttpStatus } from "../../../core/types/http-statuses";
 import { SortDirection } from "../../../core/types/sort-direction";
-import { blogsQueryRepositories } from "../../repositories/blogs.queryRepository";
-import { postsQueryRepository } from "../../../posts/repositories/posts.queryRepository"; // Предполагается, что такой файл существует
+import {
+  blogsQueryRepositories,
+  postsQueryRepository,
+} from "../../../composition-root"; // Предполагается, что такой файл существует
 
 export async function getBlogPostsListHandler(
   req: Request<{ blogId: string }, {}, PostQueryInput>,
