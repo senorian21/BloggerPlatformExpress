@@ -2,7 +2,10 @@ import { Response } from "express";
 import { HttpStatus } from "../../../core/types/http-statuses";
 import { RequestWithBody } from "../../../core/types/requests";
 import { ResultStatus } from "../../../core/result/resultCode";
-import { authService } from "../../../composition-root";
+import {container} from "../../../composition-root";
+import {AuthService} from "../../application/auth.service";
+
+const authService = container.get(AuthService);
 
 export async function registrationEmailResendingUserHandler(
   req: RequestWithBody<{ email: string }>,

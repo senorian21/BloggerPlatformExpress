@@ -2,7 +2,8 @@ import { ResultStatus } from "../../core/result/resultCode";
 import { RefreshToken } from "../../auth/types/tokens";
 import { JwtService } from "../../auth/adapters/jwt.service";
 import { AuthRepositories } from "../../auth/repositories/auth.Repository";
-
+import { injectable } from "inversify";
+@injectable()
 export class SecurityService {
   constructor(
     public jwtService: JwtService,

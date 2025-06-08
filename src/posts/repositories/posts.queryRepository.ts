@@ -5,7 +5,8 @@ import { PostQueryInput } from "../types/post-query.input";
 import { mapToPostViewModel } from "../mappers/map-to-post-view-model.util";
 import { mapToPostListPaginatedOutput } from "../mappers/map-to-post-list-paginated-output.util";
 import { postViewModel } from "../types/post-view-model";
-
+import { injectable } from "inversify";
+@injectable()
 export class PostsQueryRepository {
   async findAllPosts(
     queryDto: PostQueryInput,

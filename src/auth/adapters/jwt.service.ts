@@ -2,7 +2,8 @@ import jwt from "jsonwebtoken";
 import { appConfig } from "../../core/settings/settings";
 import { Token } from "../types/tokens";
 import { v4 as uuidv4 } from "uuid";
-
+import {injectable} from "inversify";
+@injectable()
 export class JwtService {
   async createToken(userId: string): Promise<string> {
     return jwt.sign({ userId }, appConfig.AC_SECRET_ACCESS_TOKEN, {

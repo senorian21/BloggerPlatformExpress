@@ -5,7 +5,8 @@ import { userQueryInput } from "../types/user-query.input";
 import { userViewModel } from "../types/user-view-model";
 import { mapToUserListPaginatedOutput } from "../mappers/map-to-user-list-paginated-output.util";
 import { mapToAboutUserViewModel } from "../mappers/map-to-about-user-view-model.util";
-
+import { injectable } from "inversify";
+@injectable()
 export class UserQueryRepository {
   async findAllUser(
     queryDto: userQueryInput,

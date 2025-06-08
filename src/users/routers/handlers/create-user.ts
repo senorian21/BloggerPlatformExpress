@@ -1,6 +1,11 @@
 import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/types/http-statuses";
-import { userQueryRepository, userService } from "../../../composition-root";
+import {container} from "../../../composition-root";
+import {UserQueryRepository} from "../../repositories/users.queryRepository";
+import {UserService} from "../../application/users.service";
+
+const userQueryRepository = container.get(UserQueryRepository);
+const userService = container.get(UserService);
 
 export async function createUserHandler(req: Request, res: Response) {
   const createdUserId = await userService.createUserByAdmin(req.body);

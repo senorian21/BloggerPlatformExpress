@@ -1,6 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import { IdType } from "../../core/types/id";
-import { jwtService } from "../../composition-root";
+import { container } from "../../composition-root";
+import {JwtService} from "../adapters/jwt.service";
+
+const jwtService = container.get(JwtService);
 
 export const accessTokenGuard = async (
   req: Request,

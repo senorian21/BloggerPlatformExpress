@@ -1,7 +1,9 @@
 import { Blog } from "../types/blog";
 import { blogCollection } from "../../db/mongo.db";
-import { ObjectId, WithId } from "mongodb";
+import { ObjectId } from "mongodb";
+import { injectable } from "inversify";
 
+@injectable()
 export class BlogsRepositories {
   async createBlog(newBlog: Blog) {
     const result = await blogCollection.insertOne(newBlog);

@@ -3,7 +3,8 @@ import { PostsRepository } from "../repositories/posts.repository";
 import { PostInput } from "../dto/post.input-dto";
 import { BlogsQueryRepositories } from "../../blogs/repositories/blogs.queryRepository";
 import { PostsQueryRepository } from "../repositories/posts.queryRepository";
-
+import { injectable } from "inversify";
+@injectable()
 export class PostsService {
   constructor(
     public postsRepository: PostsRepository,

@@ -12,7 +12,8 @@ import { JwtService } from "../adapters/jwt.service";
 import { UserRepository } from "../../users/repositories/users.repository";
 import { Argon2Service } from "../adapters/argon2.service";
 import { NodemailerService } from "../adapters/nodemailer.service";
-
+import { injectable } from "inversify";
+@injectable()
 export class AuthService {
   constructor(
     public authRepositories: AuthRepositories,

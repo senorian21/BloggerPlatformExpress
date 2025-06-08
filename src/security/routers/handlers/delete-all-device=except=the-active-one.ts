@@ -1,7 +1,10 @@
 import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/types/http-statuses";
 import { ResultStatus } from "../../../core/result/resultCode";
-import { securityService } from "../../../composition-root";
+import {container} from "../../../composition-root";
+import {SecurityService} from "../../application/security.service";
+
+const securityService = container.get(SecurityService);
 
 export async function deleteDeviceHandler(
   req: Request,

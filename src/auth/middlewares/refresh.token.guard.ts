@@ -2,7 +2,12 @@ import { Request, Response, NextFunction } from "express";
 import { IdType } from "../../core/types/id";
 import { RefreshToken } from "../types/tokens";
 import { HttpStatus } from "../../core/types/http-statuses";
-import { authRepositories, jwtService } from "../../composition-root";
+import {container} from "../../composition-root";
+import {AuthRepositories} from "../repositories/auth.Repository";
+import {JwtService} from "../adapters/jwt.service";
+
+const authRepositories = container.get(AuthRepositories);
+const jwtService = container.get(JwtService);
 
 export const refreshTokenGuard = async (
   req: Request,

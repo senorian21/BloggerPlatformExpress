@@ -179,7 +179,6 @@ describe("Auth API", () => {
       .set("Cookie", `refreshToken=${originalRefreshToken}`)
       .expect(HttpStatus.Ok);
 
-    // Второй refresh с тем же токеном — ожидаем 401
     await request(app)
       .post(`${AUTH_PATH}/refresh-token`)
       .set("Cookie", `refreshToken=${originalRefreshToken}`)

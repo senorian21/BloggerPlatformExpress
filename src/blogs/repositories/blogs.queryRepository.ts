@@ -4,7 +4,8 @@ import { BlogsQueryInput } from "../types/blog-query.input";
 import { mapToBlogViewModel } from "../mappers/map-to-blog-view-model.util";
 import { blogViewModel } from "../types/blog-view-model";
 import { mapToBlogListPaginatedOutput } from "../mappers/map-to-blog-list-paginated-output.util";
-
+import { injectable } from "inversify";
+@injectable()
 export class BlogsQueryRepositories {
   async findAllBlogs(
     queryDto: BlogsQueryInput,

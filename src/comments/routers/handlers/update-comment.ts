@@ -2,7 +2,10 @@ import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/types/http-statuses";
 import { commentInput } from "../../../comments/dto/comment.input-dto";
 import { ResultStatus } from "../../../core/result/resultCode";
-import { commentsService } from "../../../composition-root";
+import {container} from "../../../composition-root";
+import {CommentsService} from "../../application/comments.service";
+
+const commentsService = container.get(CommentsService);
 
 export async function updateCommentHandler(req: Request, res: Response) {
   const id = req.params.commentId;

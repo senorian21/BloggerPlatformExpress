@@ -15,40 +15,31 @@ import { NodemailerService } from "./auth/adapters/nodemailer.service";
 import { JwtService } from "./auth/adapters/jwt.service";
 import { AuthService } from "./auth/application/auth.service";
 import { SecurityService } from "./security/application/security.service";
+import {Container} from "inversify";
 
-export const blogsRepositories = new BlogsRepositories();
-export const postsRepository = new PostsRepository();
-export const blogsQueryRepositories = new BlogsQueryRepositories();
-export const postsQueryRepository = new PostsQueryRepository();
-export const userQueryRepository = new UserQueryRepository();
-export const commentsRepositories = new CommentsRepositories();
-export const argon2Service = new Argon2Service();
-export const userRepository = new UserRepository();
-export const authRepositories = new AuthRepositories();
-export const nodemailerService = new NodemailerService();
-export const jwtService = new JwtService();
 
-export const blogsService = new BlogsService(blogsRepositories);
-export const postsService = new PostsService(
-  postsRepository,
-  blogsQueryRepositories,
-  postsQueryRepository,
-);
-export const commentsService = new CommentsService(
-  userQueryRepository,
-  commentsRepositories,
-);
-export const userService = new UserService(userRepository, argon2Service);
+export const container: Container = new Container();
 
-export const authService = new AuthService(
-  authRepositories,
-  jwtService,
-  userRepository,
-  argon2Service,
-  nodemailerService,
-);
+// Repositories
+container.bind<BlogsRepositories>(BlogsRepositories).to(BlogsRepositories);
+container.bind<PostsRepository>(PostsRepository).to(PostsRepository);
+container.bind<BlogsQueryRepositories>(BlogsQueryRepositories).to(BlogsQueryRepositories);
+container.bind<PostsQueryRepository>(PostsQueryRepository).to(PostsQueryRepository);
+container.bind<UserQueryRepository>(UserQueryRepository).to(UserQueryRepository);
+container.bind<CommentsRepositories>(CommentsRepositories).to(CommentsRepositories);
+container.bind<UserRepository>(UserRepository).to(UserRepository);
+container.bind<AuthRepositories>(AuthRepositories).to(AuthRepositories);
 
-export const securityService = new SecurityService(
-  jwtService,
-  authRepositories,
-);
+// Services adapters
+container.bind<Argon2Service>(Argon2Service).to(Argon2Service);
+container.bind<NodemailerService>(NodemailerService).to(NodemailerService);
+container.bind<JwtService>(JwtService).to(JwtService);
+
+// Application Services
+container.bind<BlogsService>(BlogsService).to(BlogsService);
+container.bind<PostsService>(PostsService).to(PostsService);
+container.bind<CommentsService>(CommentsService).to(CommentsService);
+container.bind<UserService>(UserService).to(UserService);
+container.bind<AuthService>(AuthService).to(AuthService);
+container.bind<SecurityService>(SecurityService).to(SecurityService);
+

@@ -3,7 +3,10 @@ import { commentsQueryInput } from "../../../comments/types/comments-query.input
 import { paginationAndSortingDefault } from "../../../core/middlewares/validation/query-pagination-sorting.validation-middleware";
 import { HttpStatus } from "../../../core/types/http-statuses";
 import { commentsQueryRepositories } from "../../../comments/repositories/comments.queryRepository";
-import { postsQueryRepository } from "../../../composition-root";
+import {container} from "../../../composition-root";
+import {PostsQueryRepository} from "../../repositories/posts.queryRepository";
+
+const postsQueryRepository = container.get(PostsQueryRepository);
 
 export async function getPostCommentsListHandler(
   req: Request<{ postId: string }, {}, {}, commentsQueryInput>,

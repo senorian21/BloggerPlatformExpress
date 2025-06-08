@@ -2,7 +2,8 @@ import { userCollection } from "../../db/mongo.db";
 import { User } from "../types/user";
 import { ObjectId, WithId } from "mongodb";
 import { ResultStatus } from "../../core/result/resultCode";
-
+import { injectable } from "inversify";
+@injectable()
 export class UserRepository {
   async isEmailAndLoginUnique(email: string, login: string) {
     const user = await userCollection.findOne({

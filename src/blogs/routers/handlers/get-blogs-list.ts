@@ -2,7 +2,10 @@ import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/types/http-statuses";
 import { BlogsQueryInput } from "../../types/blog-query.input";
 import { paginationAndSortingDefault } from "../../../core/middlewares/validation/query-pagination-sorting.validation-middleware";
-import { blogsQueryRepositories } from "../../../composition-root";
+import {container} from "../../../composition-root";
+import {BlogsQueryRepositories} from "../../repositories/blogs.queryRepository";
+
+const blogsQueryRepositories = container.get(BlogsQueryRepositories);
 
 export async function getBlogsListHandler(
   req: Request<{}, {}, {}, BlogsQueryInput>,

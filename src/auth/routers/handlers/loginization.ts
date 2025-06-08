@@ -3,7 +3,10 @@ import { HttpStatus } from "../../../core/types/http-statuses";
 import { ResultStatus } from "../../../core/result/resultCode";
 import { RequestWithBody } from "../../../core/types/requests";
 import { LoginDto } from "../../types/login.dto";
-import { authService } from "../../../composition-root";
+import { container} from "../../../composition-root";
+import {AuthService} from "../../application/auth.service";
+
+const authService = container.get(AuthService);
 
 export async function loginizationHandler(
   req: RequestWithBody<LoginDto>,

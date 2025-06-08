@@ -2,7 +2,8 @@ import { UserInput } from "../dto/user.input-dto";
 import { User } from "../types/user";
 import { UserRepository } from "../repositories/users.repository";
 import { Argon2Service } from "../../auth/adapters/argon2.service";
-
+import { injectable } from "inversify";
+@injectable()
 export class UserService {
   constructor(
     public userRepository: UserRepository,

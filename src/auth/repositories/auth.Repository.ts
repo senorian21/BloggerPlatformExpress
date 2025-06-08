@@ -1,7 +1,7 @@
 import { sessionCollection } from "../../db/mongo.db";
 import { session } from "../types/session";
-import { ObjectId } from "mongodb";
-
+import { injectable } from "inversify";
+@injectable()
 export class AuthRepositories {
   async updateOrCreateSession(session: session) {
     const existingSession = await this.findSession({

@@ -3,7 +3,8 @@ import { commentCollection } from "../../db/mongo.db";
 import { ResultStatus } from "../../core/result/resultCode";
 import { Result } from "../../core/result/result.type";
 import { ObjectId } from "mongodb";
-
+import { injectable } from "inversify";
+@injectable()
 export class CommentsRepositories {
   async createComment(newComment: comment): Promise<Result<string>> {
     const result = await commentCollection.insertOne(newComment);

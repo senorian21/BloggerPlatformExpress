@@ -4,7 +4,8 @@ import { UserQueryRepository } from "../../users/repositories/users.queryReposit
 import { comment } from "../types/comment";
 import { CommentsRepositories } from "../repositories/comments.Repository";
 import { Result } from "../../core/result/result.type";
-
+import { injectable } from "inversify";
+@injectable()
 export class CommentsService {
   constructor(
     public userQueryRepository: UserQueryRepository,
