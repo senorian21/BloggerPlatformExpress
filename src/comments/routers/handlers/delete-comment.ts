@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/types/http-statuses";
 import { ResultStatus } from "../../../core/result/resultCode";
-import {container} from "../../../composition-root";
-import {CommentsService} from "../../application/comments.service";
+import { container } from "../../../composition-root";
+import { CommentsService } from "../../application/comments.service";
 
 const commentsService = container.get(CommentsService);
 

@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { IdType } from "../../core/types/id";
 import { container } from "../../composition-root";
-import {JwtService} from "../adapters/jwt.service";
+import { JwtService } from "../adapters/jwt.service";
 
 const jwtService = container.get(JwtService);
 

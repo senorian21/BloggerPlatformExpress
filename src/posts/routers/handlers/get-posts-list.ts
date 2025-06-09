@@ -2,8 +2,8 @@ import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/types/http-statuses";
 import { paginationAndSortingDefault } from "../../../core/middlewares/validation/query-pagination-sorting.validation-middleware";
 import { PostQueryInput } from "../../types/post-query.input";
-import {container} from "../../../composition-root";
-import {PostsQueryRepository} from "../../repositories/posts.queryRepository";
+import { container } from "../../../composition-root";
+import { PostsQueryRepository } from "../../repositories/posts.queryRepository";
 
 const postsQueryRepository = container.get(PostsQueryRepository);
 

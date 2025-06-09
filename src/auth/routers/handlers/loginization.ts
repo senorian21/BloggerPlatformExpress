@@ -3,8 +3,8 @@ import { HttpStatus } from "../../../core/types/http-statuses";
 import { ResultStatus } from "../../../core/result/resultCode";
 import { RequestWithBody } from "../../../core/types/requests";
 import { LoginDto } from "../../types/login.dto";
-import { container} from "../../../composition-root";
-import {AuthService} from "../../application/auth.service";
+import { container } from "../../../composition-root";
+import { AuthService } from "../../application/auth.service";
 
 const authService = container.get(AuthService);
 

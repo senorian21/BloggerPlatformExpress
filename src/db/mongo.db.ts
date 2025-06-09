@@ -1,5 +1,5 @@
 import { appConfig } from "../core/settings/settings";
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 let isTestMode = false;
 

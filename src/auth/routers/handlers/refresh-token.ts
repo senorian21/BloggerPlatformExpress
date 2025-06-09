@@ -2,8 +2,8 @@ import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/types/http-statuses";
 import { ResultStatus } from "../../../core/result/resultCode";
 import { cookieService } from "../../adapters/cookie.service";
-import {container} from "../../../composition-root";
-import {AuthService} from "../../application/auth.service";
+import { container } from "../../../composition-root";
+import { AuthService } from "../../application/auth.service";
 
 const authService = container.get(AuthService);
 

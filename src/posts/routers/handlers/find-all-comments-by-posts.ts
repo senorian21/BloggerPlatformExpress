@@ -3,8 +3,8 @@ import { commentsQueryInput } from "../../../comments/types/comments-query.input
 import { paginationAndSortingDefault } from "../../../core/middlewares/validation/query-pagination-sorting.validation-middleware";
 import { HttpStatus } from "../../../core/types/http-statuses";
 import { commentsQueryRepositories } from "../../../comments/repositories/comments.queryRepository";
-import {container} from "../../../composition-root";
-import {PostsQueryRepository} from "../../repositories/posts.queryRepository";
+import { container } from "../../../composition-root";
+import { PostsQueryRepository } from "../../repositories/posts.queryRepository";
 
 const postsQueryRepository = container.get(PostsQueryRepository);
 

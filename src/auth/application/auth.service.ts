@@ -12,7 +12,7 @@ import { UserRepository } from "../../users/repositories/users.repository";
 import { Argon2Service } from "../adapters/argon2.service";
 import { NodemailerService } from "../adapters/nodemailer.service";
 import { injectable } from "inversify";
-import {session} from "../domain/auth.entity";
+import { session } from "../domain/auth.entity";
 
 @injectable()
 export class AuthService {

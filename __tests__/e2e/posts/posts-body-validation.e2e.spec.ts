@@ -1,12 +1,9 @@
 import request from "supertest";
 import express from "express";
-
 import { setupApp } from "../../../src/setup-app";
 import { PostInput } from "../../../src/posts/dto/post.input-dto";
 import { HttpStatus } from "../../../src/core/types/http-statuses";
-
 import { BLOGS_PATH, POSTS_PATH } from "../../../src/core/paths/paths";
-
 import { clearDb } from "../utils/clear-db";
 import { BlogInput } from "../../../src/blogs/dto/blog.input-dto";
 import { runDb } from "../../../src/db/mongo.db";

@@ -1,13 +1,10 @@
-import { ObjectId} from "mongodb";
+import { ObjectId } from "mongodb";
 import { PostQueryInput } from "../types/post-query.input";
 import { mapToPostViewModel } from "../mappers/map-to-post-view-model.util";
 import { mapToPostListPaginatedOutput } from "../mappers/map-to-post-list-paginated-output.util";
 import { postViewModel } from "../types/post-view-model";
 import { injectable } from "inversify";
-import {PostModel} from "../domain/post.entity";
-
-
-
+import { PostModel } from "../domain/post.entity";
 
 @injectable()
 export class PostsQueryRepository {
@@ -18,8 +15,7 @@ export class PostsQueryRepository {
     const skip = (pageNumber - 1) * pageSize;
     const filter: any = {};
 
-    const items = await PostModel
-      .find(filter)
+    const items = await PostModel.find(filter)
 
       // "asc" (по возрастанию), то используется 1
       // "desc" — то -1 для сортировки по убыванию. - по алфавиту от Я-А, Z-A
@@ -29,7 +25,7 @@ export class PostsQueryRepository {
       .skip(skip)
 
       // ограничивает количество возвращаемых документов до значения pageSize
-      .limit(+pageSize)
+      .limit(+pageSize);
     const totalCount = await PostModel.countDocuments(filter);
     return mapToPostListPaginatedOutput(items, {
       pageNumber: +pageNumber,
@@ -54,8 +50,7 @@ export class PostsQueryRepository {
     const skip = (pageNumber - 1) * pageSize;
 
     const [items, totalCount] = await Promise.all([
-      PostModel
-        .find(filter)
+      PostModel.find(filter)
         .sort({ [sortBy]: sortDirection })
         .skip(skip)
         .limit(+pageSize),

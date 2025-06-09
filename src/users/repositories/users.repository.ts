@@ -2,7 +2,7 @@ import { User } from "../types/user";
 import { ObjectId, WithId } from "mongodb";
 import { ResultStatus } from "../../core/result/resultCode";
 import { injectable } from "inversify";
-import {UserModel} from "../domain/user.entity";
+import { UserModel } from "../domain/user.entity";
 @injectable()
 export class UserRepository {
   async isEmailAndLoginUnique(email: string, login: string) {

@@ -4,8 +4,7 @@ import { mapToBlogViewModel } from "../mappers/map-to-blog-view-model.util";
 import { blogViewModel } from "../types/blog-view-model";
 import { mapToBlogListPaginatedOutput } from "../mappers/map-to-blog-list-paginated-output.util";
 import { injectable } from "inversify";
-import {BlogModel} from "../domain/blog.entity";
-
+import { BlogModel } from "../domain/blog.entity";
 
 @injectable()
 export class BlogsQueryRepositories {
@@ -23,11 +22,10 @@ export class BlogsQueryRepositories {
       filter.$or.push({ name: { $regex: searchNameTerm, $options: "i" } });
     }
 
-    const items = await BlogModel
-      .find(filter)
+    const items = await BlogModel.find(filter)
       .sort({ [sortBy]: sortDirection })
       .skip(skip)
-      .limit(+pageSize)
+      .limit(+pageSize);
 
     const totalCount = await BlogModel.countDocuments(filter);
     return mapToBlogListPaginatedOutput(items, {

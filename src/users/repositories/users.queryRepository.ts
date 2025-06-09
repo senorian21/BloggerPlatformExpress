@@ -5,7 +5,7 @@ import { userViewModel } from "../types/user-view-model";
 import { mapToUserListPaginatedOutput } from "../mappers/map-to-user-list-paginated-output.util";
 import { mapToAboutUserViewModel } from "../mappers/map-to-about-user-view-model.util";
 import { injectable } from "inversify";
-import {UserModel} from "../domain/user.entity";
+import { UserModel } from "../domain/user.entity";
 @injectable()
 export class UserQueryRepository {
   async findAllUser(
@@ -37,11 +37,10 @@ export class UserQueryRepository {
       delete filter.$or;
     }
 
-    const items = await UserModel
-      .find(filter)
+    const items = await UserModel.find(filter)
       .sort({ [sortBy]: sortDirection })
       .skip(skip)
-      .limit(+pageSize)
+      .limit(+pageSize);
 
     const totalCount = await UserModel.countDocuments(filter);
     return mapToUserListPaginatedOutput(items, {

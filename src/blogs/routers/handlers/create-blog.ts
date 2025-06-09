@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/types/http-statuses";
-import {container} from "../../../composition-root";
-import {BlogsService} from "../../application/blogs.service";
-import {BlogsQueryRepositories} from "../../repositories/blogs.queryRepository";
+import { container } from "../../../composition-root";
+import { BlogsService } from "../../application/blogs.service";
+import { BlogsQueryRepositories } from "../../repositories/blogs.queryRepository";
 
 const blogsService = container.get(BlogsService);
 const blogsQueryRepositories = container.get(BlogsQueryRepositories);

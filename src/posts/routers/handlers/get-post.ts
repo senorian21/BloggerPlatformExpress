@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/types/http-statuses";
-import {container} from "../../../composition-root";
-import {PostsQueryRepository} from "../../repositories/posts.queryRepository";
+import { container } from "../../../composition-root";
+import { PostsQueryRepository } from "../../repositories/posts.queryRepository";
 
 const postsQueryRepository = container.get(PostsQueryRepository);
 

@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/types/http-statuses";
 import { PostInput } from "../../../posts/dto/post.input-dto";
-import {container} from "../../../composition-root";
-import {BlogsQueryRepositories} from "../../repositories/blogs.queryRepository";
-import {PostsQueryRepository} from "../../../posts/repositories/posts.queryRepository";
-import {PostsService} from "../../../posts/application/posts.service";
+import { container } from "../../../composition-root";
+import { BlogsQueryRepositories } from "../../repositories/blogs.queryRepository";
+import { PostsQueryRepository } from "../../../posts/repositories/posts.queryRepository";
+import { PostsService } from "../../../posts/application/posts.service";
 
 const blogsQueryRepositories = container.get(BlogsQueryRepositories);
 const postsQueryRepository = container.get(PostsQueryRepository);

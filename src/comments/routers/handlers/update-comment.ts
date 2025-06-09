@@ -2,8 +2,8 @@ import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/types/http-statuses";
 import { commentInput } from "../../../comments/dto/comment.input-dto";
 import { ResultStatus } from "../../../core/result/resultCode";
-import {container} from "../../../composition-root";
-import {CommentsService} from "../../application/comments.service";
+import { container } from "../../../composition-root";
+import { CommentsService } from "../../application/comments.service";
 
 const commentsService = container.get(CommentsService);
 

@@ -1,7 +1,6 @@
 import { ObjectId } from "mongodb";
 import { injectable } from "inversify";
-import {Blog, BlogModel} from "../domain/blog.entity";
-
+import { Blog, BlogModel } from "../domain/blog.entity";
 
 @injectable()
 export class BlogsRepositories {

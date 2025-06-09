@@ -1,7 +1,7 @@
 import express from "express";
 import { setupApp } from "../../../src/setup-app";
 import { generateBasicAuthToken } from "../utils/generate-admin-auth-token";
-import { client, runDb, setIsTestMode } from "../../../src/db/mongo.db";
+import { runDb, setIsTestMode } from "../../../src/db/mongo.db";
 import { clearDb } from "../utils/clear-db";
 import { getUserDto } from "../utils/users/get-user-dto";
 import { UserInput } from "../../../src/users/dto/user.input-dto";
@@ -24,11 +24,6 @@ describe("User API", () => {
     await clearDb(app);
   });
 
-  afterAll(async () => {
-    if (client) {
-      await client.close(); // Закрываем соединение после завершения тестов
-    }
-  });
   beforeEach(async () => {
     await clearDb(app);
   });

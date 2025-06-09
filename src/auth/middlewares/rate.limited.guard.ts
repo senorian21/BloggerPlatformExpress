@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { HttpStatus } from "../../core/types/http-statuses";
-import {RateModel} from "../domain/rate.entity";
+import { RateModel } from "../domain/rate.entity";
 
 const MAX_REQUESTS = 5;
 const TIME_WINDOW_MS = 10 * 1000; // 10 секунд

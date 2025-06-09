@@ -3,7 +3,7 @@ import { mapToBlogViewModel } from "../mappers/map-to-comment-view-model";
 import { commentsQueryInput } from "../types/comments-query.input";
 import { commentViewModel } from "../types/comment-view-model";
 import { mapToCommentsListPaginatedOutput } from "../mappers/map-to-comments-list-paginated-output.util";
-import {CommentModel} from "../domain/comment.entity";
+import { CommentModel } from "../domain/comment.entity";
 
 export const commentsQueryRepositories = {
   async findCommentsById(id: string) {
@@ -27,11 +27,10 @@ export const commentsQueryRepositories = {
     const skip = (pageNumber - 1) * pageSize;
     const filter: any = { postId: postId };
 
-    const items = await CommentModel
-      .find(filter)
+    const items = await CommentModel.find(filter)
       .sort({ [sortBy]: sortDirection })
       .skip(skip)
-      .limit(+pageSize)
+      .limit(+pageSize);
 
     const totalCount = await CommentModel.countDocuments(filter);
     return mapToCommentsListPaginatedOutput(items, {

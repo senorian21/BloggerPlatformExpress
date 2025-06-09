@@ -1,5 +1,5 @@
 import { injectable } from "inversify";
-import {session, SessionModel} from "../domain/auth.entity";
+import { session, SessionModel } from "../domain/auth.entity";
 
 @injectable()
 export class AuthRepositories {

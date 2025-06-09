@@ -1,8 +1,7 @@
-
 import { BlogsRepositories } from "../repositories/blogs.repository";
 import { BlogInput } from "../dto/blog.input-dto";
 import { injectable } from "inversify";
-import {Blog} from "../domain/blog.entity";
+import { Blog } from "../domain/blog.entity";
 @injectable()
 export class BlogsService {
   constructor(public blogsRepositories: BlogsRepositories) {}

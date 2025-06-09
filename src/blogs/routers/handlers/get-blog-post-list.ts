@@ -6,12 +6,12 @@ import {
 } from "../../../core/middlewares/validation/query-pagination-sorting.validation-middleware";
 import { HttpStatus } from "../../../core/types/http-statuses";
 import { SortDirection } from "../../../core/types/sort-direction";
-import {container} from "../../../composition-root";
-import {BlogsQueryRepositories} from "../../repositories/blogs.queryRepository";
-import {PostsQueryRepository} from "../../../posts/repositories/posts.queryRepository";
+import { container } from "../../../composition-root";
+import { BlogsQueryRepositories } from "../../repositories/blogs.queryRepository";
+import { PostsQueryRepository } from "../../../posts/repositories/posts.queryRepository";
 
-const blogsQueryRepositories = container.get(BlogsQueryRepositories)
-const postsQueryRepository = container.get(PostsQueryRepository)
+const blogsQueryRepositories = container.get(BlogsQueryRepositories);
+const postsQueryRepository = container.get(PostsQueryRepository);
 
 export async function getBlogPostsListHandler(
   req: Request<{ blogId: string }, {}, PostQueryInput>,

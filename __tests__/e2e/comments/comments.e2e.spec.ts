@@ -1,7 +1,7 @@
 import express from "express";
 import { setupApp } from "../../../src/setup-app";
 import { generateBasicAuthToken } from "../utils/generate-admin-auth-token";
-import { client, runDb, setIsTestMode } from "../../../src/db/mongo.db";
+import { runDb, setIsTestMode } from "../../../src/db/mongo.db";
 import { appConfig } from "../../../src/core/settings/settings";
 import { clearDb } from "../utils/clear-db";
 import { createBlog } from "../utils/blogs/create-blog";
@@ -28,12 +28,6 @@ describe("Comments API", () => {
     setIsTestMode(true); // Переключаемся на тестовую базу данных
     await runDb(appConfig.MONGO_URI); // Подключаемся к MongoDB
     await clearDb(app);
-  });
-
-  afterAll(async () => {
-    if (client) {
-      await client.close(); // Закрываем соединение после завершения тестов
-    }
   });
 
   it("Create comment by post, POST posts/{postId}/comments", async () => {

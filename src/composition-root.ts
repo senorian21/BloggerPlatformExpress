@@ -15,17 +15,25 @@ import { NodemailerService } from "./auth/adapters/nodemailer.service";
 import { JwtService } from "./auth/adapters/jwt.service";
 import { AuthService } from "./auth/application/auth.service";
 import { SecurityService } from "./security/application/security.service";
-import {Container} from "inversify";
+import { Container } from "inversify";
 
 export const container: Container = new Container();
 
 // Repositories
 container.bind<BlogsRepositories>(BlogsRepositories).to(BlogsRepositories);
 container.bind<PostsRepository>(PostsRepository).to(PostsRepository);
-container.bind<BlogsQueryRepositories>(BlogsQueryRepositories).to(BlogsQueryRepositories);
-container.bind<PostsQueryRepository>(PostsQueryRepository).to(PostsQueryRepository);
-container.bind<UserQueryRepository>(UserQueryRepository).to(UserQueryRepository);
-container.bind<CommentsRepositories>(CommentsRepositories).to(CommentsRepositories);
+container
+  .bind<BlogsQueryRepositories>(BlogsQueryRepositories)
+  .to(BlogsQueryRepositories);
+container
+  .bind<PostsQueryRepository>(PostsQueryRepository)
+  .to(PostsQueryRepository);
+container
+  .bind<UserQueryRepository>(UserQueryRepository)
+  .to(UserQueryRepository);
+container
+  .bind<CommentsRepositories>(CommentsRepositories)
+  .to(CommentsRepositories);
 container.bind<UserRepository>(UserRepository).to(UserRepository);
 container.bind<AuthRepositories>(AuthRepositories).to(AuthRepositories);
 
@@ -41,4 +49,3 @@ container.bind<CommentsService>(CommentsService).to(CommentsService);
 container.bind<UserService>(UserService).to(UserService);
 container.bind<AuthService>(AuthService).to(AuthService);
 container.bind<SecurityService>(SecurityService).to(SecurityService);
-

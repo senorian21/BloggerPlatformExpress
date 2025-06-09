@@ -3,7 +3,7 @@ import { ResultStatus } from "../../core/result/resultCode";
 import { Result } from "../../core/result/result.type";
 import { ObjectId } from "mongodb";
 import { injectable } from "inversify";
-import {CommentModel} from "../domain/comment.entity";
+import { CommentModel } from "../domain/comment.entity";
 
 @injectable()
 export class CommentsRepositories {
