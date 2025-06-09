@@ -1,23 +1,23 @@
-import { userCollection } from "../../db/mongo.db";
 import { User } from "../types/user";
 import { ObjectId, WithId } from "mongodb";
 import { ResultStatus } from "../../core/result/resultCode";
 import { injectable } from "inversify";
+import {UserModel} from "../domain/user.entity";
 @injectable()
 export class UserRepository {
   async isEmailAndLoginUnique(email: string, login: string) {
-    const user = await userCollection.findOne({
+    const user = await UserModel.findOne({
       $or: [{ email: email }, { login: login }],
     });
     return user;
   }
   async createUser(newUser: User) {
-    const result = await userCollection.insertOne(newUser);
-    return result.insertedId.toString();
+    const result = await UserModel.insertOne(newUser);
+    return result._id.toString();
   }
 
   async deleteUser(id: string) {
-    const deleteResult = await userCollection.deleteOne({
+    const deleteResult = await UserModel.deleteOne({
       _id: new ObjectId(id),
     });
     if (deleteResult.deletedCount < 1) {
@@ -25,7 +25,7 @@ export class UserRepository {
     }
   }
   async findByLoginOrEmail(loginOrEmail: string): Promise<WithId<User> | null> {
-    const user = await userCollection.findOne({
+    const user = await UserModel.findOne({
       $or: [{ email: loginOrEmail }, { login: loginOrEmail }],
     });
     return user;
@@ -34,7 +34,7 @@ export class UserRepository {
     login: string,
     email: string,
   ): Promise<User | null> {
-    const user = await userCollection.findOne({
+    const user = await UserModel.findOne({
       $or: [{ email }, { login }],
     });
     if (!user) {
@@ -44,14 +44,14 @@ export class UserRepository {
   }
 
   async findByCode(code: string) {
-    const user = await userCollection.findOne({
+    const user = await UserModel.findOne({
       "emailConfirmation.confirmationCode": code,
     });
     return user;
   }
 
   async registrationConfirmationUser(user: User, userId: string) {
-    const confirmUser = await userCollection.updateOne(
+    const confirmUser = await UserModel.updateOne(
       {
         _id: new ObjectId(userId),
       },
@@ -80,7 +80,7 @@ export class UserRepository {
     newCode: string,
     newExpirationDate: Date,
   ) {
-    await userCollection.updateOne(
+    await UserModel.updateOne(
       { _id: new ObjectId(userId) },
       {
         $set: {
@@ -91,7 +91,7 @@ export class UserRepository {
     );
   }
   async updatePasswordUser(userId: string, newPasswordHash: string) {
-    await userCollection.updateOne(
+    await UserModel.updateOne(
       { _id: new ObjectId(userId) },
       {
         $set: {

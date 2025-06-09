@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/types/http-statuses";
-import { Post } from "../../../posts/types/post";
 import {container} from "../../../composition-root";
 import {PostsService} from "../../application/posts.service";
+import {Post} from "../../domain/post.entity";
 
 const postsService = container.get(PostsService);
 

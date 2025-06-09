@@ -1,6 +1,6 @@
-import { sessionCollection } from "../../db/mongo.db";
-import { session } from "../types/session";
 import { injectable } from "inversify";
+import {session, SessionModel} from "../domain/auth.entity";
+
 @injectable()
 export class AuthRepositories {
   async updateOrCreateSession(session: session) {
@@ -20,7 +20,7 @@ export class AuthRepositories {
   }
 
   async createSession(session: session) {
-    await sessionCollection.insertOne(session);
+    await SessionModel.insertOne(session);
   }
 
   async updateSession(
@@ -28,7 +28,7 @@ export class AuthRepositories {
     newIssuedAt: string,
     newExpiresAt: string,
   ) {
-    await sessionCollection.updateOne(
+    await SessionModel.updateOne(
       { _id: sessionExists._id },
       { $set: { createdAt: newIssuedAt, expiresAt: newExpiresAt } },
     );
@@ -47,23 +47,23 @@ export class AuthRepositories {
     if (filters.deviceId) query.deviceId = filters.deviceId;
     if (filters.deviceName) query.deviceName = filters.deviceName;
 
-    return await sessionCollection.findOne(query);
+    return await SessionModel.findOne(query);
   }
 
   async deleteSessionByDeviceId(
     userId: string,
     deviceId: string,
   ): Promise<boolean> {
-    const result = await sessionCollection.deleteOne({ userId, deviceId });
+    const result = await SessionModel.deleteOne({ userId, deviceId });
     return result.deletedCount === 1;
   }
 
   async deleteSession(sessionId: string) {
-    await sessionCollection.deleteOne({ _id: sessionId });
+    await SessionModel.deleteOne({ _id: sessionId });
   }
 
   async deleteDevice(deviceId: string, userId: string) {
-    await sessionCollection.deleteMany({
+    await SessionModel.deleteMany({
       $and: [{ userId: userId }, { deviceId: { $ne: deviceId } }],
     });
   }

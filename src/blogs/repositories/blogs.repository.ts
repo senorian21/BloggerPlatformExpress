@@ -1,17 +1,17 @@
-import { Blog } from "../types/blog";
-import { blogCollection } from "../../db/mongo.db";
 import { ObjectId } from "mongodb";
 import { injectable } from "inversify";
+import {Blog, BlogModel} from "../domain/blog.entity";
+
 
 @injectable()
 export class BlogsRepositories {
   async createBlog(newBlog: Blog) {
-    const result = await blogCollection.insertOne(newBlog);
-    return result.insertedId.toString();
+    const result = await BlogModel.insertOne(newBlog);
+    return result._id.toString();
   }
 
   async updateBlog(id: string, dto: Blog) {
-    const updateResult = await blogCollection.updateOne(
+    const updateResult = await BlogModel.updateOne(
       {
         _id: new ObjectId(id),
       },
@@ -27,7 +27,7 @@ export class BlogsRepositories {
     );
   }
   async deleteBlog(id: string) {
-    const deleteResult = await blogCollection.deleteOne({
+    const deleteResult = await BlogModel.deleteOne({
       _id: new ObjectId(id),
     });
     if (deleteResult.deletedCount < 1) {

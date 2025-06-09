@@ -1,7 +1,6 @@
 import { WithId } from "mongodb";
-
-import { Post } from "../types/post";
 import { postViewModel } from "../types/post-view-model";
+import {Post} from "../domain/post.entity";
 
 export function mapToPostListPaginatedOutput(
   post: WithId<Post>[],

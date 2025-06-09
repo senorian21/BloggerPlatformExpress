@@ -1,6 +1,6 @@
 import { WithId } from "mongodb";
-import { User } from "../types/user";
 import { userViewModel } from "../types/user-view-model";
+import {User} from "../domain/user.entity";
 
 export function mapToUserListPaginatedOutput(
   users: WithId<User>[],
@@ -21,7 +21,7 @@ export function mapToUserListPaginatedOutput(
       id: user._id.toString(), // Преобразуем ObjectId в строку
       email: user.email,
       login: user.login,
-      createdAt: user.createdAt.toISOString(), // Преобразуем Date в строку
+      createdAt: user.createdAt, // Преобразуем Date в строку
     })),
   };
 }

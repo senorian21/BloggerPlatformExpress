@@ -1,11 +1,14 @@
-import { ObjectId, WithId } from "mongodb";
-import { postCollection } from "../../db/mongo.db";
-
+import { ObjectId} from "mongodb";
 import { PostQueryInput } from "../types/post-query.input";
 import { mapToPostViewModel } from "../mappers/map-to-post-view-model.util";
 import { mapToPostListPaginatedOutput } from "../mappers/map-to-post-list-paginated-output.util";
 import { postViewModel } from "../types/post-view-model";
 import { injectable } from "inversify";
+import {PostModel} from "../domain/post.entity";
+
+
+
+
 @injectable()
 export class PostsQueryRepository {
   async findAllPosts(
@@ -15,7 +18,7 @@ export class PostsQueryRepository {
     const skip = (pageNumber - 1) * pageSize;
     const filter: any = {};
 
-    const items = await postCollection
+    const items = await PostModel
       .find(filter)
 
       // "asc" (по возрастанию), то используется 1
@@ -27,8 +30,7 @@ export class PostsQueryRepository {
 
       // ограничивает количество возвращаемых документов до значения pageSize
       .limit(+pageSize)
-      .toArray();
-    const totalCount = await postCollection.countDocuments(filter);
+    const totalCount = await PostModel.countDocuments(filter);
     return mapToPostListPaginatedOutput(items, {
       pageNumber: +pageNumber,
       pageSize: +pageSize,
@@ -40,7 +42,7 @@ export class PostsQueryRepository {
     if (!ObjectId.isValid(id)) {
       return null;
     }
-    const post = await postCollection.findOne({ _id: new ObjectId(id) });
+    const post = await PostModel.findOne({ _id: new ObjectId(id) });
     if (!post) {
       return null;
     }
@@ -52,13 +54,13 @@ export class PostsQueryRepository {
     const skip = (pageNumber - 1) * pageSize;
 
     const [items, totalCount] = await Promise.all([
-      postCollection
+      PostModel
         .find(filter)
         .sort({ [sortBy]: sortDirection })
         .skip(skip)
-        .limit(+pageSize)
-        .toArray(),
-      postCollection.countDocuments(filter),
+        .limit(+pageSize),
+
+      PostModel.countDocuments(filter),
     ]);
     return mapToPostListPaginatedOutput(items, {
       pageNumber: +pageNumber,

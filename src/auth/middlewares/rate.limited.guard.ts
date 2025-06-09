@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { rateCollection } from "../../db/mongo.db";
 import { HttpStatus } from "../../core/types/http-statuses";
+import {RateModel} from "../domain/rate.entity";
 
 const MAX_REQUESTS = 5;
 const TIME_WINDOW_MS = 10 * 1000; // 10 секунд
@@ -18,11 +18,11 @@ const rateLimiter = async (req: Request, res: Response, next: NextFunction) => {
   const now = new Date();
   const timeAgo = new Date(now.getTime() - TIME_WINDOW_MS);
 
-  await rateCollection.deleteMany({
+  await RateModel.deleteMany({
     date: { $lt: timeAgo.toISOString() },
   });
 
-  const count = await rateCollection.countDocuments({
+  const count = await RateModel.countDocuments({
     IP: ip,
     URL: url,
     date: { $gte: timeAgo.toISOString() },
@@ -33,7 +33,7 @@ const rateLimiter = async (req: Request, res: Response, next: NextFunction) => {
     return;
   }
 
-  await rateCollection.insertOne({ IP: ip, URL: url, date: now.toISOString() });
+  await RateModel.insertOne({ IP: ip, URL: url, date: now.toISOString() });
 
   next();
   return;

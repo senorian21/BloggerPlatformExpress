@@ -5,7 +5,6 @@ import { ResultStatus } from "../../core/result/resultCode";
 import { emailExamples } from "../adapters/emailExamples";
 import { randomUUID } from "crypto";
 import { add } from "date-fns";
-import { session } from "../types/session";
 import { RefreshToken } from "../types/tokens";
 import { AuthRepositories } from "../repositories/auth.Repository";
 import { JwtService } from "../adapters/jwt.service";
@@ -13,6 +12,8 @@ import { UserRepository } from "../../users/repositories/users.repository";
 import { Argon2Service } from "../adapters/argon2.service";
 import { NodemailerService } from "../adapters/nodemailer.service";
 import { injectable } from "inversify";
+import {session} from "../domain/auth.entity";
+
 @injectable()
 export class AuthService {
   constructor(
@@ -224,7 +225,7 @@ export class AuthService {
         extensions: [{ field: "isConfirmed", message: "Already confirmed" }],
       };
     }
-    if (user.emailConfirmation.expirationDate < new Date()) {
+    if (new Date(user.emailConfirmation.expirationDate) < new Date()) {
       return {
         status: ResultStatus.BadRequest,
         errorMessage: "Bad Request",
@@ -276,7 +277,7 @@ export class AuthService {
       };
     }
 
-    if (user.emailConfirmation.expirationDate < new Date()) {
+    if (new Date(user.emailConfirmation.expirationDate) < new Date()) {
       return {
         status: ResultStatus.BadRequest,
         errorMessage: "Bad Request",

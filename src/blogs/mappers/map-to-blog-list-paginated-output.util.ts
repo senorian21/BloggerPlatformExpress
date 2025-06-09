@@ -1,6 +1,6 @@
 import { WithId } from "mongodb";
-import { Blog } from "../types/blog";
 import { blogViewModel } from "../types/blog-view-model";
+import {Blog} from "../domain/blog.entity";
 
 export function mapToBlogListPaginatedOutput(
   blogs: WithId<Blog>[],

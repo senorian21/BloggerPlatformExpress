@@ -48,6 +48,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.15.0",
     "mongodb-memory-server": "^10.1.4",
+    "mongoose": "^8.15.1",
     "nodemailer": "^7.0.3",
     "reflect-metadata": "^0.2.2",
     "uuid": "^11.1.0"

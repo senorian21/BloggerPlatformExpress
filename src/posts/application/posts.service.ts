@@ -1,9 +1,9 @@
-import { Post } from "../../posts/types/post";
 import { PostsRepository } from "../repositories/posts.repository";
 import { PostInput } from "../dto/post.input-dto";
 import { BlogsQueryRepositories } from "../../blogs/repositories/blogs.queryRepository";
 import { PostsQueryRepository } from "../repositories/posts.queryRepository";
 import { injectable } from "inversify";
+import {Post} from "../domain/post.entity";
 @injectable()
 export class PostsService {
   constructor(

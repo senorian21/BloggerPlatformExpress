@@ -1,16 +1,17 @@
 import { comment } from "../types/comment";
-import { commentCollection } from "../../db/mongo.db";
 import { ResultStatus } from "../../core/result/resultCode";
 import { Result } from "../../core/result/result.type";
 import { ObjectId } from "mongodb";
 import { injectable } from "inversify";
+import {CommentModel} from "../domain/comment.entity";
+
 @injectable()
 export class CommentsRepositories {
   async createComment(newComment: comment): Promise<Result<string>> {
-    const result = await commentCollection.insertOne(newComment);
+    const result = await CommentModel.insertOne(newComment);
     return {
       status: ResultStatus.Success,
-      data: result.insertedId.toString(),
+      data: result._id.toString(),
       extensions: [],
     };
   }
@@ -19,7 +20,7 @@ export class CommentsRepositories {
       return null;
     }
 
-    const comment = await commentCollection.findOne({ _id: new ObjectId(id) });
+    const comment = await CommentModel.findOne({ _id: new ObjectId(id) });
     if (!comment) {
       return null;
     }
@@ -36,7 +37,7 @@ export class CommentsRepositories {
       };
     }
 
-    const updateResult = await commentCollection.updateOne(
+    const updateResult = await CommentModel.updateOne(
       {
         _id: new ObjectId(idComment),
       },
@@ -77,7 +78,7 @@ export class CommentsRepositories {
         extensions: [],
       };
     }
-    const deleteComment = await commentCollection.deleteOne({
+    const deleteComment = await CommentModel.deleteOne({
       _id: new ObjectId(idComment),
     });
     if (deleteComment.deletedCount === 0) {

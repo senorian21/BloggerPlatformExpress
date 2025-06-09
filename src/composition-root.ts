@@ -17,7 +17,6 @@ import { AuthService } from "./auth/application/auth.service";
 import { SecurityService } from "./security/application/security.service";
 import {Container} from "inversify";
 
-
 export const container: Container = new Container();
 
 // Repositories
@@ -35,7 +34,7 @@ container.bind<Argon2Service>(Argon2Service).to(Argon2Service);
 container.bind<NodemailerService>(NodemailerService).to(NodemailerService);
 container.bind<JwtService>(JwtService).to(JwtService);
 
-// Application Services
+// Services
 container.bind<BlogsService>(BlogsService).to(BlogsService);
 container.bind<PostsService>(PostsService).to(PostsService);
 container.bind<CommentsService>(CommentsService).to(CommentsService);
