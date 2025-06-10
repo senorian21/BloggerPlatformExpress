@@ -1,14 +1,18 @@
-import { client, runDb, setIsTestMode } from "../../src/db/mongo.db";
+import { runDb } from "../../src/db/mongo.db";
 import { clearDb } from "../e2e/utils/clear-db";
 import express from "express";
 import { setupApp } from "../../src/setup-app";
-import { nodemailerService } from "../../src/auth/adapters/nodemailer.service";
-import { authService } from "../../src/auth/application/auth.service";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import { testSeeder } from "./test.seeder";
 import { ResultStatus } from "../../src/core/result/resultCode";
 import { describe } from "node:test";
 import { createUser } from "../e2e/utils/users/create-user";
+import {container} from "../../src/composition-root";
+import {AuthService} from "../../src/auth/application/auth.service";
+import {NodemailerService} from "../../src/auth/adapters/nodemailer.service";
+
+const authService = container.get(AuthService);
+const nodemailerService = container.get(NodemailerService);
 
 describe("AUTH-INTEGRATION", () => {
   const app = express();

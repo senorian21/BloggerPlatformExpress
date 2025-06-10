@@ -10,7 +10,6 @@ import { RateModel } from "../../auth/domain/rate.entity";
 export const testingRouter = Router({});
 
 testingRouter.delete("/all-data", async (req: Request, res: Response) => {
-  try {
     await Promise.all([
       BlogModel.deleteMany(),
       PostModel.deleteMany(),
@@ -19,10 +18,5 @@ testingRouter.delete("/all-data", async (req: Request, res: Response) => {
       SessionModel.deleteMany(),
       RateModel.deleteMany(),
     ]);
-    console.log("Очистка завершена.");
     res.sendStatus(HttpStatus.NoContent);
-  } catch (error) {
-    console.error("Ошибка при очистке БД:", error);
-    res.sendStatus(HttpStatus.InternalServerError);
-  }
 });

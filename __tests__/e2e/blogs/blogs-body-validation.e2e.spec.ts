@@ -9,6 +9,7 @@ import { BLOGS_PATH } from "../../../src/core/paths/paths";
 import { generateBasicAuthToken } from "../utils/generate-admin-auth-token";
 import { clearDb } from "../utils/clear-db";
 import { runDb } from "../../../src/db/mongo.db";
+import {appConfig} from "../../../src/core/settings/settings";
 
 describe("Blogs API validation", () => {
   const app = express();
@@ -23,7 +24,7 @@ describe("Blogs API validation", () => {
   };
 
   beforeAll(async () => {
-    await runDb("mongodb://localhost:27017/BloggerPlatform-test");
+      await runDb(appConfig.MONGO_URI);
     await clearDb(app);
   });
 

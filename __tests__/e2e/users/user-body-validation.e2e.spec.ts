@@ -7,6 +7,7 @@ import { UserInput } from "../../../src/users/dto/user.input-dto";
 import request from "supertest";
 import { HttpStatus } from "../../../src/core/types/http-statuses";
 import { USERS_PATH } from "../../../src/core/paths/paths";
+import {appConfig} from "../../../src/core/settings/settings";
 
 describe("Blogs API validation", () => {
   const app = express();
@@ -20,7 +21,7 @@ describe("Blogs API validation", () => {
     email: "test@test.com",
   };
   beforeAll(async () => {
-    await runDb("mongodb://localhost:27017/BloggerPlatform-test");
+      await runDb(appConfig.MONGO_URI);
     await clearDb(app);
   });
 
