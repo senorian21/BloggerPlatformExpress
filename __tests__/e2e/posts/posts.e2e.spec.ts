@@ -8,7 +8,7 @@ import { HttpStatus } from "../../../src/core/types/http-statuses";
 import { POSTS_PATH } from "../../../src/core/paths/paths";
 import { generateBasicAuthToken } from "../utils/generate-admin-auth-token";
 import { clearDb } from "../utils/clear-db";
-import { runDb, setIsTestMode } from "../../../src/db/mongo.db";
+import { runDb } from "../../../src/db/mongo.db";
 import { getPostDto } from "../utils/posts/get-posts-dto";
 import { createPost } from "../utils/posts/create-post";
 import { createBlog } from "../utils/blogs/create-blog";
@@ -23,7 +23,6 @@ describe("Posts API", () => {
   const adminToken = generateBasicAuthToken();
 
   beforeAll(async () => {
-    setIsTestMode(true); // Переключаемся на тестовую базу данных
     await runDb(appConfig.MONGO_URI); // Подключаемся к MongoDB
     await clearDb(app);
   });

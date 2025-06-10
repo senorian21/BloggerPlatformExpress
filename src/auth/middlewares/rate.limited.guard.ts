@@ -12,15 +12,9 @@ const rateLimiter = async (req: Request, res: Response, next: NextFunction) => {
       ? req.headers["x-forwarded-for"][0]
       : req.headers["x-forwarded-for"]) ||
     "unknown";
-
   const url = req.originalUrl;
-
   const now = new Date();
   const timeAgo = new Date(now.getTime() - TIME_WINDOW_MS);
-
-  await RateModel.deleteMany({
-    date: { $lt: timeAgo.toISOString() },
-  });
 
   const count = await RateModel.countDocuments({
     IP: ip,
@@ -33,10 +27,9 @@ const rateLimiter = async (req: Request, res: Response, next: NextFunction) => {
     return;
   }
 
-  await RateModel.insertOne({ IP: ip, URL: url, date: now.toISOString() });
+  await RateModel.create({ IP: ip, URL: url, date: now.toISOString() });
 
   next();
-  return;
 };
 
 export default rateLimiter;

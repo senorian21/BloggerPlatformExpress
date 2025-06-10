@@ -8,7 +8,7 @@ import { HttpStatus } from "../../../src/core/types/http-statuses";
 import { BLOGS_PATH, TESTING_PATH } from "../../../src/core/paths/paths";
 import { generateBasicAuthToken } from "../utils/generate-admin-auth-token";
 import { clearDb } from "../utils/clear-db";
-import { runDb, setIsTestMode } from "../../../src/db/mongo.db";
+import { runDb } from "../../../src/db/mongo.db";
 import { createBlog } from "../utils/blogs/create-blog";
 import { getBlogsDto } from "../utils/blogs/get-blogs-dto";
 import { getBlogById } from "../utils/blogs/get-blog-by-id";
@@ -24,8 +24,7 @@ describe("Blogs API", () => {
   const adminToken = generateBasicAuthToken();
 
   beforeAll(async () => {
-    setIsTestMode(true); // Переключаемся на тестовую базу данных
-    await runDb(appConfig.MONGO_URI); // Подключаемся к MongoDB
+    await runDb(appConfig.MONGO_URI);
     await clearDb(app);
   });
 

@@ -1,14 +1,8 @@
 import { appConfig } from "../core/settings/settings";
 import mongoose from "mongoose";
 
-let isTestMode = false;
-
-export function setIsTestMode(mode: boolean): void {
-  isTestMode = mode;
-}
-
 export async function runDb(url: string): Promise<void> {
-  const dbName = isTestMode ? appConfig.DB_NAME_TEST : appConfig.DB_NAME;
+  const dbName = appConfig.DB_NAME;
   const fullUrl = `${url}/${dbName}`;
 
   try {

@@ -1,7 +1,7 @@
 import express from "express";
 import { setupApp } from "../../../src/setup-app";
 import { generateBasicAuthToken } from "../utils/generate-admin-auth-token";
-import { runDb, setIsTestMode } from "../../../src/db/mongo.db";
+import { runDb } from "../../../src/db/mongo.db";
 import { appConfig } from "../../../src/core/settings/settings";
 import { clearDb } from "../utils/clear-db";
 import { createBlog } from "../utils/blogs/create-blog";
@@ -25,7 +25,6 @@ describe("Comments API", () => {
   const adminToken = generateBasicAuthToken();
 
   beforeAll(async () => {
-    setIsTestMode(true); // Переключаемся на тестовую базу данных
     await runDb(appConfig.MONGO_URI); // Подключаемся к MongoDB
     await clearDb(app);
   });

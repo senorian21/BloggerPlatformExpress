@@ -1,7 +1,7 @@
 import express from "express";
 import { setupApp } from "../../../src/setup-app";
 import { clearDb } from "../utils/clear-db";
-import { runDb, setIsTestMode } from "../../../src/db/mongo.db";
+import { runDb } from "../../../src/db/mongo.db";
 import { appConfig } from "../../../src/core/settings/settings";
 import { createUser } from "../utils/users/create-user";
 import request from "supertest";
@@ -27,7 +27,6 @@ describe("Security API", () => {
     device4Id: string;
 
   beforeAll(async () => {
-    setIsTestMode(true);
     await runDb(appConfig.MONGO_URI);
     await clearDb(app);
   });

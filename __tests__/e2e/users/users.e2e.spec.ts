@@ -1,7 +1,7 @@
 import express from "express";
 import { setupApp } from "../../../src/setup-app";
 import { generateBasicAuthToken } from "../utils/generate-admin-auth-token";
-import { runDb, setIsTestMode } from "../../../src/db/mongo.db";
+import { runDb } from "../../../src/db/mongo.db";
 import { clearDb } from "../utils/clear-db";
 import { getUserDto } from "../utils/users/get-user-dto";
 import { UserInput } from "../../../src/users/dto/user.input-dto";
@@ -19,7 +19,6 @@ describe("User API", () => {
   const adminToken = generateBasicAuthToken();
 
   beforeAll(async () => {
-    setIsTestMode(true); // Переключаемся на тестовую базу данных
     await runDb(appConfig.MONGO_URI); // Подключаемся к MongoDB
     await clearDb(app);
   });
