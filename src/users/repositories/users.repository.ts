@@ -1,8 +1,9 @@
 import { User } from "../types/user";
-import { ObjectId, WithId } from "mongodb";
+import { WithId } from "mongodb";
 import { ResultStatus } from "../../core/result/resultCode";
 import { injectable } from "inversify";
-import { UserModel } from "../domain/user.entity";
+import {userDocument, UserModel} from "../domain/user.entity";
+
 @injectable()
 export class UserRepository {
   async isEmailAndLoginUnique(email: string, login: string) {
@@ -15,11 +16,6 @@ export class UserRepository {
     const userInstance = new UserModel(newUser);
     await userInstance.save();
     return userInstance._id.toString();
-  }
-
-  async deleteUser(id: string) {
-    const result = await UserModel.deleteOne({ _id: id });
-    return result.deletedCount > 0;
   }
 
   async findByLoginOrEmail(loginOrEmail: string): Promise<WithId<User> | null> {
@@ -80,7 +76,7 @@ export class UserRepository {
     }
     userInstance.emailConfirmation.confirmationCode = newCode;
     userInstance.emailConfirmation.expirationDate =
-      newExpirationDate.toISOString();
+      newExpirationDate;
     userInstance.save();
     return true;
   }
@@ -92,5 +88,15 @@ export class UserRepository {
     userInstance.passwordHash = newPasswordHash;
     userInstance.save();
     return true;
+  }
+  async save (user: userDocument) {
+    await user.save();
+  }
+  async findById(id: string) {
+    const user = await UserModel.findById(id)
+    if (!user || user.deletedAt !== null) {
+      return null;
+    }
+    return user;
   }
 }

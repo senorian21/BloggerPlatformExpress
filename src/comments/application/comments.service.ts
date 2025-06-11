@@ -1,7 +1,6 @@
 import { commentInput } from "../dto/comment.input-dto";
 import { ResultStatus } from "../../core/result/resultCode";
 import { UserQueryRepository } from "../../users/repositories/users.queryRepository";
-import { comment } from "../types/comment";
 import { CommentsRepositories } from "../repositories/comments.Repository";
 import { Result } from "../../core/result/result.type";
 import { injectable } from "inversify";

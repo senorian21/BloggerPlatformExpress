@@ -20,7 +20,7 @@ export class UserQueryRepository {
       searchLoginTerm,
     } = queryDto;
     const skip = (pageNumber - 1) * pageSize;
-    const filter: any = {};
+    const filter: any = { deletedAt: null };
 
     if (searchEmailTerm || searchLoginTerm) {
       filter.$or = [];
@@ -56,6 +56,9 @@ export class UserQueryRepository {
     }
     const user = await UserModel.findOne({ _id: new ObjectId(id) });
     if (!user) {
+      return null;
+    }
+    if (!user || user.deletedAt !== null) {
       return null;
     }
     return mapToUserViewModel(user);

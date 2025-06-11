@@ -1,8 +1,9 @@
-import mongoose from "mongoose";
+import mongoose, {HydratedDocument} from "mongoose";
+import {Blog} from "../../blogs/domain/blog.entity";
 
 export type EmailConfirmation = {
   confirmationCode: string;
-  expirationDate: string;
+  expirationDate: Date;
   isConfirmed: boolean;
 };
 
@@ -10,9 +11,12 @@ export type User = {
   login: string;
   email: string;
   passwordHash: string;
-  createdAt: string;
+  createdAt: Date;
   emailConfirmation: EmailConfirmation;
+  deletedAt: Date;
 };
+
+export type userDocument = HydratedDocument<User>;
 
 const emailConfirmationSchema = new mongoose.Schema<EmailConfirmation>({
   confirmationCode: {
@@ -20,7 +24,7 @@ const emailConfirmationSchema = new mongoose.Schema<EmailConfirmation>({
     required: true,
   },
   expirationDate: {
-    type: String,
+    type: Date,
     required: true,
   },
   isConfirmed: {
@@ -45,13 +49,14 @@ const userSchema = new mongoose.Schema<User>({
     required: true,
   },
   createdAt: {
-    type: String,
+    type: Date,
     required: true,
   },
   emailConfirmation: {
     type: emailConfirmationSchema,
     required: true,
   },
+  deletedAt: { type: Date, default: null },
 });
 
 // Модель

@@ -8,7 +8,7 @@ const userQueryRepository = container.get(UserQueryRepository);
 const userService = container.get(UserService);
 
 export async function createUserHandler(req: Request, res: Response) {
-  const createdUserId = await userService.createUserByAdmin(req.body);
+  const createdUserId = await userService.createUser(req.body);
   if (!createdUserId) {
     res.sendStatus(HttpStatus.NotFound);
     return;

@@ -5,10 +5,10 @@ export class User {
   login: string;
   email: string;
   passwordHash: string;
-  createdAt: string;
+  createdAt: Date;
   emailConfirmation: {
     confirmationCode: string;
-    expirationDate: string;
+    expirationDate: Date;
     isConfirmed: boolean;
   };
 
@@ -18,12 +18,12 @@ export class User {
     hash: string,
     isConfirmed: boolean = false,
     confirmationCode: string = randomUUID(),
-    expirationDate: string = add(new Date(), { days: 7 }).toISOString(),
+    expirationDate: Date = add(new Date(), { days: 7 }),
   ) {
     this.login = login;
     this.email = email;
     this.passwordHash = hash;
-    this.createdAt = new Date().toISOString();
+    this.createdAt = new Date();
     this.emailConfirmation = {
       confirmationCode,
       expirationDate,
