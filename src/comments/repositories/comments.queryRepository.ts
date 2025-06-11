@@ -15,7 +15,9 @@ export const commentsQueryRepositories = {
     if (!comment) {
       return null;
     }
-
+    if (!comment || comment.deletedAt !== null) {
+      return null;
+    }
     return mapToBlogViewModel(comment);
   },
   async findAllCommentsByPost(
@@ -25,7 +27,7 @@ export const commentsQueryRepositories = {
     const { pageNumber, pageSize, sortBy, sortDirection } = queryDto;
 
     const skip = (pageNumber - 1) * pageSize;
-    const filter: any = { postId: postId };
+    const filter: any = { postId: postId, deletedAt: null };
 
     const items = await CommentModel.find(filter)
       .sort({ [sortBy]: sortDirection })

@@ -29,14 +29,14 @@ export class AuthRepositories {
     newIssuedAt: string,
     newExpiresAt: string,
   ) {
-    const sessionInstance = await SessionModel.findOne({_id: sessionId})
+    const sessionInstance = await SessionModel.findOne({ _id: sessionId });
     if (!sessionInstance) {
-      return false
+      return false;
     }
     sessionInstance.createdAt = newIssuedAt;
     sessionInstance.expiresAt = newExpiresAt;
-    await sessionInstance.save()
-    return true
+    await sessionInstance.save();
+    return true;
   }
 
   async findSession(filters: {

@@ -5,19 +5,23 @@ import { comment } from "../types/comment";
 import { CommentsRepositories } from "../repositories/comments.Repository";
 import { Result } from "../../core/result/result.type";
 import { injectable } from "inversify";
+import { CommentModel } from "../domain/comment.entity";
+import { PostsQueryRepository } from "../../posts/repositories/posts.queryRepository";
+
 @injectable()
 export class CommentsService {
   constructor(
     public userQueryRepository: UserQueryRepository,
     public commentsRepositories: CommentsRepositories,
+    public postsRepositories: PostsQueryRepository,
   ) {}
+
   async createComment(
     dto: commentInput,
     userId: string,
     postId: string,
   ): Promise<Result<string | null>> {
     const user = await this.userQueryRepository.findUserById(userId);
-
     if (!user) {
       return {
         status: ResultStatus.Unauthorized,
@@ -29,17 +33,33 @@ export class CommentsService {
       };
     }
 
-    const newComment: comment = {
-      postId: postId,
-      content: dto.content,
-      commentatorInfo: {
-        userId: user.id,
-        userLogin: user.login,
-      },
-      createdAt: new Date().toISOString(),
-    };
+    const post = await this.postsRepositories.findPostById(postId);
+    if (!post) {
+      return {
+        status: ResultStatus.NotFound,
+        data: null,
+        errorMessage: "Post not found",
+        extensions: [
+          { field: "post", message: "Post with the given ID does not exist" },
+        ],
+      };
+    }
 
-    return this.commentsRepositories.createComment(newComment);
+    const newComment = new CommentModel();
+    newComment.postId = post.id; // Используем _id вместо id
+    newComment.content = dto.content;
+    newComment.commentatorInfo = {
+      userId: user.id,
+      userLogin: user.login,
+    };
+    newComment.createdAt = new Date();
+
+    await this.commentsRepositories.save(newComment);
+    return {
+      status: ResultStatus.Success,
+      data: newComment._id.toString(),
+      extensions: [],
+    };
   }
 
   async updateComment(
@@ -47,7 +67,7 @@ export class CommentsService {
     dto: commentInput,
     userId: string,
   ): Promise<Result<string | null>> {
-    const comment = await this.commentsRepositories.findCommentsById(idComment);
+    const comment = await this.commentsRepositories.findById(idComment);
 
     if (!comment) {
       return {
@@ -73,25 +93,17 @@ export class CommentsService {
         ],
       };
     }
-
-    const updatedComment: comment = {
-      postId: comment.postId,
-      content: dto.content,
-      commentatorInfo: {
-        userId: comment.commentatorInfo.userId,
-        userLogin: comment.commentatorInfo.userLogin,
-      },
-      createdAt: comment.createdAt,
+    comment.content = dto.content;
+    await this.commentsRepositories.save(comment);
+    return {
+      status: ResultStatus.Success,
+      data: null,
+      extensions: [],
     };
-
-    return await this.commentsRepositories.updateComment(
-      idComment,
-      updatedComment,
-    );
   }
-  async deleteComment(idComment: string, userId: string) {
-    const comment = await this.commentsRepositories.findCommentsById(idComment);
 
+  async deleteComment(idComment: string, userId: string) {
+    const comment = await this.commentsRepositories.findById(idComment);
     if (!comment) {
       return {
         status: ResultStatus.NotFound,
@@ -102,7 +114,6 @@ export class CommentsService {
         ],
       };
     }
-
     if (comment.commentatorInfo.userId !== userId) {
       return {
         status: ResultStatus.Forbidden,
@@ -113,6 +124,12 @@ export class CommentsService {
         ],
       };
     }
-    return this.commentsRepositories.deleteComment(idComment);
+    comment.deletedAt = new Date();
+    await this.commentsRepositories.save(comment);
+    return {
+      status: ResultStatus.Success,
+      data: null,
+      extensions: [],
+    };
   }
 }

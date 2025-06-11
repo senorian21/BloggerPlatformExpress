@@ -1,5 +1,5 @@
-import mongoose, {HydratedDocument} from "mongoose";
-import {Blog} from "../../blogs/domain/blog.entity";
+import mongoose, { HydratedDocument } from "mongoose";
+import { Blog } from "../../blogs/domain/blog.entity";
 
 export type Post = {
   title: string;
@@ -10,7 +10,7 @@ export type Post = {
   createdAt: Date;
   deletedAt: Date;
 };
-export type postDocument = HydratedDocument<Post>
+export type postDocument = HydratedDocument<Post>;
 const postSchema = new mongoose.Schema<Post>({
   title: { type: String, required: true },
   shortDescription: { type: String, required: true },

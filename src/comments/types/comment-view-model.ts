@@ -5,5 +5,5 @@ export type commentViewModel = {
     userId: string;
     userLogin: string;
   };
-  createdAt: string;
+  createdAt: Date;
 };

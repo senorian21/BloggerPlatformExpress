@@ -3,7 +3,7 @@ import { PostInput } from "../dto/post.input-dto";
 import { BlogsQueryRepositories } from "../../blogs/repositories/blogs.queryRepository";
 import { PostsQueryRepository } from "../repositories/posts.queryRepository";
 import { injectable } from "inversify";
-import {Post, PostModel} from "../domain/post.entity";
+import { Post, PostModel } from "../domain/post.entity";
 @injectable()
 export class PostsService {
   constructor(
@@ -18,7 +18,7 @@ export class PostsService {
     if (!blog) {
       return null;
     }
-    const newPost = new PostModel()
+    const newPost = new PostModel();
     newPost.title = dto.title;
     newPost.content = dto.content;
     newPost.shortDescription = dto.shortDescription;
@@ -44,10 +44,10 @@ export class PostsService {
     existingPost.shortDescription = dto.shortDescription;
     existingPost.content = dto.content;
     existingPost.blogId = dto.blogId;
-    existingPost.blogName = blog.name
+    existingPost.blogName = blog.name;
 
     await this.postsRepository.save(existingPost);
-    return true
+    return true;
   }
 
   async deletePost(id: string) {
@@ -57,6 +57,6 @@ export class PostsService {
     }
     post.deletedAt = new Date();
     await this.postsRepository.save(post);
-    return true
+    return true;
   }
 }

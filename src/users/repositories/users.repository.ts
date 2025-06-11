@@ -76,20 +76,21 @@ export class UserRepository {
   ) {
     const userInstance = await UserModel.findById(userId);
     if (!userInstance) {
-      return false
+      return false;
     }
-    userInstance.emailConfirmation.confirmationCode = newCode
-    userInstance.emailConfirmation.expirationDate = newExpirationDate.toISOString()
-    userInstance.save()
-    return true
+    userInstance.emailConfirmation.confirmationCode = newCode;
+    userInstance.emailConfirmation.expirationDate =
+      newExpirationDate.toISOString();
+    userInstance.save();
+    return true;
   }
   async updatePasswordUser(userId: string, newPasswordHash: string) {
     const userInstance = await UserModel.findById(userId);
     if (!userInstance) {
-      return false
+      return false;
     }
     userInstance.passwordHash = newPasswordHash;
-    userInstance.save()
-    return true
+    userInstance.save();
+    return true;
   }
 }

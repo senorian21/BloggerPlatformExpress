@@ -1,4 +1,4 @@
-import mongoose, {HydratedDocument} from "mongoose";
+import mongoose, { HydratedDocument } from "mongoose";
 
 export type Blog = {
   name: string;
@@ -9,7 +9,7 @@ export type Blog = {
   deletedAt: Date;
 };
 
-export type BlogDocument = HydratedDocument<Blog>
+export type BlogDocument = HydratedDocument<Blog>;
 
 const blogSchema = new mongoose.Schema<Blog>({
   name: { type: String, required: true },

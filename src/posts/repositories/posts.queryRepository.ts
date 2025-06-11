@@ -51,7 +51,7 @@ export class PostsQueryRepository {
   }
   async findAllPostsByBlogId(queryDto: PostQueryInput, blogId: string) {
     const { pageNumber, pageSize, sortBy, sortDirection } = queryDto;
-    const filter = { blogId: blogId, deletedAt: null, };
+    const filter = { blogId: blogId, deletedAt: null };
     const skip = (pageNumber - 1) * pageSize;
 
     const [items, totalCount] = await Promise.all([

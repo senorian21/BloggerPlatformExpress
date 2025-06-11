@@ -1,10 +1,9 @@
 import { injectable } from "inversify";
-import {BlogDocument, BlogModel} from "../domain/blog.entity";
+import { BlogDocument, BlogModel } from "../domain/blog.entity";
 
 @injectable()
 export class BlogsRepositories {
-
-  async save (blog: BlogDocument) {
+  async save(blog: BlogDocument) {
     await blog.save();
   }
 

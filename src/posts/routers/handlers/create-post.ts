@@ -6,6 +6,7 @@ import { PostsService } from "../../application/posts.service";
 
 const postsQueryRepository = container.get(PostsQueryRepository);
 const postsService = container.get(PostsService);
+
 export async function createPostHandler(req: Request, res: Response) {
   const createdPostsId = await postsService.createPost(req.body);
   if (!createdPostsId) {

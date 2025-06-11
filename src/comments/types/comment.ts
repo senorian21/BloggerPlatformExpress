@@ -5,5 +5,5 @@ export type comment = {
     userId: string;
     userLogin: string;
   };
-  createdAt: string;
+  createdAt: Date;
 };
