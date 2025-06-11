@@ -7,9 +7,9 @@ import { testSeeder } from "./test.seeder";
 import { ResultStatus } from "../../src/core/result/resultCode";
 import { describe } from "node:test";
 import { createUser } from "../e2e/utils/users/create-user";
-import {container} from "../../src/composition-root";
-import {AuthService} from "../../src/auth/application/auth.service";
-import {NodemailerService} from "../../src/auth/adapters/nodemailer.service";
+import { container } from "../../src/composition-root";
+import { AuthService } from "../../src/auth/application/auth.service";
+import { NodemailerService } from "../../src/auth/adapters/nodemailer.service";
 
 const authService = container.get(AuthService);
 const nodemailerService = container.get(NodemailerService);

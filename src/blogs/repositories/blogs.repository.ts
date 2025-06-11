@@ -4,33 +4,29 @@ import { Blog, BlogModel } from "../domain/blog.entity";
 
 @injectable()
 export class BlogsRepositories {
+
   async createBlog(newBlog: Blog) {
-    const result = await BlogModel.insertOne(newBlog);
-    return result._id.toString();
+    const blogInstance = new BlogModel(newBlog)
+    await blogInstance.save();
+    return blogInstance._id.toString();
   }
 
   async updateBlog(id: string, dto: Blog) {
-    const updateResult = await BlogModel.updateOne(
-      {
-        _id: new ObjectId(id),
-      },
-      {
-        $set: {
-          name: dto.name,
-          description: dto.description,
-          websiteUrl: dto.websiteUrl,
-          createdAt: dto.createdAt,
-          isMembership: dto.isMembership,
-        },
-      },
-    );
-  }
-  async deleteBlog(id: string) {
-    const deleteResult = await BlogModel.deleteOne({
-      _id: new ObjectId(id),
-    });
-    if (deleteResult.deletedCount < 1) {
-      throw new Error("Blog not exist");
+    const blogInstance = await BlogModel.findOne({_id: id})
+    if (!blogInstance) {
+      return false
     }
+    blogInstance.name = dto.name;
+    blogInstance.description = dto.description;
+    blogInstance.websiteUrl = dto.websiteUrl;
+    blogInstance.createdAt = dto.createdAt;
+    blogInstance.isMembership = dto.isMembership;
+
+    await blogInstance.save()
   }
+  async deleteBlog(id: string): Promise<boolean> {
+    const result = await BlogModel.deleteOne({ _id: id });
+    return result.deletedCount > 0;
+  }
+
 }

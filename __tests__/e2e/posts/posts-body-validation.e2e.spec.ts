@@ -8,7 +8,7 @@ import { clearDb } from "../utils/clear-db";
 import { BlogInput } from "../../../src/blogs/dto/blog.input-dto";
 import { runDb } from "../../../src/db/mongo.db";
 import { generateBasicAuthToken } from "../utils/generate-admin-auth-token";
-import {appConfig} from "../../../src/core/settings/settings";
+import { appConfig } from "../../../src/core/settings/settings";
 
 describe("Posts API", () => {
   const app = express();

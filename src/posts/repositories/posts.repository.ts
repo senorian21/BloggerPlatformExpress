@@ -1,38 +1,31 @@
-import { ObjectId } from "mongodb";
 import { injectable } from "inversify";
 import { Post, PostModel } from "../domain/post.entity";
 
 @injectable()
 export class PostsRepository {
   async createPost(newPost: Post) {
-    const result = await PostModel.insertOne(newPost);
-    return result._id.toString();
+    const postInstance = new PostModel(newPost);
+    await postInstance.save();
+    return postInstance._id.toString();
   }
 
   async updatePost(id: string, dto: Post) {
-    const updateResult = await PostModel.updateOne(
-      {
-        _id: new ObjectId(id),
-      },
-      {
-        $set: {
-          title: dto.title,
-          shortDescription: dto.shortDescription,
-          content: dto.content,
-          blogId: dto.blogId,
-          blogName: dto.blogName,
-          createdAt: dto.createdAt,
-        },
-      },
-    );
+    const postInstance = await PostModel.findOne({_id: id});
+    if (!postInstance) {
+      return false;
+    }
+    postInstance.title = dto.title;
+    postInstance.shortDescription = dto.shortDescription;
+    postInstance.content = dto.content;
+    postInstance.blogId = dto.blogId;
+    postInstance.blogName = dto.blogName;
+    postInstance.createdAt = dto.createdAt;
+    await postInstance.save()
+    return true
   }
 
   async deletePost(id: string) {
-    const deleteResult = await PostModel.deleteOne({
-      _id: new ObjectId(id),
-    });
-    if (deleteResult.deletedCount < 1) {
-      throw new Error("Post not exist");
-    }
+    const result = await PostModel.deleteOne({ _id: id });
+    return result.deletedCount > 0;
   }
 }

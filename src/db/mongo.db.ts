@@ -13,8 +13,6 @@ export async function runDb(url: string): Promise<void> {
     } else {
       throw new Error("Failed to establish a connection with the database");
     }
-
-    console.log(`Connected to database: ${dbName}`);
   } catch (err) {
     await mongoose.disconnect();
     console.error("Failed to connect to the database:", err);

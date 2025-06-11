@@ -10,13 +10,13 @@ import { RateModel } from "../../auth/domain/rate.entity";
 export const testingRouter = Router({});
 
 testingRouter.delete("/all-data", async (req: Request, res: Response) => {
-    await Promise.all([
-      BlogModel.deleteMany(),
-      PostModel.deleteMany(),
-      CommentModel.deleteMany(),
-      UserModel.deleteMany(),
-      SessionModel.deleteMany(),
-      RateModel.deleteMany(),
-    ]);
-    res.sendStatus(HttpStatus.NoContent);
+  await Promise.all([
+    BlogModel.deleteMany(),
+    PostModel.deleteMany(),
+    CommentModel.deleteMany(),
+    UserModel.deleteMany(),
+    SessionModel.deleteMany(),
+    RateModel.deleteMany(),
+  ]);
+  res.sendStatus(HttpStatus.NoContent);
 });

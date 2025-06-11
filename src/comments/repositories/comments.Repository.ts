@@ -8,60 +8,46 @@ import { CommentModel } from "../domain/comment.entity";
 @injectable()
 export class CommentsRepositories {
   async createComment(newComment: comment): Promise<Result<string>> {
-    const result = await CommentModel.insertOne(newComment);
+    const commentInstance = new CommentModel(newComment);
+    await commentInstance.save();
     return {
       status: ResultStatus.Success,
-      data: result._id.toString(),
+      data: commentInstance._id.toString(),
       extensions: [],
     };
   }
+
   async findCommentsById(id: string) {
     if (!ObjectId.isValid(id)) {
       return null;
     }
-
     const comment = await CommentModel.findOne({ _id: new ObjectId(id) });
     if (!comment) {
       return null;
     }
-
     return comment;
   }
+
   async updateComment(idComment: string, dto: comment): Promise<Result> {
-    if (!ObjectId.isValid(idComment)) {
-      return {
-        status: ResultStatus.NotFound,
-        data: null,
-        errorMessage: "Invalid comment ID",
-        extensions: [],
-      };
-    }
+    const commentInstance = await CommentModel.findOne({ _id: idComment });
 
-    const updateResult = await CommentModel.updateOne(
-      {
-        _id: new ObjectId(idComment),
-      },
-      {
-        $set: {
-          postId: dto.postId,
-          content: dto.content,
-          commentatorInfo: {
-            userId: dto.commentatorInfo.userId,
-            userLogin: dto.commentatorInfo.userLogin,
-          },
-          createdAt: dto.createdAt,
-        },
-      },
-    );
-
-    if (updateResult.modifiedCount === 0) {
+    if (!commentInstance) {
       return {
         status: ResultStatus.BadRequest,
         data: null,
-        errorMessage: "No changes were made to the comment",
+        errorMessage: "Comment not found",
         extensions: [],
       };
     }
+
+    commentInstance.content = dto.content;
+    commentInstance.postId = dto.postId;
+    commentInstance.commentatorInfo.userId = dto.commentatorInfo.userId;
+    commentInstance.commentatorInfo.userLogin = dto.commentatorInfo.userLogin;
+    commentInstance.createdAt = dto.createdAt;
+
+    const updateResult = await commentInstance.save();
+
 
     return {
       status: ResultStatus.Success,
@@ -69,6 +55,7 @@ export class CommentsRepositories {
       extensions: [],
     };
   }
+
   async deleteComment(idComment: string): Promise<Result> {
     if (!ObjectId.isValid(idComment)) {
       return {

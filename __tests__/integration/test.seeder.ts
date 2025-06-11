@@ -1,7 +1,6 @@
 import { randomUUID } from "crypto";
 import { add } from "date-fns/add";
-import {UserModel} from "../../src/users/domain/user.entity";
-
+import { UserModel } from "../../src/users/domain/user.entity";
 
 type RegisterUserPayloadType = {
   login: string;

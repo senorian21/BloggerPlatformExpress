@@ -26,9 +26,12 @@ export class BlogsService {
       createdAt: blog.createdAt,
       isMembership: blog.isMembership,
     };
-    await this.blogsRepositories.updateBlog(id, dto);
+    const updateBlog = await this.blogsRepositories.updateBlog(id, dto);
+    if (!updateBlog) {
+      return false
+    }
   }
-  async deleteBlog(id: string) {
-    await this.blogsRepositories.deleteBlog(id);
+  async deleteBlog(id: string): Promise<boolean> {
+    return this.blogsRepositories.deleteBlog(id);
   }
 }
