@@ -13,7 +13,9 @@ export class PostsQueryRepository {
   ): Promise<{ items: postViewModel[]; totalCount: number }> {
     const { pageNumber, pageSize, sortBy, sortDirection } = queryDto;
     const skip = (pageNumber - 1) * pageSize;
-    const filter: any = {};
+    const filter: any = {
+      deletedAt: null,
+    };
 
     const items = await PostModel.find(filter)
 
@@ -42,11 +44,14 @@ export class PostsQueryRepository {
     if (!post) {
       return null;
     }
+    if (!post || post.deletedAt !== null) {
+      return null;
+    }
     return mapToPostViewModel(post);
   }
   async findAllPostsByBlogId(queryDto: PostQueryInput, blogId: string) {
     const { pageNumber, pageSize, sortBy, sortDirection } = queryDto;
-    const filter = { blogId: blogId };
+    const filter = { blogId: blogId, deletedAt: null, };
     const skip = (pageNumber - 1) * pageSize;
 
     const [items, totalCount] = await Promise.all([

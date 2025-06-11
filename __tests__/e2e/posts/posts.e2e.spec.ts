@@ -84,7 +84,7 @@ describe("Posts API", () => {
 
     expect(postsResponse).toBe(HttpStatus.NotFound);
   });
-  it("should return blogs list ; GET /blogs", async () => {
+  it("should return posts list ; GET /blogs", async () => {
     // Создаем блог
     const blog = await createBlog(app);
 
@@ -104,7 +104,7 @@ describe("Posts API", () => {
     expect(postsList.body.items).toBeInstanceOf(Array);
   });
 
-  it("should update blogs; PUT /posts/:id", async () => {
+  it("should update post; PUT /posts/:id", async () => {
     const blogCreated = await createBlog(app);
     const newPost: PostInput = {
       ...getPostDto,

@@ -9,7 +9,10 @@ export class BlogsRepositories {
   }
 
   async findById(id: string): Promise<BlogDocument | null> {
-    return await BlogModel.findById(id);
+    const blog = await BlogModel.findById(id);
+    if (!blog || blog.deletedAt !== null) {
+      return null;
+    }
+    return blog;
   }
-
 }

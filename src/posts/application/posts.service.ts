@@ -3,7 +3,7 @@ import { PostInput } from "../dto/post.input-dto";
 import { BlogsQueryRepositories } from "../../blogs/repositories/blogs.queryRepository";
 import { PostsQueryRepository } from "../repositories/posts.queryRepository";
 import { injectable } from "inversify";
-import { Post } from "../domain/post.entity";
+import {Post, PostModel} from "../domain/post.entity";
 @injectable()
 export class PostsService {
   constructor(
@@ -11,51 +11,52 @@ export class PostsService {
     public blogsQueryRepositories: BlogsQueryRepositories,
     public postsQueryRepository: PostsQueryRepository,
   ) {}
+
   async createPost(dto: PostInput) {
     const blogId = dto.blogId;
-
     const blog = await this.blogsQueryRepositories.findById(blogId);
     if (!blog) {
       return null;
     }
+    const newPost = new PostModel()
+    newPost.title = dto.title;
+    newPost.content = dto.content;
+    newPost.shortDescription = dto.shortDescription;
+    newPost.blogId = dto.blogId;
+    newPost.blogName = blog.name;
+    newPost.createdAt = new Date();
 
-    const newPost: Post = {
-      title: dto.title,
-      shortDescription: dto.shortDescription,
-      content: dto.content,
-      blogId: blog.id.toString(),
-      blogName: blog.name,
-      createdAt: new Date().toISOString(),
-    };
-
-    return this.postsRepository.createPost(newPost);
+    await this.postsRepository.save(newPost);
+    return newPost._id.toString();
   }
 
   async updatePost(id: string, dto: Post) {
     const blog = await this.blogsQueryRepositories.findById(dto.blogId);
     if (!blog) {
-      return null;
+      return false;
     }
 
-    const existingPost = await this.postsQueryRepository.findPostById(id);
+    const existingPost = await this.postsRepository.findById(id);
     if (!existingPost) {
-      return null;
+      return false;
     }
+    existingPost.title = dto.title;
+    existingPost.shortDescription = dto.shortDescription;
+    existingPost.content = dto.content;
+    existingPost.blogId = dto.blogId;
+    existingPost.blogName = blog.name
 
-    const postUpdated: Post = {
-      title: dto.title,
-      shortDescription: dto.shortDescription,
-      content: dto.content,
-      blogId: dto.blogId,
-      blogName: blog.name,
-      createdAt: existingPost.createdAt,
-    };
-
-    await this.postsRepository.updatePost(id, postUpdated);
-    return postUpdated;
+    await this.postsRepository.save(existingPost);
+    return true
   }
 
   async deletePost(id: string) {
-    await this.postsRepository.deletePost(id);
+    const post = await this.postsRepository.findById(id);
+    if (!post) {
+      return false;
+    }
+    post.deletedAt = new Date();
+    await this.postsRepository.save(post);
+    return true
   }
 }
