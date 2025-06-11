@@ -9,7 +9,7 @@ export class AuthRepositories {
     deviceId?: string;
     deviceName?: string;
   }) {
-    const query: any = {};
+    const query: any = { };
 
     if (filters.userId) {
       query.userId = filters.userId;
@@ -20,18 +20,16 @@ export class AuthRepositories {
     return await SessionModel.findOne(query);
   }
 
-  async deleteSessionByDeviceId(
-    userId: string,
-    deviceId: string,
-  ): Promise<boolean> {
-    const result = await SessionModel.deleteOne({ userId, deviceId });
-    return result.deletedCount === 1;
-  }
-
   async deleteDevice(deviceId: string, userId: string) {
-    await SessionModel.deleteMany({
-      $and: [{ userId: userId }, { deviceId: { $ne: deviceId } }],
-    });
+    await SessionModel.updateMany(
+        {
+          $and: [
+            { userId: userId },
+            { deviceId: { $ne: deviceId } }
+          ]
+        },
+        { deletedAt: new Date() }
+    );
   }
   async save(session: sessionDocument) {
     await session.save();

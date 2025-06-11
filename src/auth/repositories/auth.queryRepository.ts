@@ -3,7 +3,7 @@ import { SessionModel } from "../domain/session.entity";
 
 export const authQueryRepositories = {
   async deviceSessionList(userId: string) {
-    const sessions = await SessionModel.find({ userId });
+    const sessions = await SessionModel.find({ userId, deletedAt: null });
 
     return mapToDeviceListOutput(sessions);
   },
