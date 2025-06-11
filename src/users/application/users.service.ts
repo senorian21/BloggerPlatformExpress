@@ -1,5 +1,4 @@
 import { UserInput } from "../dto/user.input-dto";
-import { User } from "../types/user";
 import { UserRepository } from "../repositories/users.repository";
 import { Argon2Service } from "../../auth/adapters/argon2.service";
 import { injectable } from "inversify";
@@ -17,7 +16,8 @@ export class UserService {
 
   async createUser(dto: UserInput): Promise<string | null> {
     const isEmailAndLoginUnique =
-      await this.userRepository.isEmailAndLoginUnique(dto.email, dto.login);
+      await this.userRepository.doesExistByLoginOrEmail(dto.email, dto.login);
+
     if (isEmailAndLoginUnique) {
       return null;
     }

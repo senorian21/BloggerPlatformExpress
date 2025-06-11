@@ -13,6 +13,7 @@ import { Argon2Service } from "../adapters/argon2.service";
 import { NodemailerService } from "../adapters/nodemailer.service";
 import { injectable } from "inversify";
 import { session } from "../domain/auth.entity";
+import {UserModel} from "../../users/domain/user.entity";
 
 @injectable()
 export class AuthService {
@@ -184,8 +185,18 @@ export class AuthService {
     }
 
     const passwordHash = await this.argon2Service.generateHash(password);
-    const newUser = new User(login, email, passwordHash);
-    const createdUser = await this.userRepository.createUser(newUser);
+
+    const newUser = new UserModel()
+    newUser.login = login;
+    newUser.email = email;
+    newUser.passwordHash = passwordHash;
+    newUser.createdAt = new Date();
+    newUser.emailConfirmation = {
+      confirmationCode: randomUUID(),
+      expirationDate: add(new Date(), { days: 7 }),
+      isConfirmed: false,
+    }
+    this.userRepository.save(newUser);
 
     this.nodemailerService
       .sendEmail(
@@ -197,7 +208,7 @@ export class AuthService {
 
     return {
       status: ResultStatus.Success,
-      data: createdUser,
+      data: newUser.id,
       extensions: [],
     };
   }
@@ -214,8 +225,6 @@ export class AuthService {
         extensions: [{ field: "code", message: "there is no such code" }],
       };
     }
-
-    const userId = user!._id.toString();
 
     if (user.emailConfirmation.isConfirmed) {
       return {
@@ -235,18 +244,8 @@ export class AuthService {
         ],
       };
     }
-    const confirmUser = await this.userRepository.registrationConfirmationUser(
-      user,
-      userId,
-    );
-    if (confirmUser.status !== ResultStatus.Success) {
-      return {
-        status: ResultStatus.BadRequest,
-        errorMessage: "Bad Request",
-        data: null,
-        extensions: [{ field: "", message: "" }],
-      };
-    }
+    user.emailConfirmation.isConfirmed = true;
+    this.userRepository.save(user);
 
     return {
       status: ResultStatus.Success,
@@ -293,12 +292,10 @@ export class AuthService {
 
     const newConfirmationCode = randomUUID();
     const newExpirationDate = add(new Date(), { days: 7 });
+    user.emailConfirmation.confirmationCode = newConfirmationCode;
+    user.emailConfirmation.expirationDate = newExpirationDate;
 
-    await this.userRepository.updateConfirmationCodeAndExpiration(
-      user._id.toString(),
-      newConfirmationCode,
-      newExpirationDate,
-    );
+    await this.userRepository.save(user);
 
     this.nodemailerService
       .sendEmail(
@@ -428,11 +425,8 @@ export class AuthService {
     const newConfirmationCode = randomUUID();
     const newExpirationDate = add(new Date(), { days: 7 });
 
-    await this.userRepository.updateConfirmationCodeAndExpiration(
-      user._id.toString(),
-      newConfirmationCode,
-      newExpirationDate,
-    );
+    user.emailConfirmation.confirmationCode = newConfirmationCode;
+    user.emailConfirmation.expirationDate = newExpirationDate;
 
     this.nodemailerService
       .sendEmail(
@@ -448,6 +442,7 @@ export class AuthService {
       extensions: [],
     };
   }
+
   async newPassword(newPassword: string, recoveryCode: string) {
     const user = await this.userRepository.findByCode(recoveryCode);
     if (!user) {
@@ -459,10 +454,10 @@ export class AuthService {
       };
     }
     const newPasswordHash = await this.argon2Service.generateHash(newPassword);
-    await this.userRepository.updatePasswordUser(
-      user._id.toString(),
-      newPasswordHash,
-    );
+
+    user.passwordHash = newPasswordHash;
+    await this.userRepository.save(user);
+
 
     return {
       status: ResultStatus.Success,
