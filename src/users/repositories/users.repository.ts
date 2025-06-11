@@ -12,24 +12,23 @@ export class UserRepository {
     return user;
   }
   async createUser(newUser: User) {
-    const result = await UserModel.insertOne(newUser);
-    return result._id.toString();
+    const userInstance = new UserModel(newUser);
+    await userInstance.save();
+    return userInstance._id.toString();
   }
 
   async deleteUser(id: string) {
-    const deleteResult = await UserModel.deleteOne({
-      _id: new ObjectId(id),
-    });
-    if (deleteResult.deletedCount < 1) {
-      throw new Error("Post not exist");
-    }
+    const result = await UserModel.deleteOne({ _id: id });
+    return result.deletedCount > 0;
   }
+
   async findByLoginOrEmail(loginOrEmail: string): Promise<WithId<User> | null> {
     const user = await UserModel.findOne({
       $or: [{ email: loginOrEmail }, { login: loginOrEmail }],
     });
     return user;
   }
+
   async doesExistByLoginOrEmail(
     login: string,
     email: string,
@@ -51,24 +50,19 @@ export class UserRepository {
   }
 
   async registrationConfirmationUser(user: User, userId: string) {
-    const confirmUser = await UserModel.updateOne(
-      {
-        _id: new ObjectId(userId),
-      },
-      {
-        $set: {
-          "emailConfirmation.isConfirmed": true,
-        },
-      },
-    );
-    if (confirmUser.modifiedCount !== 1) {
+    const userInstance = await UserModel.findById(userId);
+    if (!userInstance) {
       return {
         status: ResultStatus.BadRequest,
         data: null,
-        errorMessage: "No changes were made to the comment",
+        errorMessage: "User not found",
         extensions: [],
       };
     }
+
+    userInstance.emailConfirmation.isConfirmed = true;
+    await userInstance.save();
+
     return {
       status: ResultStatus.Success,
       data: null,
@@ -80,24 +74,22 @@ export class UserRepository {
     newCode: string,
     newExpirationDate: Date,
   ) {
-    await UserModel.updateOne(
-      { _id: new ObjectId(userId) },
-      {
-        $set: {
-          "emailConfirmation.confirmationCode": newCode,
-          "emailConfirmation.expirationDate": newExpirationDate,
-        },
-      },
-    );
+    const userInstance = await UserModel.findById(userId);
+    if (!userInstance) {
+      return false
+    }
+    userInstance.emailConfirmation.confirmationCode = newCode
+    userInstance.emailConfirmation.expirationDate = newExpirationDate.toISOString()
+    userInstance.save()
+    return true
   }
   async updatePasswordUser(userId: string, newPasswordHash: string) {
-    await UserModel.updateOne(
-      { _id: new ObjectId(userId) },
-      {
-        $set: {
-          passwordHash: newPasswordHash,
-        },
-      },
-    );
+    const userInstance = await UserModel.findById(userId);
+    if (!userInstance) {
+      return false
+    }
+    userInstance.passwordHash = newPasswordHash;
+    userInstance.save()
+    return true
   }
 }

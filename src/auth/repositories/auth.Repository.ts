@@ -4,13 +4,13 @@ import { session, SessionModel } from "../domain/auth.entity";
 @injectable()
 export class AuthRepositories {
   async updateOrCreateSession(session: session) {
-    const existingSession = await this.findSession({
+    const existingSession = await SessionModel.findOne({
       userId: session.userId,
       deviceId: session.deviceId,
     });
     if (existingSession) {
       await this.updateSession(
-        existingSession,
+        existingSession._id,
         session.createdAt,
         session.expiresAt!,
       );
@@ -20,18 +20,23 @@ export class AuthRepositories {
   }
 
   async createSession(session: session) {
-    await SessionModel.insertOne(session);
+    const sessionInstance = new SessionModel(session);
+    await sessionInstance.save();
   }
 
   async updateSession(
-    sessionExists: session,
+    sessionId: string,
     newIssuedAt: string,
     newExpiresAt: string,
   ) {
-    await SessionModel.updateOne(
-      { _id: sessionExists._id },
-      { $set: { createdAt: newIssuedAt, expiresAt: newExpiresAt } },
-    );
+    const sessionInstance = await SessionModel.findOne({_id: sessionId})
+    if (!sessionInstance) {
+      return false
+    }
+    sessionInstance.createdAt = newIssuedAt;
+    sessionInstance.expiresAt = newExpiresAt;
+    await sessionInstance.save()
+    return true
   }
 
   async findSession(filters: {

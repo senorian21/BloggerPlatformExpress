@@ -362,7 +362,7 @@ export class AuthService {
     const newIssuedAt = token.iat!.toString();
     const newExpiresAt = token.exp!.toString();
     await this.authRepositories.updateSession(
-      sessionExists,
+      sessionExists._id!,
       newIssuedAt!,
       newExpiresAt!,
     );
