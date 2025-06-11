@@ -4,7 +4,7 @@ import { BlogModel } from "../../blogs/domain/blog.entity";
 import { PostModel } from "../../posts/domain/post.entity";
 import { CommentModel } from "../../comments/domain/comment.entity";
 import { UserModel } from "../../users/domain/user.entity";
-import { SessionModel } from "../../auth/domain/auth.entity";
+import { SessionModel } from "../../auth/domain/session.entity";
 import { RateModel } from "../../auth/domain/rate.entity";
 
 export const testingRouter = Router({});

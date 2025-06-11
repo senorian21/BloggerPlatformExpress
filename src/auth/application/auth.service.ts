@@ -1,6 +1,4 @@
-import { User } from "../../users/types/user";
 import { Result } from "../../core/result/result.type";
-import { WithId } from "mongodb";
 import { ResultStatus } from "../../core/result/resultCode";
 import { emailExamples } from "../adapters/emailExamples";
 import { randomUUID } from "crypto";
@@ -12,7 +10,7 @@ import { UserRepository } from "../../users/repositories/users.repository";
 import { Argon2Service } from "../adapters/argon2.service";
 import { NodemailerService } from "../adapters/nodemailer.service";
 import { injectable } from "inversify";
-import { session } from "../domain/auth.entity";
+import {session, SessionModel} from "../domain/session.entity";
 import {UserModel} from "../../users/domain/user.entity";
 
 @injectable()
@@ -24,11 +22,12 @@ export class AuthService {
     public argon2Service: Argon2Service,
     public nodemailerService: NodemailerService,
   ) {}
+
   async loginUser(
-    loginOrEmail: string,
-    password: string,
-    ip: string,
-    userAgent: string,
+      loginOrEmail: string,
+      password: string,
+      ip: string,
+      userAgent: string,
   ): Promise<Result<{ accessToken: string; cookie: string } | null>> {
     const result = await this.checkUserCredentials(loginOrEmail, password);
     if (result.status !== ResultStatus.Success) {
@@ -39,91 +38,91 @@ export class AuthService {
         data: null,
       };
     }
-    const userIdToken = result.data?._id;
 
-    if (!userIdToken) {
-      return {
-        status: ResultStatus.Unauthorized,
-        errorMessage: "User ID not found",
-        extensions: [{ field: "userId", message: "Invalid user ID" }],
-        data: null,
-      };
-    }
-    const existSessions = await this.authRepositories.findSession({
-      userId: userIdToken.toString(),
+    const userId = result.data!._id.toString();
+    const existSession = await this.authRepositories.findSession({
+      userId,
       deviceName: userAgent,
     });
-    let actualDeviceId;
 
     let refreshToken;
     let cookie;
 
-    if (existSessions) {
-      actualDeviceId = existSessions?.deviceId;
-
+    try {
       const refreshData = await this.jwtService.createRefreshToken(
-        result.data!._id.toString(),
-        ip,
-        userAgent,
-        actualDeviceId,
+          userId,
+          ip,
+          userAgent,
+          existSession?.deviceId,
       );
 
-      refreshToken = refreshData.token;
+      if (!refreshData.cookie) {
+        throw new Error("Cookie generation failed");
+      }
+
       cookie = refreshData.cookie;
-    } else {
-      const refreshData = await this.jwtService.createRefreshToken(
-        result.data!._id.toString(),
-        ip,
-        userAgent,
-      );
-
       refreshToken = refreshData.token;
-      cookie = refreshData.cookie;
-    }
 
-    const accessToken = await this.jwtService.createToken(
-      result.data!._id.toString(),
-    );
+      const verifiedToken = await this.jwtService.verifyRefreshToken(refreshToken) as RefreshToken;
+      if (!verifiedToken) {
+        return {
+          status: ResultStatus.Unauthorized,
+          errorMessage: "Invalid token",
+          extensions: [{ field: "token", message: "Token verification failed" }],
+          data: null,
+        };
+      }
 
-    const verifiedToken =
-      await this.jwtService.verifyRefreshToken(refreshToken);
-    if (!verifiedToken) {
+      if (existSession) {
+        if(existSession.deletedAt !== null) {
+          return {
+            status: ResultStatus.Unauthorized,
+            extensions: [{ field: "token", message: "Token verification failed" }],
+            data: null,
+          };
+        }
+        existSession.createdAt = new Date(verifiedToken.iat);
+        existSession.expiresAt = new Date(verifiedToken.exp);
+        existSession.ip = ip;
+        await this.authRepositories.save(existSession);
+      } else {
+        // Создаем новую сессию
+        const newSession = new SessionModel();
+        newSession.userId = userId;
+        newSession.createdAt = new Date(verifiedToken.iat);
+        newSession.expiresAt = new Date(verifiedToken.exp);
+        newSession.deviceId = verifiedToken.deviceId;
+        newSession.deviceName = userAgent;
+        newSession.ip = ip;
+
+        await this.authRepositories.save(newSession);
+      }
+
+      const accessToken = await this.jwtService.createToken(userId);
+
+      return {
+        status: ResultStatus.Success,
+        data: {
+          accessToken,
+          cookie,
+        },
+        extensions: [],
+      };
+    } catch (error) {
       return {
         status: ResultStatus.Unauthorized,
-        errorMessage: "Invalid token",
-        extensions: [{ field: "token", message: "Token verification failed" }],
+        errorMessage: "Authentication failed",
+        extensions: [{ field: "general", message: "Internal server error" }],
         data: null,
       };
     }
-
-    const refreshTokenPayload = verifiedToken as RefreshToken;
-    const { userId, iat, exp, deviceName, deviceId } = refreshTokenPayload;
-
-    const newSession: session = {
-      userId,
-      createdAt: iat!.toString(),
-      expiresAt: exp!.toString(),
-      deviceId,
-      deviceName,
-      ip,
-    };
-
-    await this.authRepositories.updateOrCreateSession(newSession);
-
-    return {
-      status: ResultStatus.Success,
-      data: {
-        accessToken,
-        cookie,
-      },
-      extensions: [],
-    };
   }
+
 
   async checkUserCredentials(
     loginOrEmail: string,
     password: string,
-  ): Promise<Result<WithId<User> | null>> {
+  ) {
     const user = await this.userRepository.findByLoginOrEmail(loginOrEmail);
 
     if (!user) {
@@ -215,7 +214,7 @@ export class AuthService {
 
   async registrationConfirmationUser(
     code: string,
-  ): Promise<Result<WithId<User> | null>> {
+  ) {
     const user = await this.userRepository.findByCode(code);
     if (!user) {
       return {
@@ -324,17 +323,9 @@ export class AuthService {
     }
 
     const refreshTokenPayload = payload as RefreshToken;
-    const { userId, iat, exp, deviceName, deviceId } = refreshTokenPayload;
-    const session: session = {
-      userId,
-      createdAt: iat!.toString(),
-      expiresAt: exp!.toString(),
-      deviceId,
-      deviceName,
-      ip,
-    };
+    const { userId, deviceName, deviceId } = refreshTokenPayload;
 
-    const sessionExists = await this.authRepositories.findSession(session);
+    const sessionExists = await this.authRepositories.findSession({deviceId: deviceId});
 
     if (!sessionExists) {
       return {
@@ -352,17 +343,18 @@ export class AuthService {
         deviceName,
         deviceId,
       );
+
     const token = (await this.jwtService.verifyRefreshToken(
       newRefreshToken,
     )) as RefreshToken;
 
-    const newIssuedAt = token.iat!.toString();
-    const newExpiresAt = token.exp!.toString();
-    await this.authRepositories.updateSession(
-      sessionExists._id!,
-      newIssuedAt!,
-      newExpiresAt!,
-    );
+    const newIssuedAt = new Date(token.iat);
+    const newExpiresAt = new Date(token.exp);
+
+    sessionExists.createdAt = newIssuedAt
+    sessionExists.expiresAt = newExpiresAt
+
+    await this.authRepositories.save(sessionExists)
 
     const newAccessToken = await this.jwtService.createToken(userId);
 
@@ -401,8 +393,8 @@ export class AuthService {
         extensions: [],
       };
     }
-
-    await this.authRepositories.deleteSession(sessionExists._id);
+    sessionExists.deletedAt = new Date();
+    await this.authRepositories.save(sessionExists);
 
     return {
       status: ResultStatus.Success,

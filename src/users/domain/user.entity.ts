@@ -1,5 +1,4 @@
 import mongoose, {HydratedDocument} from "mongoose";
-import {Blog} from "../../blogs/domain/blog.entity";
 
 export type EmailConfirmation = {
   confirmationCode: string;
@@ -59,5 +58,4 @@ const userSchema = new mongoose.Schema<User>({
   deletedAt: { type: Date, default: null },
 });
 
-// Модель
 export const UserModel = mongoose.model("user", userSchema);

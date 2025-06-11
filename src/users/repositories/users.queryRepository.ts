@@ -8,39 +8,33 @@ import { injectable } from "inversify";
 import { UserModel } from "../domain/user.entity";
 @injectable()
 export class UserQueryRepository {
-  async findAllUser(
-    queryDto: userQueryInput,
-  ): Promise<{ items: userViewModel[]; totalCount: number }> {
-    const {
-      pageNumber,
-      pageSize,
-      sortBy,
-      sortDirection,
-      searchEmailTerm,
-      searchLoginTerm,
-    } = queryDto;
+
+  async findAllUser(queryDto: userQueryInput): Promise<{ items: userViewModel[], totalCount: number }> {
+    const { pageNumber, pageSize, sortBy, sortDirection, searchEmailTerm, searchLoginTerm } = queryDto;
     const skip = (pageNumber - 1) * pageSize;
-    const filter: any = { deletedAt: null };
+
+    const filter: any = {
+      $and: [
+        { deletedAt: null }, // ✅ Обязательное условие
+        {
+          $or: []
+        }
+      ]
+    };
 
     if (searchEmailTerm || searchLoginTerm) {
-      filter.$or = [];
       if (searchEmailTerm && searchEmailTerm.trim() !== "") {
-        filter.$or.push({ email: { $regex: searchEmailTerm, $options: "i" } });
+        filter.$and[1].$or.push({ email: { $regex: searchEmailTerm, $options: "i" } });
       }
       if (searchLoginTerm && searchLoginTerm.trim() !== "") {
-        filter.$or.push({ login: { $regex: searchLoginTerm, $options: "i" } });
+        filter.$and[1].$or.push({ login: { $regex: searchLoginTerm, $options: "i" } });
       }
-    }
-
-    // Удаляем пустой массив $or
-    if (filter.$or && filter.$or.length === 0) {
-      delete filter.$or;
     }
 
     const items = await UserModel.find(filter)
-      .sort({ [sortBy]: sortDirection })
-      .skip(skip)
-      .limit(+pageSize);
+        .sort({ [sortBy]: sortDirection })
+        .skip(skip)
+        .limit(+pageSize);
 
     const totalCount = await UserModel.countDocuments(filter);
     return mapToUserListPaginatedOutput(items, {
@@ -69,7 +63,7 @@ export class UserQueryRepository {
       return null;
     }
     const user = await UserModel.findOne({ _id: new ObjectId(id) });
-    if (!user) {
+    if (!user || user.deletedAt !== null) {
       return null;
     }
     return mapToAboutUserViewModel(user);

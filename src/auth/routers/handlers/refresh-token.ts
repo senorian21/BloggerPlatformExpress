@@ -9,6 +9,7 @@ const authService = container.get(AuthService);
 
 export async function refreshTokenHandler(req: Request, res: Response) {
   const refreshToken = req.refreshToken;
+  console.log("refreshToken", refreshToken);
   const ip =
     req.socket.remoteAddress ||
     (Array.isArray(req.headers["x-forwarded-for"])

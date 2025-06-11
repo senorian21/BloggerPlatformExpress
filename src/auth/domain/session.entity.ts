@@ -1,14 +1,16 @@
-import mongoose from "mongoose";
+import mongoose, {HydratedDocument} from "mongoose";
 
 export type session = {
-  _id?: string;
   userId: string;
-  createdAt: string;
-  expiresAt?: string;
+  createdAt: Date;
+  expiresAt: Date;
   deviceId: string;
   ip: string;
   deviceName: string;
+  deletedAt: Date;
 };
+
+export type sessionDocument = HydratedDocument<session>;
 
 const sessionSchema = new mongoose.Schema<session>({
   userId: {
@@ -16,11 +18,11 @@ const sessionSchema = new mongoose.Schema<session>({
     required: true,
   },
   createdAt: {
-    type: String,
+    type: Date,
     required: true,
   },
   expiresAt: {
-    type: String,
+    type: Date,
     required: true,
   },
   deviceId: {
@@ -35,6 +37,10 @@ const sessionSchema = new mongoose.Schema<session>({
     type: String,
     required: true,
   },
+  deletedAt: {
+    type: Date,
+    default: null
+  }
 });
 
 export const SessionModel = mongoose.model("session", sessionSchema);

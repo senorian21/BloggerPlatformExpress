@@ -96,13 +96,13 @@ describe("User API", () => {
     await createUser(app, user2);
 
     await request(app)
-      .delete(`${USERS_PATH}/${user.id}`)
-      .set("Authorization", adminToken)
-      .expect(HttpStatus.NoContent);
+        .delete(`${USERS_PATH}/${user.id}`)
+        .set("Authorization", adminToken)
+        .expect(HttpStatus.NoContent);
 
     const usersResponse = await request(app)
-      .get(`${USERS_PATH}`)
-      .set("Authorization", adminToken);
+        .get(`${USERS_PATH}`)
+        .set("Authorization", adminToken);
 
     expect(usersResponse.body.items.length).toBe(1);
   });

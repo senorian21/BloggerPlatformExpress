@@ -1,6 +1,6 @@
 import { WithId } from "mongodb";
 import { deviceViewModel } from "../type/device-view-model";
-import { session } from "../../auth/domain/auth.entity";
+import { session } from "../../auth/domain/session.entity";
 
 export function mapToDeviceListOutput(
   sessions: WithId<session>[],

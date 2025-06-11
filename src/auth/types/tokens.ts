@@ -16,8 +16,8 @@ export type RefreshToken = {
   deviceId: string;
   deviceName: string;
   ip: string;
-  iat?: number;
-  exp?: number;
+  iat: number;
+  exp: number;
 };
 
 export type Token = accessToken | RefreshToken;

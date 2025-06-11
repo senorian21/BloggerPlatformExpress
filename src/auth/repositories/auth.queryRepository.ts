@@ -1,5 +1,5 @@
 import { mapToDeviceListOutput } from "../../security/mappers/map-to-device-list-output.util";
-import { SessionModel } from "../domain/auth.entity";
+import { SessionModel } from "../domain/session.entity";
 
 export const authQueryRepositories = {
   async deviceSessionList(userId: string) {

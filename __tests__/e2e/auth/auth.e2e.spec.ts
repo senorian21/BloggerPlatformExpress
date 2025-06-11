@@ -31,22 +31,34 @@ describe("Auth API", () => {
   });
 
   it("should login user with valid credentials, /auth/login", async () => {
-    const user = await createUser(app);
+    const newUser: UserInput = {
+      ...getUserDto(),
+      login: "admin",
+      password: "123456",
+      email: "admin@example.com",
+    };
+    const user = await createUser(app, newUser);
 
     const response = await request(app)
       .post(`${AUTH_PATH}/login`)
-      .send({ loginOrEmail: user.email, password: "111111" });
+      .send({ loginOrEmail: newUser.email, password: newUser.password });
 
     expect(response.status).toBe(HttpStatus.Ok);
     expect(response.body).toHaveProperty("accessToken");
   });
 
   it("should return 401 if invalid credentials, /auth/login", async () => {
-    const user = await createUser(app);
+    const newUser: UserInput = {
+      ...getUserDto(),
+      login: "admin",
+      password: "123456",
+      email: "admin@example.com",
+    };
+    const user = await createUser(app, newUser);
 
     const response = await request(app)
       .post(`${AUTH_PATH}/login`)
-      .send({ loginOrEmail: user.email, password: "wrong-password" });
+      .send({ loginOrEmail: newUser.email, password: "newUser.password" });
 
     expect(response.status).toBe(HttpStatus.Unauthorized);
   });
@@ -111,6 +123,7 @@ describe("Auth API", () => {
 
     expect(response.status).toBe(HttpStatus.Unauthorized);
   });
+
   it("Should not allow multiple refreshes with the same token", async () => {
     const user = await createUser(app);
     const loginRes = await request(app)
