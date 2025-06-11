@@ -1,37 +1,41 @@
 import { BlogsRepositories } from "../repositories/blogs.repository";
 import { BlogInput } from "../dto/blog.input-dto";
 import { injectable } from "inversify";
-import { Blog } from "../domain/blog.entity";
+import {Blog, BlogModel} from "../domain/blog.entity";
 
 @injectable()
 export class BlogsService {
   constructor(public blogsRepositories: BlogsRepositories) {}
   async createBlog(dto: Blog) {
-    const newBlog: Blog = {
-      name: dto.name,
-      description: dto.description,
-      websiteUrl: dto.websiteUrl,
-      createdAt: new Date().toISOString(),
-      isMembership: false,
-    };
-    return this.blogsRepositories.createBlog(newBlog);
+    const blog = new BlogModel ()
+    blog.name = dto.name;
+    blog.description = dto.description;
+    blog.websiteUrl = dto.websiteUrl;
+    blog.createdAt = new Date();
+    blog.isMembership = false
+
+    await this.blogsRepositories.save(blog);
+    return blog._id.toString();
   }
 
-  async updateBlog(id: string, blogInput: BlogInput, blog: Blog) {
-    const dto: Blog = {
-      ...blog,
-      name: blogInput.name,
-      description: blogInput.description,
-      websiteUrl: blogInput.websiteUrl,
-      createdAt: blog.createdAt,
-      isMembership: blog.isMembership,
-    };
-    const updateBlog = await this.blogsRepositories.updateBlog(id, dto);
-    if (!updateBlog) {
+  async updateBlog(id: string, blogInput: BlogInput) {
+    const blog = await this.blogsRepositories.findById(id);
+    if (!blog) {
+      return null
+    }
+    blog.name = blogInput.name;
+    blog.description = blogInput.description;
+    blog.websiteUrl = blogInput.websiteUrl;
+    await this.blogsRepositories.save(blog);
+  }
+
+  async deleteBlog(id: string) {
+    const blog = await this.blogsRepositories.findById(id);
+    if (!blog) {
       return false
     }
-  }
-  async deleteBlog(id: string): Promise<boolean> {
-    return this.blogsRepositories.deleteBlog(id);
+    blog.deletedAt = new Date();
+    await this.blogsRepositories.save(blog);
+    return true
   }
 }

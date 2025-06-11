@@ -10,15 +10,9 @@ const blogsService = container.get(BlogsService);
 
 export async function putBlogHandler(req: Request, res: Response) {
   const id = req.params.blogId;
-  const blog = await blogsQueryRepositories.findById(id);
-  if (!blog) {
-    res.sendStatus(HttpStatus.NotFound);
-    return;
-  }
   const blogInput: BlogInput = {
     ...req.body,
   };
-
-  await blogsService.updateBlog(id, blogInput, blog);
+  await blogsService.updateBlog(id, blogInput);
   res.sendStatus(HttpStatus.NoContent);
 }

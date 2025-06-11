@@ -9,25 +9,28 @@ import { BlogModel } from "../domain/blog.entity";
 @injectable()
 export class BlogsQueryRepositories {
   async findAllBlogs(
-    queryDto: BlogsQueryInput,
+      queryDto: BlogsQueryInput,
   ): Promise<{ items: blogViewModel[]; totalCount: number }> {
-    const { pageNumber, pageSize, sortBy, sortDirection, searchNameTerm } =
-      queryDto;
+    const { pageNumber, pageSize, sortBy, sortDirection, searchNameTerm } = queryDto;
 
     const skip = (pageNumber - 1) * pageSize;
-    const filter: any = {};
+    const filter: any = {
+      deletedAt: null,
+    };
 
     if (searchNameTerm) {
-      filter.$or = [];
-      filter.$or.push({ name: { $regex: searchNameTerm, $options: "i" } });
+      filter.$or = [
+        { name: { $regex: searchNameTerm, $options: 'i' } }
+      ];
     }
 
     const items = await BlogModel.find(filter)
-      .sort({ [sortBy]: sortDirection })
-      .skip(skip)
-      .limit(+pageSize);
+        .sort({ [sortBy]: sortDirection })
+        .skip(skip)
+        .limit(+pageSize);
 
     const totalCount = await BlogModel.countDocuments(filter);
+
     return mapToBlogListPaginatedOutput(items, {
       pageNumber: +pageNumber,
       pageSize: +pageSize,
@@ -39,10 +42,13 @@ export class BlogsQueryRepositories {
     if (!ObjectId.isValid(id)) {
       return null;
     }
+
     const blog = await BlogModel.findOne({ _id: new ObjectId(id) });
-    if (!blog) {
+
+    if (!blog || blog.deletedAt !== null) {
       return null;
     }
+
     return mapToBlogViewModel(blog);
   }
 }
