@@ -11,6 +11,8 @@ export type comment = {
   commentatorInfo: commentatorInfo;
   createdAt: Date;
   deletedAt: Date;
+  likeCount: number;
+  dislikeCount: number;
 };
 
 export type commentDocument = HydratedDocument<comment>;
@@ -26,6 +28,8 @@ const commentSchema = new mongoose.Schema<comment>({
   commentatorInfo: { type: commentatorInfoShema, required: true },
   createdAt: { type: Date, required: true },
   deletedAt: { type: Date, default: null },
+  likeCount: { type: Number, default: 0, required: true },
+  dislikeCount: { type: Number, default: 0, required: true },
 });
 
 export const CommentModel = mongoose.model("comment", commentSchema);

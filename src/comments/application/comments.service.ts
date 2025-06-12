@@ -6,6 +6,8 @@ import { Result } from "../../core/result/result.type";
 import { injectable } from "inversify";
 import { CommentModel } from "../domain/comment.entity";
 import { PostsQueryRepository } from "../../posts/repositories/posts.queryRepository";
+import { LikeCommentModel, likeStatus } from "../../like/domain/like.entity";
+import { UserRepository } from "../../users/repositories/users.repository";
 
 @injectable()
 export class CommentsService {
@@ -13,6 +15,7 @@ export class CommentsService {
     public userQueryRepository: UserQueryRepository,
     public commentsRepositories: CommentsRepositories,
     public postsRepositories: PostsQueryRepository,
+    public userRepository: UserRepository,
   ) {}
 
   async createComment(
@@ -125,6 +128,81 @@ export class CommentsService {
     }
     comment.deletedAt = new Date();
     await this.commentsRepositories.save(comment);
+    return {
+      status: ResultStatus.Success,
+      data: null,
+      extensions: [],
+    };
+  }
+
+  async likeComments(
+    idComment: string,
+    userId: string,
+    likeStatusReq: likeStatus,
+  ) {
+    const comment = await this.commentsRepositories.findById(idComment);
+    if (!comment) {
+      return {
+        status: ResultStatus.NotFound,
+        data: null,
+        errorMessage: "Comment not found",
+        extensions: [
+          { field: "comment", message: "No such comment was found." },
+        ],
+      };
+    }
+
+    const user = await this.userRepository.findById(userId);
+    if (!user) {
+      return {
+        status: ResultStatus.NotFound,
+        data: null,
+        errorMessage: "User not found",
+        extensions: [{ field: "User", message: "No such user was found." }],
+      };
+    }
+
+    let like = await this.commentsRepositories.findLikeByidUser(
+      userId,
+      idComment,
+    );
+
+    if (!like) {
+      like = new LikeCommentModel();
+      like.commentId = comment.id;
+      like.userId = user.id;
+      like.status = likeStatusReq;
+      like.createdAt = new Date();
+
+      await this.commentsRepositories.saveLike(like);
+
+      if (likeStatusReq === likeStatus.Like) {
+        comment.likeCount += 1;
+      } else if (likeStatusReq === likeStatus.Dislike) {
+        comment.dislikeCount += 1;
+      }
+
+      await this.commentsRepositories.save(comment);
+    } else {
+      const prevStatus = like.status;
+
+      like.status = likeStatusReq;
+      await this.commentsRepositories.saveLike(like);
+
+      if (prevStatus === likeStatus.Like) {
+        comment.likeCount -= 1;
+      } else if (prevStatus === likeStatus.Dislike) {
+        comment.dislikeCount -= 1;
+      }
+
+      if (likeStatusReq === likeStatus.Like) {
+        comment.likeCount += 1;
+      } else if (likeStatusReq === likeStatus.Dislike) {
+        comment.dislikeCount += 1;
+      }
+
+      await this.commentsRepositories.save(comment);
+    }
     return {
       status: ResultStatus.Success,
       data: null,
