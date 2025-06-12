@@ -9,21 +9,21 @@ import { AuthService } from "../../application/auth.service";
 const authService = container.get(AuthService);
 
 export async function registrationUserHandler(
-    req: RequestWithBody<registrationDto>,
-    res: Response,
+  req: RequestWithBody<registrationDto>,
+  res: Response,
 ) {
   const { login, email, password } = req.body;
 
   const result = await authService.registerUser(login, password, email);
 
   if (result.status === ResultStatus.BadRequest) {
-     res.status(HttpStatus.BadRequest).json({
+    res.status(HttpStatus.BadRequest).json({
       errorsMessages: result.extensions.map((ext) => ({
         message: ext.message,
         field: ext.field,
       })),
     });
-    return
+    return;
   }
 
   res.sendStatus(HttpStatus.NoContent);

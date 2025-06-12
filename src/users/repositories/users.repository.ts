@@ -6,7 +6,7 @@ export class UserRepository {
   async doesExistByLoginOrEmail(login: string, email: string) {
     return await UserModel.findOne({
       $or: [{ login }, { email }],
-      deletedAt: null, 
+      deletedAt: null,
     });
   }
 

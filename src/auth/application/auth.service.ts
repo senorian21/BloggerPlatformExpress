@@ -341,7 +341,9 @@ export class AuthService {
       return {
         status: ResultStatus.Unauthorized,
         errorMessage: "Session was invalidated",
-        extensions: [{ field: "session", message: "Session is no longer valid" }],
+        extensions: [
+          { field: "session", message: "Session is no longer valid" },
+        ],
         data: null,
       };
     }
