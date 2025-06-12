@@ -3,11 +3,11 @@ import { userDocument, UserModel } from "../domain/user.entity";
 
 @injectable()
 export class UserRepository {
-  async doesExistByLoginOrEmail(email: string, login: string) {
-    const user = await UserModel.findOne({
-      $or: [{ email: email }, { login: login }],
+  async doesExistByLoginOrEmail(login: string, email: string) {
+    return await UserModel.findOne({
+      $or: [{ login }, { email }],
+      deletedAt: null, 
     });
-    return user;
   }
 
   async findByLoginOrEmail(loginOrEmail: string) {

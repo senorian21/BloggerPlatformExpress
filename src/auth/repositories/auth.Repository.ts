@@ -12,7 +12,7 @@ export class AuthRepositories {
     deviceId?: string;
     deviceName?: string;
   }) {
-    const query: any = {};
+    const query: any = {deletedAt: null};
 
     if (filters.userId) {
       query.userId = filters.userId;

@@ -197,7 +197,7 @@ export class AuthService {
       expirationDate: add(new Date(), { days: 7 }),
       isConfirmed: false,
     };
-    this.userRepository.save(newUser);
+    await this.userRepository.save(newUser);
 
     this.nodemailerService
       .sendEmail(
@@ -337,7 +337,14 @@ export class AuthService {
         extensions: [],
       };
     }
-
+    if (sessionExists.deletedAt !== null) {
+      return {
+        status: ResultStatus.Unauthorized,
+        errorMessage: "Session was invalidated",
+        extensions: [{ field: "session", message: "Session is no longer valid" }],
+        data: null,
+      };
+    }
     const { token: newRefreshToken, cookie } =
       await this.jwtService.createRefreshToken(
         userId,
@@ -422,6 +429,8 @@ export class AuthService {
     user.emailConfirmation.confirmationCode = newConfirmationCode;
     user.emailConfirmation.expirationDate = newExpirationDate;
 
+    await this.userRepository.save(user);
+
     this.nodemailerService
       .sendEmail(
         user.email,
@@ -442,16 +451,14 @@ export class AuthService {
     if (!user) {
       return {
         status: ResultStatus.BadRequest,
-        errorMessage: "There is no such user",
+        errorMessage: "User not found",
         data: null,
         extensions: [],
       };
     }
     const newPasswordHash = await this.argon2Service.generateHash(newPassword);
-
     user.passwordHash = newPasswordHash;
     await this.userRepository.save(user);
-
     return {
       status: ResultStatus.Success,
       data: null,
