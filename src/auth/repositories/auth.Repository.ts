@@ -1,15 +1,18 @@
 import { injectable } from "inversify";
-import {session, sessionDocument, SessionModel} from "../domain/session.entity";
+import {
+  session,
+  sessionDocument,
+  SessionModel,
+} from "../domain/session.entity";
 
 @injectable()
 export class AuthRepositories {
-
   async findSession(filters: {
     userId?: string;
     deviceId?: string;
     deviceName?: string;
   }) {
-    const query: any = { };
+    const query: any = {};
 
     if (filters.userId) {
       query.userId = filters.userId;
@@ -22,13 +25,10 @@ export class AuthRepositories {
 
   async deleteDevice(deviceId: string, userId: string) {
     await SessionModel.updateMany(
-        {
-          $and: [
-            { userId: userId },
-            { deviceId: { $ne: deviceId } }
-          ]
-        },
-        { deletedAt: new Date() }
+      {
+        $and: [{ userId: userId }, { deviceId: { $ne: deviceId } }],
+      },
+      { deletedAt: new Date() },
     );
   }
   async save(session: sessionDocument) {

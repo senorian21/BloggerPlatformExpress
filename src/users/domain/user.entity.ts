@@ -1,4 +1,4 @@
-import mongoose, {HydratedDocument} from "mongoose";
+import mongoose, { HydratedDocument } from "mongoose";
 
 export type EmailConfirmation = {
   confirmationCode: string;

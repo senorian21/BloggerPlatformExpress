@@ -2,11 +2,10 @@ import { UserInput } from "../dto/user.input-dto";
 import { UserRepository } from "../repositories/users.repository";
 import { Argon2Service } from "../../auth/adapters/argon2.service";
 import { injectable } from "inversify";
-import {UserModel} from "../domain/user.entity";
-import {randomUUID} from "crypto";
-import {add} from "date-fns/add";
+import { UserModel } from "../domain/user.entity";
+import { randomUUID } from "crypto";
+import { add } from "date-fns/add";
 import mongoose from "mongoose";
-
 
 @injectable()
 export class UserService {
@@ -16,9 +15,8 @@ export class UserService {
   ) {}
 
   async createUser(dto: UserInput): Promise<string | null> {
-
     const isEmailOrLoginTaken =
-        await this.userRepository.doesExistByLoginOrEmail(dto.email, dto.login);
+      await this.userRepository.doesExistByLoginOrEmail(dto.email, dto.login);
     if (isEmailOrLoginTaken) {
       return null;
     }
@@ -32,7 +30,7 @@ export class UserService {
     newUser.createdAt = new Date();
     newUser.emailConfirmation = {
       confirmationCode: randomUUID(),
-      expirationDate: add(new Date(), {days: 7}),
+      expirationDate: add(new Date(), { days: 7 }),
       isConfirmed: false,
     };
 
@@ -44,7 +42,6 @@ export class UserService {
       return null;
     }
   }
-
 
   async deleteUser(id: string): Promise<boolean> {
     const user = await this.userRepository.findById(id);

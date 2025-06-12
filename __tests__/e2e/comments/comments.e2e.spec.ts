@@ -17,8 +17,8 @@ import {
 } from "../../../src/core/paths/paths";
 import { HttpStatus } from "../../../src/core/types/http-statuses";
 import { UserInput } from "../../../src/users/dto/user.input-dto";
-import {getUserDto} from "../utils/users/get-user-dto";
-import {beforeEach} from "node:test";
+import { getUserDto } from "../utils/users/get-user-dto";
+import { beforeEach } from "node:test";
 
 describe("Comments API", () => {
   const app = express();
@@ -253,31 +253,31 @@ describe("Comments API", () => {
     const user = await createUser(app, newUser);
 
     const loginResponse = await request(app)
-        .post(`${AUTH_PATH}/login`)
-        .send({
-          login: user.login,
-          password: newUser.password,
-        })
-        .expect(HttpStatus.Ok);
+      .post(`${AUTH_PATH}/login`)
+      .send({
+        login: user.login,
+        password: newUser.password,
+      })
+      .expect(HttpStatus.Ok);
 
     const accessToken = loginResponse.body.accessToken;
     expect(accessToken).toBeDefined();
 
     const createCommentResponse = await request(app)
-        .post(`${POSTS_PATH}/${post.id}/comments`)
-        .set("Authorization", `Bearer ${accessToken}`)
-        .send({
-          content: "Original comment content.",
-        })
-        .expect(HttpStatus.Created);
+      .post(`${POSTS_PATH}/${post.id}/comments`)
+      .set("Authorization", `Bearer ${accessToken}`)
+      .send({
+        content: "Original comment content.",
+      })
+      .expect(HttpStatus.Created);
 
     const originalComment = createCommentResponse.body;
     expect(originalComment).toHaveProperty("id");
 
     const getCommentResponse = await request(app)
-        .get(`${COMMENTS_PATH}/${originalComment.id}`)
-        .set("Authorization", `Bearer ${accessToken}`)
-        .expect(HttpStatus.Ok);
+      .get(`${COMMENTS_PATH}/${originalComment.id}`)
+      .set("Authorization", `Bearer ${accessToken}`)
+      .expect(HttpStatus.Ok);
 
     const retrievedComment = getCommentResponse.body;
     expect(retrievedComment).toHaveProperty("id");

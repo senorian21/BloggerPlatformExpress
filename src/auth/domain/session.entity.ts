@@ -1,4 +1,4 @@
-import mongoose, {HydratedDocument} from "mongoose";
+import mongoose, { HydratedDocument } from "mongoose";
 
 export type session = {
   userId: string;
@@ -39,8 +39,8 @@ const sessionSchema = new mongoose.Schema<session>({
   },
   deletedAt: {
     type: Date,
-    default: null
-  }
+    default: null,
+  },
 });
 
 export const SessionModel = mongoose.model("session", sessionSchema);

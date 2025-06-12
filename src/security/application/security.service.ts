@@ -12,7 +12,9 @@ export class SecurityService {
   ) {}
 
   async deleteSessionsByDeviceId(refreshToken: string, deleteDeviceId: string) {
-    const payload = (await this.jwtService.verifyRefreshToken(refreshToken)) as RefreshToken;
+    const payload = (await this.jwtService.verifyRefreshToken(
+      refreshToken,
+    )) as RefreshToken;
     if (!payload) {
       return {
         status: ResultStatus.Unauthorized,
@@ -24,7 +26,9 @@ export class SecurityService {
 
     const { userId } = payload;
 
-    const foundSession = await this.authRepositories.findSession({ deviceId: deleteDeviceId });
+    const foundSession = await this.authRepositories.findSession({
+      deviceId: deleteDeviceId,
+    });
 
     if (!foundSession) {
       return {
@@ -66,7 +70,7 @@ export class SecurityService {
 
   async deleteAllDeviceExceptTheActiveOne(refreshToken: string) {
     const payload = (await this.jwtService.verifyRefreshToken(
-        refreshToken
+      refreshToken,
     )) as RefreshToken;
 
     if (!payload) {

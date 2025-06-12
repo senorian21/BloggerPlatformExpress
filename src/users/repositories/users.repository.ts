@@ -1,5 +1,5 @@
 import { injectable } from "inversify";
-import {userDocument, UserModel} from "../domain/user.entity";
+import { userDocument, UserModel } from "../domain/user.entity";
 
 @injectable()
 export class UserRepository {
@@ -24,11 +24,11 @@ export class UserRepository {
     return user;
   }
 
-  async save (user: userDocument) {
+  async save(user: userDocument) {
     await user.save();
   }
   async findById(id: string) {
-    const user = await UserModel.findById(id)
+    const user = await UserModel.findById(id);
     if (!user || user.deletedAt !== null) {
       return null;
     }

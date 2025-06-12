@@ -8,33 +8,45 @@ import { injectable } from "inversify";
 import { UserModel } from "../domain/user.entity";
 @injectable()
 export class UserQueryRepository {
-
-  async findAllUser(queryDto: userQueryInput): Promise<{ items: userViewModel[], totalCount: number }> {
-    const { pageNumber, pageSize, sortBy, sortDirection, searchEmailTerm, searchLoginTerm } = queryDto;
+  async findAllUser(
+    queryDto: userQueryInput,
+  ): Promise<{ items: userViewModel[]; totalCount: number }> {
+    const {
+      pageNumber,
+      pageSize,
+      sortBy,
+      sortDirection,
+      searchEmailTerm,
+      searchLoginTerm,
+    } = queryDto;
     const skip = (pageNumber - 1) * pageSize;
 
     const filter: any = {
       $and: [
         { deletedAt: null }, // ✅ Обязательное условие
         {
-          $or: []
-        }
-      ]
+          $or: [],
+        },
+      ],
     };
 
     if (searchEmailTerm || searchLoginTerm) {
       if (searchEmailTerm && searchEmailTerm.trim() !== "") {
-        filter.$and[1].$or.push({ email: { $regex: searchEmailTerm, $options: "i" } });
+        filter.$and[1].$or.push({
+          email: { $regex: searchEmailTerm, $options: "i" },
+        });
       }
       if (searchLoginTerm && searchLoginTerm.trim() !== "") {
-        filter.$and[1].$or.push({ login: { $regex: searchLoginTerm, $options: "i" } });
+        filter.$and[1].$or.push({
+          login: { $regex: searchLoginTerm, $options: "i" },
+        });
       }
     }
 
     const items = await UserModel.find(filter)
-        .sort({ [sortBy]: sortDirection })
-        .skip(skip)
-        .limit(+pageSize);
+      .sort({ [sortBy]: sortDirection })
+      .skip(skip)
+      .limit(+pageSize);
 
     const totalCount = await UserModel.countDocuments(filter);
     return mapToUserListPaginatedOutput(items, {

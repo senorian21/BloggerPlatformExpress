@@ -12,19 +12,19 @@ export async function createUserHandler(req: Request, res: Response) {
   const createdUserId = await userService.createUser(dto);
 
   if (!createdUserId) {
-     res.status(HttpStatus.BadRequest).send({
+    res.status(HttpStatus.BadRequest).send({
       errorsMessages: [
         { field: "email", message: "Email already exists" },
         { field: "login", message: "Login already exists" },
       ],
     });
-    return
+    return;
   }
 
   const createdUser = await userQueryRepository.findUserById(createdUserId);
   if (!createdUser) {
-     res.sendStatus(HttpStatus.InternalServerError);
-    return
+    res.sendStatus(HttpStatus.InternalServerError);
+    return;
   }
 
   res.status(HttpStatus.Created).send(createdUser);

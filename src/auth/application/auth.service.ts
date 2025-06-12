@@ -10,8 +10,8 @@ import { UserRepository } from "../../users/repositories/users.repository";
 import { Argon2Service } from "../adapters/argon2.service";
 import { NodemailerService } from "../adapters/nodemailer.service";
 import { injectable } from "inversify";
-import {session, SessionModel} from "../domain/session.entity";
-import {UserModel} from "../../users/domain/user.entity";
+import { session, SessionModel } from "../domain/session.entity";
+import { UserModel } from "../../users/domain/user.entity";
 
 @injectable()
 export class AuthService {
@@ -24,10 +24,10 @@ export class AuthService {
   ) {}
 
   async loginUser(
-      loginOrEmail: string,
-      password: string,
-      ip: string,
-      userAgent: string,
+    loginOrEmail: string,
+    password: string,
+    ip: string,
+    userAgent: string,
   ): Promise<Result<{ accessToken: string; cookie: string } | null>> {
     const result = await this.checkUserCredentials(loginOrEmail, password);
     if (result.status !== ResultStatus.Success) {
@@ -50,10 +50,10 @@ export class AuthService {
 
     try {
       const refreshData = await this.jwtService.createRefreshToken(
-          userId,
-          ip,
-          userAgent,
-          existSession?.deviceId,
+        userId,
+        ip,
+        userAgent,
+        existSession?.deviceId,
       );
 
       if (!refreshData.cookie) {
@@ -63,21 +63,27 @@ export class AuthService {
       cookie = refreshData.cookie;
       refreshToken = refreshData.token;
 
-      const verifiedToken = await this.jwtService.verifyRefreshToken(refreshToken) as RefreshToken;
+      const verifiedToken = (await this.jwtService.verifyRefreshToken(
+        refreshToken,
+      )) as RefreshToken;
       if (!verifiedToken) {
         return {
           status: ResultStatus.Unauthorized,
           errorMessage: "Invalid token",
-          extensions: [{ field: "token", message: "Token verification failed" }],
+          extensions: [
+            { field: "token", message: "Token verification failed" },
+          ],
           data: null,
         };
       }
 
       if (existSession) {
-        if(existSession.deletedAt !== null) {
+        if (existSession.deletedAt !== null) {
           return {
             status: ResultStatus.Unauthorized,
-            extensions: [{ field: "token", message: "Token verification failed" }],
+            extensions: [
+              { field: "token", message: "Token verification failed" },
+            ],
             data: null,
           };
         }
@@ -118,11 +124,7 @@ export class AuthService {
     }
   }
 
-
-  async checkUserCredentials(
-    loginOrEmail: string,
-    password: string,
-  ) {
+  async checkUserCredentials(loginOrEmail: string, password: string) {
     const user = await this.userRepository.findByLoginOrEmail(loginOrEmail);
 
     if (!user) {
@@ -185,7 +187,7 @@ export class AuthService {
 
     const passwordHash = await this.argon2Service.generateHash(password);
 
-    const newUser = new UserModel()
+    const newUser = new UserModel();
     newUser.login = login;
     newUser.email = email;
     newUser.passwordHash = passwordHash;
@@ -194,7 +196,7 @@ export class AuthService {
       confirmationCode: randomUUID(),
       expirationDate: add(new Date(), { days: 7 }),
       isConfirmed: false,
-    }
+    };
     this.userRepository.save(newUser);
 
     this.nodemailerService
@@ -212,9 +214,7 @@ export class AuthService {
     };
   }
 
-  async registrationConfirmationUser(
-    code: string,
-  ) {
+  async registrationConfirmationUser(code: string) {
     const user = await this.userRepository.findByCode(code);
     if (!user) {
       return {
@@ -325,7 +325,9 @@ export class AuthService {
     const refreshTokenPayload = payload as RefreshToken;
     const { userId, deviceName, deviceId } = refreshTokenPayload;
 
-    const sessionExists = await this.authRepositories.findSession({deviceId: deviceId});
+    const sessionExists = await this.authRepositories.findSession({
+      deviceId: deviceId,
+    });
 
     if (!sessionExists) {
       return {
@@ -351,10 +353,10 @@ export class AuthService {
     const newIssuedAt = new Date(token.iat);
     const newExpiresAt = new Date(token.exp);
 
-    sessionExists.createdAt = newIssuedAt
-    sessionExists.expiresAt = newExpiresAt
+    sessionExists.createdAt = newIssuedAt;
+    sessionExists.expiresAt = newExpiresAt;
 
-    await this.authRepositories.save(sessionExists)
+    await this.authRepositories.save(sessionExists);
 
     const newAccessToken = await this.jwtService.createToken(userId);
 
@@ -449,7 +451,6 @@ export class AuthService {
 
     user.passwordHash = newPasswordHash;
     await this.userRepository.save(user);
-
 
     return {
       status: ResultStatus.Success,
