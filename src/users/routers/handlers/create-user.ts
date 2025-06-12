@@ -8,18 +8,24 @@ const userQueryRepository = container.get(UserQueryRepository);
 const userService = container.get(UserService);
 
 export async function createUserHandler(req: Request, res: Response) {
-  const createdUserId = await userService.createUser(req.body);
+  const dto = req.body;
+  const createdUserId = await userService.createUser(dto);
+
   if (!createdUserId) {
-    res.sendStatus(HttpStatus.NotFound);
-    return;
-  } else if (!createdUserId) {
-    res.status(HttpStatus.BadRequest).json({
+     res.status(HttpStatus.BadRequest).send({
       errorsMessages: [
-        { field: "email or login", message: "email or login is not correct" },
+        { field: "email", message: "Email already exists" },
+        { field: "login", message: "Login already exists" },
       ],
     });
+    return
   }
+
   const createdUser = await userQueryRepository.findUserById(createdUserId);
+  if (!createdUser) {
+     res.sendStatus(HttpStatus.InternalServerError);
+    return
+  }
 
   res.status(HttpStatus.Created).send(createdUser);
 }

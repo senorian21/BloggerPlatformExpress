@@ -16,29 +16,33 @@ export class UserService {
   ) {}
 
   async createUser(dto: UserInput): Promise<string | null> {
-    const isEmailAndLoginUnique =
-      await this.userRepository.doesExistByLoginOrEmail(dto.email, dto.login);
 
-    if (isEmailAndLoginUnique) {
+    const isEmailOrLoginTaken =
+        await this.userRepository.doesExistByLoginOrEmail(dto.email, dto.login);
+    if (isEmailOrLoginTaken) {
       return null;
     }
 
-    const hashedPassword: string = await this.argon2Service.generateHash(
-      dto.password,
-    );
-    const newUser = new UserModel()
+    const hashedPassword = await this.argon2Service.generateHash(dto.password);
+
+    const newUser = new UserModel();
     newUser.login = dto.login;
     newUser.email = dto.email;
     newUser.passwordHash = hashedPassword;
     newUser.createdAt = new Date();
     newUser.emailConfirmation = {
       confirmationCode: randomUUID(),
-      expirationDate: add(new Date(), { days: 7 }),
+      expirationDate: add(new Date(), {days: 7}),
       isConfirmed: false,
-    }
-    this.userRepository.save(newUser);
+    };
 
-    return newUser.id;
+    try {
+      await newUser.save();
+      return newUser.id;
+    } catch (error) {
+      console.error("Error saving user:", error);
+      return null;
+    }
   }
 
 

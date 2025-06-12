@@ -27,6 +27,7 @@ export class BlogsService {
     blog.description = blogInput.description;
     blog.websiteUrl = blogInput.websiteUrl;
     await this.blogsRepositories.save(blog);
+    return true
   }
 
   async deleteBlog(id: string) {

@@ -13,6 +13,9 @@ export async function putBlogHandler(req: Request, res: Response) {
   const blogInput: BlogInput = {
     ...req.body,
   };
-  await blogsService.updateBlog(id, blogInput);
+  const updateBlog = await blogsService.updateBlog(id, blogInput);
+  if (!updateBlog) {
+    res.sendStatus(HttpStatus.NotFound);
+  }
   res.sendStatus(HttpStatus.NoContent);
 }

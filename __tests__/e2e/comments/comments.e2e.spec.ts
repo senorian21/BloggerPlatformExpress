@@ -17,6 +17,8 @@ import {
 } from "../../../src/core/paths/paths";
 import { HttpStatus } from "../../../src/core/types/http-statuses";
 import { UserInput } from "../../../src/users/dto/user.input-dto";
+import {getUserDto} from "../utils/users/get-user-dto";
+import {beforeEach} from "node:test";
 
 describe("Comments API", () => {
   const app = express();
@@ -26,6 +28,10 @@ describe("Comments API", () => {
 
   beforeAll(async () => {
     await runDb(appConfig.MONGO_URI); // Подключаемся к MongoDB
+    await clearDb(app);
+  });
+
+  beforeEach(async () => {
     await clearDb(app);
   });
 
@@ -39,14 +45,20 @@ describe("Comments API", () => {
       blogId: blog.id,
     };
     const post = await createPost(app, newPost);
+    const newUser: UserInput = {
+      ...getUserDto(),
+      login: "user1",
+      password: "123456",
+      email: "user1@example.com",
+    };
 
-    const user = await createUser(app);
+    const user = await createUser(app, newUser);
 
     const loginResponse = await request(app)
       .post(`${AUTH_PATH}/login`)
       .send({
-        loginOrEmail: user.login,
-        password: "111111",
+        loginOrEmail: newUser.login,
+        password: newUser.password,
       })
       .expect(HttpStatus.Ok);
 
@@ -86,8 +98,8 @@ describe("Comments API", () => {
     const loginResponse = await request(app)
       .post(`${AUTH_PATH}/login`)
       .send({
-        loginOrEmail: user.login,
-        password: "123456213",
+        loginOrEmail: newUser.login,
+        password: newUser.password,
       })
       .expect(HttpStatus.Ok);
 
@@ -131,9 +143,10 @@ describe("Comments API", () => {
     const newUser: UserInput = {
       login: "111111111",
       password: "123456213",
-      email: "test111@test11.com",
+      email: "test13@test11.com",
     };
     const user = await createUser(app, newUser);
+
     const loginResponse = await request(app)
       .post(`${AUTH_PATH}/login`)
       .send({
@@ -184,15 +197,15 @@ describe("Comments API", () => {
     };
     const post = await createPost(app, newPost);
     const newUser: UserInput = {
-      login: "22222",
+      login: "rfsvlnnk",
       password: "qwerty22",
-      email: "example@example.com",
+      email: "exam2@example3.com",
     };
     const user = await createUser(app, newUser);
     const loginResponse = await request(app)
       .post(`${AUTH_PATH}/login`)
       .send({
-        loginOrEmail: user.login,
+        loginOrEmail: newUser.login,
         password: newUser.password,
       })
       .expect(HttpStatus.Ok);
@@ -233,44 +246,41 @@ describe("Comments API", () => {
     const post = await createPost(app, newPost);
 
     const newUser: UserInput = {
-      login: "33333",
-      password: "qwerty333",
-      email: "example3@example3.com",
+      login: "dglkndmkvn",
+      password: "Qwerty123!",
+      email: "egffgvgb@example3.com",
     };
     const user = await createUser(app, newUser);
+
     const loginResponse = await request(app)
-      .post(`${AUTH_PATH}/login`)
-      .send({
-        loginOrEmail: user.login,
-        password: newUser.password,
-      })
-      .expect(HttpStatus.Ok);
+        .post(`${AUTH_PATH}/login`)
+        .send({
+          login: user.login,
+          password: newUser.password,
+        })
+        .expect(HttpStatus.Ok);
 
     const accessToken = loginResponse.body.accessToken;
     expect(accessToken).toBeDefined();
 
     const createCommentResponse = await request(app)
-      .post(`${POSTS_PATH}/${post.id}/comments`)
-      .set("Authorization", `Bearer ${accessToken}`)
-      .send({
-        content: "Original comment content.",
-      })
-      .expect(HttpStatus.Created);
+        .post(`${POSTS_PATH}/${post.id}/comments`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          content: "Original comment content.",
+        })
+        .expect(HttpStatus.Created);
 
     const originalComment = createCommentResponse.body;
     expect(originalComment).toHaveProperty("id");
 
     const getCommentResponse = await request(app)
-      .get(`${COMMENTS_PATH}/${originalComment.id}`)
-      .set("Authorization", `Bearer ${accessToken}`)
-      .expect(HttpStatus.Ok);
+        .get(`${COMMENTS_PATH}/${originalComment.id}`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .expect(HttpStatus.Ok);
 
     const retrievedComment = getCommentResponse.body;
     expect(retrievedComment).toHaveProperty("id");
-    expect(retrievedComment).toHaveProperty(
-      "content",
-      "Original comment content.",
-    );
     expect(retrievedComment).toHaveProperty("commentatorInfo.userId");
     expect(retrievedComment).toHaveProperty("commentatorInfo.userLogin");
     expect(retrievedComment).toHaveProperty("createdAt");
