@@ -23,7 +23,7 @@ export class UserQueryRepository {
 
     const filter: any = {
       $and: [
-        { deletedAt: null }, // ✅ Обязательное условие
+        { deletedAt: null },
         {
           $or: [],
         },

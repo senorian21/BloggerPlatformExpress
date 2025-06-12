@@ -5,7 +5,7 @@ import { commentViewModel } from "../types/comment-view-model";
 import { mapToCommentsListPaginatedOutput } from "../mappers/map-to-comments-list-paginated-output.util";
 import { CommentModel } from "../domain/comment.entity";
 
-export const commentsQueryRepositories = {
+export class CommentsQueryRepositories {
   async findCommentsById(id: string) {
     if (!ObjectId.isValid(id)) {
       return null;
@@ -19,7 +19,7 @@ export const commentsQueryRepositories = {
       return null;
     }
     return mapToBlogViewModel(comment);
-  },
+  }
   async findAllCommentsByPost(
     queryDto: commentsQueryInput,
     postId: string,
@@ -40,5 +40,5 @@ export const commentsQueryRepositories = {
       pageSize: +pageSize,
       totalCount,
     });
-  },
-};
+  }
+}

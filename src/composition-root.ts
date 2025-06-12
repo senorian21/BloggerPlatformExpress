@@ -16,6 +16,7 @@ import { JwtService } from "./auth/adapters/jwt.service";
 import { AuthService } from "./auth/application/auth.service";
 import { SecurityService } from "./security/application/security.service";
 import { Container } from "inversify";
+import { CommentsQueryRepositories } from "./comments/repositories/comments.queryRepository";
 
 export const container: Container = new Container();
 
@@ -36,6 +37,9 @@ container
   .to(CommentsRepositories);
 container.bind<UserRepository>(UserRepository).to(UserRepository);
 container.bind<AuthRepositories>(AuthRepositories).to(AuthRepositories);
+container
+  .bind<CommentsQueryRepositories>(CommentsQueryRepositories)
+  .to(CommentsQueryRepositories);
 
 // Services adapters
 container.bind<Argon2Service>(Argon2Service).to(Argon2Service);

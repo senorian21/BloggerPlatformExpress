@@ -1,6 +1,9 @@
 import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/types/http-statuses";
-import { commentsQueryRepositories } from "../../repositories/comments.queryRepository";
+import { container } from "../../../composition-root";
+import { CommentsQueryRepositories } from "../../repositories/comments.queryRepository";
+
+const commentsQueryRepositories = container.get(CommentsQueryRepositories);
 
 export async function getCommentByIdHandler(req: Request, res: Response) {
   const id = req.params.commentId;

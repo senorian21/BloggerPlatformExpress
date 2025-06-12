@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/types/http-statuses";
-import { commentsQueryRepositories } from "../../../comments/repositories/comments.queryRepository";
 import { ResultStatus } from "../../../core/result/resultCode";
 import { container } from "../../../composition-root";
 import { CommentsService } from "../../../comments/application/comments.service";
-import { PostsQueryRepository } from "../../repositories/posts.queryRepository";
+import { CommentsQueryRepositories } from "../../../comments/repositories/comments.queryRepository";
 
 const commentsService = container.get(CommentsService);
+const commentsQueryRepositories = container.get(CommentsQueryRepositories);
 
 export async function createCommentHandler(req: Request, res: Response) {
   const postId = req.params.postId;

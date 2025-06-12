@@ -2,10 +2,11 @@ import { Request, Response } from "express";
 import { commentsQueryInput } from "../../../comments/types/comments-query.input";
 import { paginationAndSortingDefault } from "../../../core/middlewares/validation/query-pagination-sorting.validation-middleware";
 import { HttpStatus } from "../../../core/types/http-statuses";
-import { commentsQueryRepositories } from "../../../comments/repositories/comments.queryRepository";
 import { container } from "../../../composition-root";
 import { PostsQueryRepository } from "../../repositories/posts.queryRepository";
+import { CommentsQueryRepositories } from "../../../comments/repositories/comments.queryRepository";
 
+const commentsQueryRepositories = container.get(CommentsQueryRepositories);
 const postsQueryRepository = container.get(PostsQueryRepository);
 
 export async function getPostCommentsListHandler(
