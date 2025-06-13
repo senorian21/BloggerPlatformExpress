@@ -24,7 +24,7 @@ export async function createCommentHandler(req: Request, res: Response) {
     res.sendStatus(HttpStatus.Unauthorized);
   }
 
-  const createdComments = await commentsQueryRepositories.findCommentsById(
+  const createdComments = await commentsQueryRepositories.findCommentsByIdLike(
     createdCommentId.data!,
   );
 

@@ -7,6 +7,7 @@ import { getCommentByIdHandler } from "./handlers/get-comment-by-id";
 import { accessTokenGuard } from "../../auth/middlewares/access.token.guard";
 import { likeCommentHandler } from "./handlers/like-comment";
 import { likeInputDtoValidation } from "../../like/validation/like.input-dto.validation-middlewares";
+import { authorizationVerification } from "../../like/middlewares/authorizationVerification";
 
 export const commentsRouter = Router({});
 
@@ -20,7 +21,11 @@ commentsRouter.put(
 
 commentsRouter.delete("/:commentId", accessTokenGuard, deleteCommentHandler);
 
-commentsRouter.get("/:commentId", getCommentByIdHandler);
+commentsRouter.get(
+  "/:commentId",
+  authorizationVerification,
+  getCommentByIdHandler,
+);
 
 commentsRouter.put(
   "/:commentId/like-status",

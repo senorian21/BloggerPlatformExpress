@@ -1,9 +1,10 @@
-import { WithId } from "mongodb";
-import { comment } from "../types/comment";
 import { commentViewModel } from "../types/comment-view-model";
+import { commentDocument } from "../domain/comment.entity";
+import { likeStatus } from "../../like/domain/like.entity";
 
 export function mapToCommentViewModel(
-  comment: WithId<comment>,
+  comment: commentDocument,
+  myStatus: likeStatus,
 ): commentViewModel {
   return {
     id: comment._id.toString(),
@@ -13,5 +14,10 @@ export function mapToCommentViewModel(
       userLogin: comment.commentatorInfo.userLogin,
     },
     createdAt: comment.createdAt,
+    likesInfo: {
+      likesCount: comment.likeCount,
+      dislikesCount: comment.dislikeCount,
+      myStatus: myStatus,
+    },
   };
 }

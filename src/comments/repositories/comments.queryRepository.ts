@@ -11,40 +11,70 @@ import { CommentsRepositories } from "./comments.Repository";
 @injectable()
 export class CommentsQueryRepositories {
   constructor(public commentsRepositories: CommentsRepositories) {}
-  async findCommentsById(id: string) {
-    if (!ObjectId.isValid(id)) {
-      return null;
-    }
 
-    const comment = await CommentModel.findOne({ _id: new ObjectId(id) });
-    if (!comment) {
-      return null;
-    }
-    if (!comment || comment.deletedAt !== null) {
-      return null;
-    }
-    return mapToCommentViewModel(comment);
-  }
   async findAllCommentsByPost(
     queryDto: commentsQueryInput,
     postId: string,
+    userId?: string | null,
   ): Promise<{ items: commentViewModel[]; totalCount: number }> {
     const { pageNumber, pageSize, sortBy, sortDirection } = queryDto;
 
     const skip = (pageNumber - 1) * pageSize;
-    const filter: any = { postId: postId, deletedAt: null };
+    const filter = { postId, deletedAt: null };
 
-    const items = await CommentModel.find(filter)
+    // Получаем сырые комментарии из БД
+    const rawComments = await CommentModel.find(filter)
       .sort({ [sortBy]: sortDirection })
       .skip(skip)
       .limit(+pageSize);
 
+    // Подсчёт общего числа комментариев
     const totalCount = await CommentModel.countDocuments(filter);
-    return mapToCommentsListPaginatedOutput(items, {
-      pageNumber: +pageNumber,
-      pageSize: +pageSize,
-      totalCount,
-    });
+
+    // Если пользователь не авторизован — все статусы будут 'None'
+    if (!userId) {
+      const defaultStatusArray = Array(rawComments.length).fill(
+        likeStatus.None,
+      );
+      const result = mapToCommentsListPaginatedOutput(
+        rawComments,
+        defaultStatusArray,
+        {
+          pageNumber: +pageNumber,
+          pageSize: +pageSize,
+          totalCount,
+        },
+      );
+      return {
+        items: result.items,
+        totalCount: result.totalCount,
+      };
+    }
+
+    const myStatusArray = await Promise.all(
+      rawComments.map(async (comment) => {
+        const userLike = await this.commentsRepositories.findLikeByidUser(
+          userId,
+          comment._id.toString(),
+        );
+        return userLike?.status ?? likeStatus.None;
+      }),
+    );
+
+    const result = mapToCommentsListPaginatedOutput(
+      rawComments,
+      myStatusArray,
+      {
+        pageNumber: +pageNumber,
+        pageSize: +pageSize,
+        totalCount,
+      },
+    );
+
+    return {
+      items: result.items,
+      totalCount: result.totalCount,
+    };
   }
 
   async findCommentsByIdLike(id: string, userId?: string | null) {
@@ -66,7 +96,7 @@ export class CommentsQueryRepositories {
       }
     }
 
-    //const mappedComment = mapToCommentViewModel(comment, myStatus);
-    //return { ...mappedComment, myStatus };
+    const mappedComment = mapToCommentViewModel(comment, myStatus);
+    return mappedComment;
   }
 }

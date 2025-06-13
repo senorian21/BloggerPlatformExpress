@@ -1,3 +1,5 @@
+import { likeStatus } from "../../like/domain/like.entity";
+
 export type commentViewModel = {
   id: string;
   content: string;
@@ -6,4 +8,9 @@ export type commentViewModel = {
     userLogin: string;
   };
   createdAt: Date;
+  likesInfo: {
+    likesCount: number;
+    dislikesCount: number;
+    myStatus: likeStatus;
+  };
 };

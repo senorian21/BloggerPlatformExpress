@@ -6,8 +6,12 @@ import { CommentsQueryRepositories } from "../../repositories/comments.queryRepo
 const commentsQueryRepositories = container.get(CommentsQueryRepositories);
 
 export async function getCommentByIdHandler(req: Request, res: Response) {
+  const userId = req.user?.id ?? null;
   const id = req.params.commentId;
-  const findComments = await commentsQueryRepositories.findCommentsById(id);
+  const findComments = await commentsQueryRepositories.findCommentsByIdLike(
+    id,
+    userId,
+  );
   if (!findComments) {
     res.sendStatus(HttpStatus.NotFound);
   }
