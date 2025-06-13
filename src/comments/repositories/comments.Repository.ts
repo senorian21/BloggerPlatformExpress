@@ -24,7 +24,7 @@ export class CommentsRepositories {
     return comment;
   }
 
-  async findLikeByidUser(userId: string, commentId: string) {
+  async findLikeByidUser(userId: string, commentId: string | string[]) {
     const userLike = await LikeCommentModel.findOne({ userId, commentId });
     return userLike;
   }

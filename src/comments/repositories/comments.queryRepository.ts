@@ -1,11 +1,16 @@
 import { ObjectId } from "mongodb";
-import { mapToBlogViewModel } from "../mappers/map-to-comment-view-model";
+import { mapToCommentViewModel } from "../mappers/map-to-comment-view-model";
 import { commentsQueryInput } from "../types/comments-query.input";
 import { commentViewModel } from "../types/comment-view-model";
 import { mapToCommentsListPaginatedOutput } from "../mappers/map-to-comments-list-paginated-output.util";
 import { CommentModel } from "../domain/comment.entity";
+import { injectable } from "inversify";
+import { likeStatus } from "../../like/domain/like.entity";
+import { CommentsRepositories } from "./comments.Repository";
 
+@injectable()
 export class CommentsQueryRepositories {
+  constructor(public commentsRepositories: CommentsRepositories) {}
   async findCommentsById(id: string) {
     if (!ObjectId.isValid(id)) {
       return null;
@@ -18,7 +23,7 @@ export class CommentsQueryRepositories {
     if (!comment || comment.deletedAt !== null) {
       return null;
     }
-    return mapToBlogViewModel(comment);
+    return mapToCommentViewModel(comment);
   }
   async findAllCommentsByPost(
     queryDto: commentsQueryInput,
@@ -40,5 +45,28 @@ export class CommentsQueryRepositories {
       pageSize: +pageSize,
       totalCount,
     });
+  }
+
+  async findCommentsByIdLike(id: string, userId?: string | null) {
+    const comment = await CommentModel.findOne({ _id: new ObjectId(id) });
+    if (!comment || comment.deletedAt !== null) {
+      return null;
+    }
+
+    let myStatus: likeStatus = likeStatus.None;
+
+    if (userId) {
+      const userLike = await this.commentsRepositories.findLikeByidUser(
+        userId,
+        id,
+      );
+
+      if (userLike) {
+        myStatus = userLike.status;
+      }
+    }
+
+    //const mappedComment = mapToCommentViewModel(comment, myStatus);
+    //return { ...mappedComment, myStatus };
   }
 }

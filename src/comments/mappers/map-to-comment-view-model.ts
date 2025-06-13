@@ -2,7 +2,9 @@ import { WithId } from "mongodb";
 import { comment } from "../types/comment";
 import { commentViewModel } from "../types/comment-view-model";
 
-export function mapToBlogViewModel(comment: WithId<comment>): commentViewModel {
+export function mapToCommentViewModel(
+  comment: WithId<comment>,
+): commentViewModel {
   return {
     id: comment._id.toString(),
     content: comment.content,
