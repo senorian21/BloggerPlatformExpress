@@ -10,24 +10,30 @@ const commentsQueryRepositories = container.get(CommentsQueryRepositories);
 const postsQueryRepository = container.get(PostsQueryRepository);
 
 export async function getPostCommentsListHandler(
-  req: Request<{ postId: string }, {}, {}, commentsQueryInput>,
+  req: Request<{ postId: string }, any, {}, {}>,
   res: Response,
 ) {
+  const userId = req.user?.id ?? null;
   const postId = req.params.postId;
+  console.log("post comment handler");
   const post = await postsQueryRepository.findPostById(postId);
 
   if (!post) {
-    res.sendStatus(HttpStatus.NotFound); // Завершаем выполнение функции
+    res.sendStatus(HttpStatus.NotFound);
     return;
   }
 
-  const queryInput: commentsQueryInput = {
+  const queryInput = {
     ...paginationAndSortingDefault,
     ...req.query,
-  };
+  } as commentsQueryInput;
 
   const allCommentsByPost =
-    await commentsQueryRepositories.findAllCommentsByPost(queryInput, postId);
+    await commentsQueryRepositories.findAllCommentsByPost(
+      queryInput,
+      postId,
+      userId,
+    );
 
   res.status(HttpStatus.Ok).send(allCommentsByPost);
 }

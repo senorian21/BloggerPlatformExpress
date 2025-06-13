@@ -22,16 +22,15 @@ export class CommentsQueryRepositories {
     const skip = (pageNumber - 1) * pageSize;
     const filter = { postId, deletedAt: null };
 
-    // Получаем сырые комментарии из БД
     const rawComments = await CommentModel.find(filter)
       .sort({ [sortBy]: sortDirection })
       .skip(skip)
       .limit(+pageSize);
 
-    // Подсчёт общего числа комментариев
     const totalCount = await CommentModel.countDocuments(filter);
 
-    // Если пользователь не авторизован — все статусы будут 'None'
+    console.log("rawComments", rawComments);
+
     if (!userId) {
       const defaultStatusArray = Array(rawComments.length).fill(
         likeStatus.None,

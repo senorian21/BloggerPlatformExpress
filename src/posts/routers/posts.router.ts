@@ -13,6 +13,7 @@ import { commentsInputDtoValidation } from "../../comments/validation/comments.i
 import { createCommentHandler } from "./handlers/create-comment-by-post";
 import { getPostCommentsListHandler } from "./handlers/find-all-comments-by-posts";
 import { accessTokenGuard } from "../../auth/middlewares/access.token.guard";
+import { authorizationVerification } from "../../like/middlewares/authorizationVerification";
 
 export const postsRouter = Router({});
 
@@ -62,5 +63,6 @@ postsRouter.get(
   "/:postId/comments",
   paginationAndSortingValidation(),
   inputValidationResultMiddleware,
+  authorizationVerification,
   getPostCommentsListHandler,
 );

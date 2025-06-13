@@ -14,6 +14,7 @@ export function mapToCommentsListPaginatedOutput(
   totalCount: number;
   items: commentViewModel[];
 } {
+  console.log(`mapping work`);
   return {
     pagesCount: Math.ceil(meta.totalCount / meta.pageSize),
     page: meta.pageNumber,
@@ -28,8 +29,8 @@ export function mapToCommentsListPaginatedOutput(
       },
       createdAt: comment.createdAt,
       likesInfo: {
-        likesCount: comment.likeCount || 0,
-        dislikesCount: comment.dislikeCount || 0,
+        likesCount: comment.likeCount,
+        dislikesCount: comment.dislikeCount,
         myStatus: myStatusArray[index],
       },
     })),

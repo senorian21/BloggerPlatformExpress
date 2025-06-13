@@ -33,4 +33,5 @@ export const authorizationVerification = async (
   req.user = { id: payload.userId } as IdType;
 
   next();
+  return;
 };
