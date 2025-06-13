@@ -17,7 +17,7 @@ export async function likeCommentHandler(req: Request, res: Response) {
     likeStatus,
   );
   if (likeComments.status != ResultStatus.Success) {
-    res.sendStatus(HttpStatus.BadRequest);
+    res.sendStatus(HttpStatus.NotFound);
     return;
   }
   res.sendStatus(HttpStatus.NoContent);

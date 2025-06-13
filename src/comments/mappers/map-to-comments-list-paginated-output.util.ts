@@ -14,12 +14,12 @@ export function mapToCommentsListPaginatedOutput(
   totalCount: number;
   items: commentViewModel[];
 } {
-  console.log(`mapping work`);
-  return {
-    pagesCount: Math.ceil(meta.totalCount / meta.pageSize),
-    page: meta.pageNumber,
-    pageSize: meta.pageSize,
-    totalCount: meta.totalCount,
+  const { pageNumber, pageSize, totalCount } = meta;
+  const res = {
+    pagesCount: Math.ceil(totalCount / pageSize),
+    page: pageNumber,
+    pageSize: pageSize,
+    totalCount: totalCount,
     items: comments.map((comment, index) => ({
       id: comment._id.toString(),
       content: comment.content,
@@ -35,4 +35,5 @@ export function mapToCommentsListPaginatedOutput(
       },
     })),
   };
+  return res;
 }

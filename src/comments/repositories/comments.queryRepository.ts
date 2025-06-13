@@ -29,51 +29,24 @@ export class CommentsQueryRepositories {
 
     const totalCount = await CommentModel.countDocuments(filter);
 
-    console.log("rawComments", rawComments);
-
-    if (!userId) {
-      const defaultStatusArray = Array(rawComments.length).fill(
-        likeStatus.None,
+    let statusArray = Array(rawComments.length).fill(likeStatus.None);
+    if (userId) {
+      statusArray = await Promise.all(
+        rawComments.map(async (comment) => {
+          const userLike = await this.commentsRepositories.findLikeByidUser(
+            userId,
+            comment._id.toString(),
+          );
+          return userLike?.status ?? likeStatus.None;
+        }),
       );
-      const result = mapToCommentsListPaginatedOutput(
-        rawComments,
-        defaultStatusArray,
-        {
-          pageNumber: +pageNumber,
-          pageSize: +pageSize,
-          totalCount,
-        },
-      );
-      return {
-        items: result.items,
-        totalCount: result.totalCount,
-      };
     }
 
-    const myStatusArray = await Promise.all(
-      rawComments.map(async (comment) => {
-        const userLike = await this.commentsRepositories.findLikeByidUser(
-          userId,
-          comment._id.toString(),
-        );
-        return userLike?.status ?? likeStatus.None;
-      }),
-    );
-
-    const result = mapToCommentsListPaginatedOutput(
-      rawComments,
-      myStatusArray,
-      {
-        pageNumber: +pageNumber,
-        pageSize: +pageSize,
-        totalCount,
-      },
-    );
-
-    return {
-      items: result.items,
-      totalCount: result.totalCount,
-    };
+    return mapToCommentsListPaginatedOutput(rawComments, statusArray, {
+      pageNumber: +pageNumber,
+      pageSize: +pageSize,
+      totalCount,
+    });
   }
 
   async findCommentsByIdLike(id: string, userId?: string | null) {
