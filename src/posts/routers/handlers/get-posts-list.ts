@@ -7,22 +7,17 @@ import { PostsQueryRepository } from "../../repositories/posts.queryRepository";
 
 const postsQueryRepository = container.get(PostsQueryRepository);
 
-export async function getPostsListHandler(
-  req: Request<{}, {}, {}, PostQueryInput>,
-  res: Response,
-) {
-  try {
-    const queryInput: PostQueryInput = {
-      ...paginationAndSortingDefault,
-      ...req.query,
-    };
-    const posts = await postsQueryRepository.findAllPosts(queryInput);
+export async function getPostsListHandler(req: Request, res: Response) {
+  const userId = req.user?.id;
+  const queryInput: PostQueryInput = {
+    ...paginationAndSortingDefault,
+    ...req.query,
+  } as PostQueryInput;
 
-    res.send(posts);
-  } catch (e) {
-    console.error(e);
-    res
-      .status(HttpStatus.InternalServerError)
-      .json({ message: "Ошибка при получении списка постов" });
-  }
+  const posts = await postsQueryRepository.findAllPosts(
+    queryInput,
+    undefined,
+    userId,
+  );
+  res.send(posts);
 }

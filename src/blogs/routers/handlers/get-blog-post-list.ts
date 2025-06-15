@@ -19,12 +19,13 @@ export async function getBlogPostsListHandler(
 ) {
   try {
     const idBlog = req.params.blogId;
+    const userId = req.user?.id;
     const blog = await blogsQueryRepositories.findById(idBlog);
     if (!blog) {
       res.sendStatus(HttpStatus.NotFound);
       return;
     }
-    const queryInput: PostQueryInput = {
+    const queryInput = {
       ...paginationAndSortingDefault,
       pageNumber:
         parseInt(req.query.pageNumber as string, 10) ||
@@ -38,11 +39,12 @@ export async function getBlogPostsListHandler(
       sortDirection:
         (req.query.sortDirection as SortDirection) ||
         paginationAndSortingDefault.sortDirection,
-    };
+    } as PostQueryInput;
 
-    const postsByBlog = await postsQueryRepository.findAllPostsByBlogId(
+    const postsByBlog = await postsQueryRepository.findAllPosts(
       queryInput,
       idBlog,
+      userId,
     );
 
     res.send(postsByBlog);

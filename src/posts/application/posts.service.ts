@@ -93,18 +93,20 @@ export class PostsService {
       (entry) => entry.userId === userId,
     );
 
-    let like = await this.postsRepository.findLikeByIdUser(userId, idPost);
-    const updateNewestLikes = (likeEntry: newestLikes) => {
+    const updateNewestLikes = (likeEntry: newestLikes | null) => {
       if (existingLikeIndex > -1) {
         post.newestLikes.splice(existingLikeIndex, 1);
       }
-      if (post.newestLikes.length >= 3) {
-        post.newestLikes.pop();
-      }
+
       if (likeEntry) {
+        if (post.newestLikes.length >= 3) {
+          post.newestLikes.pop();
+        }
         post.newestLikes.unshift(likeEntry);
       }
     };
+
+    let like = await this.postsRepository.findLikeByIdUser(userId, idPost);
 
     if (!like) {
       like = new LikePostModel();
@@ -122,8 +124,11 @@ export class PostsService {
           userId: user.id,
           login: user.login,
         });
-      } else {
+      } else if (likeStatusReq === likeStatus.Dislike) {
         post.dislikeCount += 1;
+        updateNewestLikes(null);
+      } else {
+        updateNewestLikes(null);
       }
     } else {
       const prevStatus = like.status;
@@ -132,7 +137,7 @@ export class PostsService {
 
       if (prevStatus === likeStatus.Like) {
         post.likeCount -= 1;
-      } else {
+      } else if (prevStatus === likeStatus.Dislike) {
         post.dislikeCount -= 1;
       }
 
@@ -143,11 +148,11 @@ export class PostsService {
           userId: user.id,
           login: user.login,
         });
-      } else {
+      } else if (likeStatusReq === likeStatus.Dislike) {
         post.dislikeCount += 1;
-        if (existingLikeIndex > -1) {
-          post.newestLikes.splice(existingLikeIndex, 1);
-        }
+        updateNewestLikes(null);
+      } else {
+        updateNewestLikes(null);
       }
     }
 

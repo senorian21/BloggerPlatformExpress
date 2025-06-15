@@ -73,8 +73,6 @@ export class CommentsQueryRepositories {
         myStatus = userLike.status;
       }
     }
-
-    const mappedComment = mapToCommentViewModel(comment, myStatus);
-    return mappedComment;
+    return mapToCommentViewModel(comment, myStatus);
   }
 }

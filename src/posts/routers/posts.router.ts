@@ -23,10 +23,11 @@ postsRouter.get(
   "",
   paginationAndSortingValidation(),
   inputValidationResultMiddleware,
+  authorizationVerification,
   getPostsListHandler,
 );
 
-postsRouter.get("/:id", inputValidationResultMiddleware, getPostHandler);
+postsRouter.get("/:id", authorizationVerification, getPostHandler);
 
 postsRouter.delete(
   "/:id",

@@ -13,6 +13,7 @@ import { postsBlogInputDtoValidation } from "../../posts/validation/posts.input-
 
 import { createPostByBlogHandler } from "./handlers/create-post-by-blog";
 import { paginationAndSortingValidation } from "../../core/middlewares/validation/query-pagination-sorting.validation-middleware";
+import { authorizationVerification } from "../../like/middlewares/authorizationVerification";
 
 export const blogsRouter = Router({});
 
@@ -47,6 +48,7 @@ blogsRouter.get(
   "/:blogId/posts",
   paginationAndSortingValidation(),
   inputValidationResultMiddleware,
+  authorizationVerification,
   getBlogPostsListHandler,
 );
 

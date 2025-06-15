@@ -2,41 +2,68 @@ import { ObjectId } from "mongodb";
 import { PostQueryInput } from "../types/post-query.input";
 import { mapToPostViewModel } from "../mappers/map-to-post-view-model.util";
 import { mapToPostListPaginatedOutput } from "../mappers/map-to-post-list-paginated-output.util";
-import { postViewModel } from "../types/post-view-model";
 import { injectable } from "inversify";
 import { PostModel } from "../domain/post.entity";
+import { likeStatus } from "../../like/domain/like.entity";
+import { PostsRepository } from "./posts.repository";
+import { PostViewModel } from "../types/post-view-model";
 
 @injectable()
 export class PostsQueryRepository {
+  constructor(public postsRepository: PostsRepository) {}
   async findAllPosts(
     queryDto: PostQueryInput,
-  ): Promise<{ items: postViewModel[]; totalCount: number }> {
+    blogId?: string,
+    userId?: string,
+  ): Promise<{ items: PostViewModel[]; totalCount: number }> {
     const { pageNumber, pageSize, sortBy, sortDirection } = queryDto;
     const skip = (pageNumber - 1) * pageSize;
     const filter: any = {
       deletedAt: null,
     };
 
-    const items = await PostModel.find(filter)
-
-      // "asc" (по возрастанию), то используется 1
-      // "desc" — то -1 для сортировки по убыванию. - по алфавиту от Я-А, Z-A
+    if (blogId) {
+      filter.blogId = blogId;
+    }
+    console.log(userId, "в сервисе ");
+    const rawPosts = await PostModel.find(filter)
       .sort({ [sortBy]: sortDirection })
-
-      // пропускаем определённое количество док. перед тем, как вернуть нужный набор данных.
       .skip(skip)
-
-      // ограничивает количество возвращаемых документов до значения pageSize
       .limit(+pageSize);
+
     const totalCount = await PostModel.countDocuments(filter);
-    return mapToPostListPaginatedOutput(items, {
+
+    let myStatusArray = Array(rawPosts.length).fill(likeStatus.None);
+
+    if (userId) {
+      console.log("userId:", userId);
+      console.log(
+        "postIds:",
+        rawPosts.map((p) => p._id.toString()),
+      );
+
+      myStatusArray = await Promise.all(
+        rawPosts.map(async (post) => {
+          const postId = post._id.toString();
+          const userLike = await this.postsRepository.findLikeByIdUser(
+            userId,
+            postId,
+          );
+          console.log(`Like for ${postId} by ${userId}:`, userLike); // Логируем результат
+          return userLike?.status ?? likeStatus.None;
+        }),
+      );
+    }
+    console.log(myStatusArray);
+
+    return mapToPostListPaginatedOutput(rawPosts, myStatusArray, {
       pageNumber: +pageNumber,
       pageSize: +pageSize,
       totalCount,
     });
   }
 
-  async findPostById(id: string) {
+  async findPostById(id: string, userId?: string | null) {
     if (!ObjectId.isValid(id)) {
       return null;
     }
@@ -44,28 +71,17 @@ export class PostsQueryRepository {
     if (!post) {
       return null;
     }
+    let myStatus: likeStatus = likeStatus.None;
+    if (userId) {
+      const userLike = await this.postsRepository.findLikeByIdUser(userId, id);
+      if (userLike) {
+        myStatus = userLike.status;
+      }
+    }
+
     if (!post || post.deletedAt !== null) {
       return null;
     }
-    return mapToPostViewModel(post);
-  }
-  async findAllPostsByBlogId(queryDto: PostQueryInput, blogId: string) {
-    const { pageNumber, pageSize, sortBy, sortDirection } = queryDto;
-    const filter = { blogId: blogId, deletedAt: null };
-    const skip = (pageNumber - 1) * pageSize;
-
-    const [items, totalCount] = await Promise.all([
-      PostModel.find(filter)
-        .sort({ [sortBy]: sortDirection })
-        .skip(skip)
-        .limit(+pageSize),
-
-      PostModel.countDocuments(filter),
-    ]);
-    return mapToPostListPaginatedOutput(items, {
-      pageNumber: +pageNumber,
-      pageSize: +pageSize,
-      totalCount,
-    });
+    return mapToPostViewModel(post, myStatus);
   }
 }
