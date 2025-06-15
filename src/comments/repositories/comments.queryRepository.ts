@@ -31,6 +31,12 @@ export class CommentsQueryRepositories {
 
     let statusArray = Array(rawComments.length).fill(likeStatus.None);
     if (userId) {
+      //const commentsIds: ObjectId[]
+      //const likeForComments = CommentRepo.findLikeForComments(commentsIds, userId)
+      //1 получить комменты
+      //2 достать все лайки пользователя к коментs
+      //3 маппинг лайки[] + comments[]
+
       statusArray = await Promise.all(
         rawComments.map(async (comment) => {
           const userLike = await this.commentsRepositories.findLikeByidUser(

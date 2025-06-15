@@ -1,10 +1,9 @@
-import { comment } from "../types/comment";
-import { ResultStatus } from "../../core/result/resultCode";
-import { Result } from "../../core/result/result.type";
-import { ObjectId } from "mongodb";
 import { injectable } from "inversify";
 import { commentDocument, CommentModel } from "../domain/comment.entity";
-import { LikeCommentModel, likeDocument } from "../../like/domain/like.entity";
+import {
+  LikeCommentModel,
+  likeCommentsDocument,
+} from "../../like/domain/like.entity";
 
 @injectable()
 export class CommentsRepositories {
@@ -12,7 +11,7 @@ export class CommentsRepositories {
     await comment.save();
   }
 
-  async saveLike(like: likeDocument) {
+  async saveLike(like: likeCommentsDocument) {
     await like.save();
   }
 

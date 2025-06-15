@@ -6,6 +6,7 @@ import { CommentModel } from "../../comments/domain/comment.entity";
 import { UserModel } from "../../users/domain/user.entity";
 import { SessionModel } from "../../auth/domain/session.entity";
 import { RateModel } from "../../auth/domain/rate.entity";
+import { LikeCommentModel, LikePostModel } from "../../like/domain/like.entity";
 
 export const testingRouter = Router({});
 
@@ -17,6 +18,8 @@ testingRouter.delete("/all-data", async (req: Request, res: Response) => {
     UserModel.deleteMany(),
     SessionModel.deleteMany(),
     RateModel.deleteMany(),
+    LikePostModel.deleteMany(),
+    LikeCommentModel.deleteMany(),
   ]);
   res.sendStatus(HttpStatus.NoContent);
 });

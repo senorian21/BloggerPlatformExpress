@@ -14,6 +14,8 @@ import { createCommentHandler } from "./handlers/create-comment-by-post";
 import { getPostCommentsListHandler } from "./handlers/find-all-comments-by-posts";
 import { accessTokenGuard } from "../../auth/middlewares/access.token.guard";
 import { authorizationVerification } from "../../like/middlewares/authorizationVerification";
+import { likeInputDtoValidation } from "../../like/validation/like.input-dto.validation-middlewares";
+import { likePostHandler } from "./handlers/likePostHandler";
 
 export const postsRouter = Router({});
 
@@ -65,4 +67,12 @@ postsRouter.get(
   inputValidationResultMiddleware,
   authorizationVerification,
   getPostCommentsListHandler,
+);
+
+postsRouter.put(
+  "/:postId/like-status",
+  accessTokenGuard,
+  likeInputDtoValidation,
+  inputValidationResultMiddleware,
+  likePostHandler,
 );
