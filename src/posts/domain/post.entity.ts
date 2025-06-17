@@ -1,4 +1,7 @@
-import mongoose, { HydratedDocument } from "mongoose";
+import mongoose, { HydratedDocument, model, Model } from "mongoose";
+import { PostInput } from "../dto/post.input-dto";
+import { likeStatus } from "../../like/domain/like.entity";
+import { BlogEntity } from "../../blogs/domain/blog.entity";
 
 export type newestLikes = {
   addedAt: Date;
@@ -18,10 +21,115 @@ export type Post = {
   dislikeCount: number;
   newestLikes: newestLikes[];
 };
+export class PostEntity {
+  constructor(
+    public title: string,
+    public shortDescription: string,
+    public content: string,
+    public blogId: string,
+    public blogName: string,
+    public createdAt: Date,
+    public deletedAt: Date | null,
+    public likeCount: number,
+    public dislikeCount: number,
+    public newestLikes: newestLikes[],
+  ) {}
+  static createPost(dto: PostInput, blogName: string) {
+    const newPost = new PostModel();
+    newPost.title = dto.title;
+    newPost.content = dto.content;
+    newPost.shortDescription = dto.shortDescription;
+    newPost.blogId = dto.blogId;
+    newPost.blogName = blogName;
+    newPost.createdAt = new Date();
+    return newPost;
+  }
+  updatePost(dto: Post, blogName: string) {
+    this.title = dto.title;
+    this.shortDescription = dto.shortDescription;
+    this.content = dto.content;
+    this.blogId = dto.blogId;
+    this.blogName = blogName;
+  }
 
-export type newestLikesDocument = HydratedDocument<newestLikes>;
+  deletePost() {
+    this.deletedAt = new Date();
+  }
 
-export type postDocument = HydratedDocument<Post>;
+  public setLikeStatus(
+    userId: string,
+    login: string,
+    newStatus: likeStatus,
+  ): void {
+    const existingLikeIndex = this.newestLikes.findIndex(
+      (entry) => entry.userId === userId,
+    );
+
+    if (existingLikeIndex > -1) {
+      this._removeLike(existingLikeIndex);
+    }
+
+    if (newStatus === likeStatus.Like) {
+      this._addLike(userId, login);
+    } else if (newStatus === likeStatus.Dislike) {
+      this._removeLikeFromCount();
+      this.dislikeCount += 1;
+    } else {
+      this._removeLikeFromCount();
+    }
+  }
+
+  private _addLike(userId: string, login: string): void {
+    this.likeCount += 1;
+
+    this.newestLikes.unshift({
+      addedAt: new Date(),
+      userId,
+      login,
+    });
+
+    if (this.newestLikes.length > 3) {
+      this.newestLikes.pop();
+    }
+  }
+
+  private _removeLike(index: number): void {
+    const removed = this.newestLikes.splice(index, 1)[0];
+    if (removed) {
+      this.likeCount -= 1;
+    }
+  }
+
+  private _removeLikeFromCount(): void {
+    if (this.likeCount > 0) {
+      this.likeCount -= 1;
+    }
+    if (this.dislikeCount > 0) {
+      this.dislikeCount -= 1;
+    }
+  }
+
+  public clearUserLike(userId: string): void {
+    const index = this.newestLikes.findIndex((like) => like.userId === userId);
+    if (index > -1) {
+      this._removeLike(index);
+    }
+  }
+}
+
+interface PostMethods {
+  updatePost(dto: PostInput, blogName: string): void;
+  deletePost(): void;
+  setLikeStatus(userId: string, login: string, newStatus: likeStatus): void;
+  updateLikeStatus(userId: string, login: string, newStatus: likeStatus): void;
+  clearUserLike(userId: string): void;
+}
+
+type PostStatic = typeof PostEntity;
+
+type PostModelType = Model<PostEntity, {}, PostMethods> & PostStatic;
+
+export type postDocument = HydratedDocument<PostEntity, PostMethods>;
 
 const newestLikesShema = new mongoose.Schema<newestLikes>({
   addedAt: { type: Date, required: true },
@@ -29,7 +137,7 @@ const newestLikesShema = new mongoose.Schema<newestLikes>({
   login: { type: String, required: true },
 });
 
-const postSchema = new mongoose.Schema<Post>({
+const postSchema = new mongoose.Schema<PostEntity>({
   title: { type: String, required: true },
   shortDescription: { type: String, required: true },
   content: { type: String, required: true },
@@ -45,4 +153,6 @@ const postSchema = new mongoose.Schema<Post>({
   },
 });
 
-export const PostModel = mongoose.model("Post", postSchema);
+postSchema.loadClass(PostEntity);
+
+export const PostModel = model<PostEntity, PostModelType>("Post", postSchema);

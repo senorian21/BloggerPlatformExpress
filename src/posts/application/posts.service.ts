@@ -3,7 +3,12 @@ import { PostInput } from "../dto/post.input-dto";
 import { BlogsQueryRepositories } from "../../blogs/repositories/blogs.queryRepository";
 import { PostsQueryRepository } from "../repositories/posts.queryRepository";
 import { injectable } from "inversify";
-import { newestLikes, Post, PostModel } from "../domain/post.entity";
+import {
+  newestLikes,
+  Post,
+  PostEntity,
+  PostModel,
+} from "../domain/post.entity";
 import {
   LikeCommentModel,
   LikePostModel,
@@ -26,13 +31,7 @@ export class PostsService {
     if (!blog) {
       return null;
     }
-    const newPost = new PostModel();
-    newPost.title = dto.title;
-    newPost.content = dto.content;
-    newPost.shortDescription = dto.shortDescription;
-    newPost.blogId = dto.blogId;
-    newPost.blogName = blog.name;
-    newPost.createdAt = new Date();
+    const newPost = PostModel.createPost(dto, blog.name);
 
     await this.postsRepository.save(newPost);
     return newPost._id.toString();
@@ -48,11 +47,8 @@ export class PostsService {
     if (!existingPost) {
       return false;
     }
-    existingPost.title = dto.title;
-    existingPost.shortDescription = dto.shortDescription;
-    existingPost.content = dto.content;
-    existingPost.blogId = dto.blogId;
-    existingPost.blogName = blog.name;
+
+    existingPost.updatePost(dto, blog.name);
 
     await this.postsRepository.save(existingPost);
     return true;
@@ -63,7 +59,7 @@ export class PostsService {
     if (!post) {
       return false;
     }
-    post.deletedAt = new Date();
+    post.deletePost();
     await this.postsRepository.save(post);
     return true;
   }
@@ -74,7 +70,7 @@ export class PostsService {
       return {
         status: ResultStatus.NotFound,
         data: null,
-        errorMessage: "Post not found",
+        errorMessage: "post not found",
         extensions: [{ field: "post", message: "No such post was found." }],
       };
     }
@@ -84,76 +80,27 @@ export class PostsService {
       return {
         status: ResultStatus.NotFound,
         data: null,
-        errorMessage: "User not found",
-        extensions: [{ field: "User", message: "No such user was found." }],
+        errorMessage: "user not found",
+        extensions: [{ field: "user", message: "No such user was found." }],
       };
     }
-
-    const existingLikeIndex = post.newestLikes.findIndex(
-      (entry) => entry.userId === userId,
-    );
-
-    const updateNewestLikes = (likeEntry: newestLikes | null) => {
-      if (existingLikeIndex > -1) {
-        post.newestLikes.splice(existingLikeIndex, 1);
-      }
-
-      if (likeEntry) {
-        if (post.newestLikes.length >= 3) {
-          post.newestLikes.pop();
-        }
-        post.newestLikes.unshift(likeEntry);
-      }
-    };
 
     let like = await this.postsRepository.findLikeByIdUser(userId, idPost);
 
     if (!like) {
-      like = new LikePostModel();
-      like.userId = user.id;
-      like.status = likeStatusReq;
-      like.postId = post.id;
-      like.createdAt = new Date();
+      const newLike = new LikePostModel();
+      newLike.userId = user.id;
+      newLike.status = likeStatusReq;
+      newLike.postId = post.id;
+      newLike.createdAt = new Date();
+      await this.postsRepository.saveLike(newLike);
 
-      await this.postsRepository.saveLike(like);
-
-      if (likeStatusReq === likeStatus.Like) {
-        post.likeCount += 1;
-        updateNewestLikes({
-          addedAt: new Date(),
-          userId: user.id,
-          login: user.login,
-        });
-      } else if (likeStatusReq === likeStatus.Dislike) {
-        post.dislikeCount += 1;
-        updateNewestLikes(null);
-      } else {
-        updateNewestLikes(null);
-      }
+      post.setLikeStatus(user.id, user.login, likeStatusReq);
     } else {
-      const prevStatus = like.status;
       like.status = likeStatusReq;
       await this.postsRepository.saveLike(like);
 
-      if (prevStatus === likeStatus.Like) {
-        post.likeCount -= 1;
-      } else if (prevStatus === likeStatus.Dislike) {
-        post.dislikeCount -= 1;
-      }
-
-      if (likeStatusReq === likeStatus.Like) {
-        post.likeCount += 1;
-        updateNewestLikes({
-          addedAt: new Date(),
-          userId: user.id,
-          login: user.login,
-        });
-      } else if (likeStatusReq === likeStatus.Dislike) {
-        post.dislikeCount += 1;
-        updateNewestLikes(null);
-      } else {
-        updateNewestLikes(null);
-      }
+      post.setLikeStatus(user.id, user.login, likeStatusReq);
     }
 
     await this.postsRepository.save(post);
