@@ -79,16 +79,18 @@ export class PostsService {
     const previousStatus = like?.status || likeStatus.None;
 
     if (!like) {
-      const newLike = new LikePostModel();
-      newLike.userId = user.id;
-      newLike.status = likeStatusReq;
-      newLike.postId = post.id;
-      newLike.createdAt = new Date();
+      const newLike = LikePostModel.createPostLike(
+        user.id,
+        likeStatusReq,
+        post.id,
+      );
+
       await this.postsRepository.saveLike(newLike);
 
       post.setLikeStatus(user.id, user.login, likeStatusReq, previousStatus);
     } else {
-      like.status = likeStatusReq;
+      like.updateLikePost(likeStatusReq);
+
       await this.postsRepository.saveLike(like);
 
       post.setLikeStatus(user.id, user.login, likeStatusReq, previousStatus);

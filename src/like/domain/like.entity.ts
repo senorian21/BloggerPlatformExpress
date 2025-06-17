@@ -77,9 +77,44 @@ export type LikePost = {
   postId: string;
 };
 
-export type likePostsDocument = HydratedDocument<LikePost>;
+export class LikePostEntity {
+  constructor(
+    public createdAt: Date,
+    public status: likeStatus,
+    public userId: string,
+    public postId: string,
+  ) {}
+  static createPostLike(
+    userId: string,
+    likeStatusReq: likeStatus,
+    postId: string,
+  ) {
+    const newLike = new LikePostModel();
+    newLike.userId = userId;
+    newLike.status = likeStatusReq;
+    newLike.postId = postId;
+    newLike.createdAt = new Date();
+    return newLike;
+  }
+  updateLikePost(likeStatusReq: likeStatus) {
+    this.status = likeStatusReq;
+  }
+}
+interface LikePostMethods {
+  updateLikePost(likeStatusReq: likeStatus): void;
+}
 
-const likePostsSchema = new mongoose.Schema<LikePost>({
+type likePostStatic = typeof LikePostEntity;
+
+type likePostModelType = Model<LikePostEntity, LikePostMethods> &
+  likePostStatic;
+
+export type likePostsDocument = HydratedDocument<
+  LikePostEntity,
+  LikePostMethods
+>;
+
+const likePostsSchema = new mongoose.Schema<LikePostEntity>({
   createdAt: {
     type: Date,
     required: true,
@@ -99,7 +134,9 @@ const likePostsSchema = new mongoose.Schema<LikePost>({
   },
 });
 
-export const LikePostModel = mongoose.model<LikePost>(
+likePostsSchema.loadClass(LikePostEntity);
+
+export const LikePostModel = model<LikePostEntity, likePostModelType>(
   "LikePost",
   likePostsSchema,
 );
