@@ -48,6 +48,7 @@ export class PostEntity {
     userId: string,
     login: string,
     newStatus: likeStatus,
+    previousStatus: likeStatus,
   ): void {
     const existingLikeIndex = this.newestLikes.findIndex(
       (entry) => entry.userId === userId,
@@ -57,13 +58,14 @@ export class PostEntity {
       this._removeLike(existingLikeIndex);
     }
 
+    if (previousStatus === likeStatus.Dislike) {
+      this.dislikeCount -= 1;
+    }
+
     if (newStatus === likeStatus.Like) {
       this._addLike(userId, login);
     } else if (newStatus === likeStatus.Dislike) {
-      this._removeLikeFromCount();
       this.dislikeCount += 1;
-    } else {
-      this._removeLikeFromCount();
     }
   }
 
@@ -108,7 +110,12 @@ export class PostEntity {
 interface PostMethods {
   updatePost(dto: PostInput, blogName: string): void;
   deletePost(): void;
-  setLikeStatus(userId: string, login: string, newStatus: likeStatus): void;
+  setLikeStatus(
+    userId: string,
+    login: string,
+    newStatus: likeStatus,
+    previousStatus: likeStatus,
+  ): void;
   updateLikeStatus(userId: string, login: string, newStatus: likeStatus): void;
   clearUserLike(userId: string): void;
 }
