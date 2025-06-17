@@ -1,4 +1,4 @@
-import mongoose, { HydratedDocument } from "mongoose";
+import mongoose, { HydratedDocument, model, Model } from "mongoose";
 
 export enum likeStatus {
   None = "None",
@@ -6,23 +6,44 @@ export enum likeStatus {
   Dislike = "Dislike",
 }
 
-export type LikeComment = {
-  createdAt: Date;
-  status: likeStatus;
-  userId: string;
-  commentId: string;
-};
+export class LikeCommentEntity {
+  constructor(
+    public createdAt: Date,
+    public status: likeStatus,
+    public userId: string,
+    public commentId: string,
+  ) {}
+  static createLikeComment(
+    commentId: string,
+    userId: string,
+    likeStatusReq: likeStatus,
+  ) {
+    const like = new LikeCommentModel();
+    like.commentId = commentId;
+    like.userId = userId;
+    like.status = likeStatusReq;
+    like.createdAt = new Date();
+    return like;
+  }
+  updateLikeComment(likeStatusReq: likeStatus) {
+    this.status = likeStatusReq;
+  }
+}
+interface LikeCommentMethods {
+  updateLikeComment(likeStatusReq: likeStatus): void;
+}
 
-export type LikePost = {
-  createdAt: Date;
-  status: likeStatus;
-  userId: string;
-  postId: string;
-};
+type LikeCommentStatic = typeof LikeCommentEntity;
 
-export type likeCommentsDocument = HydratedDocument<LikeComment>;
+type LikeCommentModelType = Model<LikeCommentEntity, {}, LikeCommentMethods> &
+  LikeCommentStatic;
 
-const likeCommentSchema = new mongoose.Schema<LikeComment>({
+export type likeCommentsDocument = HydratedDocument<
+  LikeCommentEntity,
+  LikeCommentMethods
+>;
+
+const likeCommentSchema = new mongoose.Schema<LikeCommentEntity>({
   createdAt: {
     type: Date,
     required: true,
@@ -42,10 +63,19 @@ const likeCommentSchema = new mongoose.Schema<LikeComment>({
   },
 });
 
-export const LikeCommentModel = mongoose.model<LikeComment>(
-  "LikeComment",
-  likeCommentSchema,
-);
+likeCommentSchema.loadClass(LikeCommentEntity);
+
+export const LikeCommentModel: LikeCommentModelType = model<
+  LikeCommentEntity,
+  LikeCommentModelType
+>("LikeComment", likeCommentSchema);
+
+export type LikePost = {
+  createdAt: Date;
+  status: likeStatus;
+  userId: string;
+  postId: string;
+};
 
 export type likePostsDocument = HydratedDocument<LikePost>;
 

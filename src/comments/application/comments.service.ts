@@ -167,11 +167,11 @@ export class CommentsService {
     );
 
     if (!like) {
-      like = new LikeCommentModel();
-      like.commentId = comment.id;
-      like.userId = user.id;
-      like.status = likeStatusReq;
-      like.createdAt = new Date();
+      like = LikeCommentModel.createLikeComment(
+        comment.id,
+        user.id,
+        likeStatusReq,
+      );
 
       await this.commentsRepositories.saveLike(like);
 
@@ -180,7 +180,8 @@ export class CommentsService {
     } else {
       const prevStatus = like.status;
 
-      like.status = likeStatusReq;
+      like.updateLikeComment(likeStatusReq);
+
       await this.commentsRepositories.saveLike(like);
 
       comment.setLikeStatus(likeStatusReq, prevStatus);
