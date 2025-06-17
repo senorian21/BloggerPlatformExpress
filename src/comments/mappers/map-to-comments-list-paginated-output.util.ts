@@ -1,10 +1,10 @@
 import { WithId } from "mongodb";
 import { commentViewModel } from "../types/comment-view-model";
-import { comment } from "../domain/comment.entity";
 import { likeStatus } from "../../like/domain/like.entity";
+import { CommentEntity } from "../domain/comment.entity";
 
 export function mapToCommentsListPaginatedOutput(
-  comments: WithId<comment>[],
+  comments: WithId<CommentEntity>[],
   myStatusArray: likeStatus[],
   meta: { pageNumber: number; pageSize: number; totalCount: number },
 ): {

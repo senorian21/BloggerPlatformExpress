@@ -1,7 +1,6 @@
 import mongoose, { HydratedDocument, model, Model } from "mongoose";
 import { PostInput } from "../dto/post.input-dto";
 import { likeStatus } from "../../like/domain/like.entity";
-import { BlogEntity } from "../../blogs/domain/blog.entity";
 
 export type newestLikes = {
   addedAt: Date;
@@ -87,22 +86,6 @@ export class PostEntity {
     const removed = this.newestLikes.splice(index, 1)[0];
     if (removed) {
       this.likeCount -= 1;
-    }
-  }
-
-  private _removeLikeFromCount(): void {
-    if (this.likeCount > 0) {
-      this.likeCount -= 1;
-    }
-    if (this.dislikeCount > 0) {
-      this.dislikeCount -= 1;
-    }
-  }
-
-  public clearUserLike(userId: string): void {
-    const index = this.newestLikes.findIndex((like) => like.userId === userId);
-    if (index > -1) {
-      this._removeLike(index);
     }
   }
 }

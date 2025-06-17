@@ -47,14 +47,12 @@ export class CommentsService {
       };
     }
 
-    const newComment = new CommentModel();
-    newComment.postId = post.id; // Используем _id вместо id
-    newComment.content = dto.content;
-    newComment.commentatorInfo = {
-      userId: user.id,
-      userLogin: user.login,
-    };
-    newComment.createdAt = new Date();
+    const newComment = CommentModel.createComment(
+      dto,
+      post.id,
+      user.id,
+      user.login,
+    );
 
     await this.commentsRepositories.save(newComment);
     return {
@@ -95,7 +93,7 @@ export class CommentsService {
         ],
       };
     }
-    comment.content = dto.content;
+    comment.updateComment(dto);
     await this.commentsRepositories.save(comment);
     return {
       status: ResultStatus.Success,
@@ -126,7 +124,8 @@ export class CommentsService {
         ],
       };
     }
-    comment.deletedAt = new Date();
+
+    comment.softDeletedComment();
     await this.commentsRepositories.save(comment);
     return {
       status: ResultStatus.Success,
@@ -176,12 +175,7 @@ export class CommentsService {
 
       await this.commentsRepositories.saveLike(like);
 
-      if (likeStatusReq === likeStatus.Like) {
-        comment.likeCount += 1;
-      } else if (likeStatusReq === likeStatus.Dislike) {
-        comment.dislikeCount += 1;
-      }
-
+      comment.setLikeStatus(likeStatusReq, likeStatus.None);
       await this.commentsRepositories.save(comment);
     } else {
       const prevStatus = like.status;
@@ -189,20 +183,10 @@ export class CommentsService {
       like.status = likeStatusReq;
       await this.commentsRepositories.saveLike(like);
 
-      if (prevStatus === likeStatus.Like) {
-        comment.likeCount -= 1;
-      } else if (prevStatus === likeStatus.Dislike) {
-        comment.dislikeCount -= 1;
-      }
-
-      if (likeStatusReq === likeStatus.Like) {
-        comment.likeCount += 1;
-      } else if (likeStatusReq === likeStatus.Dislike) {
-        comment.dislikeCount += 1;
-      }
-
+      comment.setLikeStatus(likeStatusReq, prevStatus);
       await this.commentsRepositories.save(comment);
     }
+
     return {
       status: ResultStatus.Success,
       data: null,
