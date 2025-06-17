@@ -25,7 +25,6 @@ export class PostsQueryRepository {
     if (blogId) {
       filter.blogId = blogId;
     }
-    console.log(userId, "в сервисе ");
     const rawPosts = await PostModel.find(filter)
       .sort({ [sortBy]: sortDirection })
       .skip(skip)

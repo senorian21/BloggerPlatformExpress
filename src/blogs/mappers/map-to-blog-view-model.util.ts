@@ -1,8 +1,8 @@
 import { WithId } from "mongodb";
 import { blogViewModel } from "../types/blog-view-model";
-import { Blog } from "../domain/blog.entity";
+import { BlogEntity } from "../domain/blog.entity";
 
-export function mapToBlogViewModel(blog: WithId<Blog>): blogViewModel {
+export function mapToBlogViewModel(blog: WithId<BlogEntity>): blogViewModel {
   return {
     id: blog._id.toString(),
     name: blog.name,
