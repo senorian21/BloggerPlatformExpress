@@ -1,9 +1,9 @@
 import { WithId } from "mongodb";
-import { Post } from "../domain/post.entity";
 import { PostViewModel } from "../types/post-view-model";
+import { PostEntity } from "../domain/post.entity";
 
 export function mapToPostListPaginatedOutput(
-  posts: WithId<Post>[],
+  posts: WithId<PostEntity>[],
   myStatusArray: string[],
   meta: { pageNumber: number; pageSize: number; totalCount: number },
 ): {

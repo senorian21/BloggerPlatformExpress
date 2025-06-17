@@ -9,18 +9,6 @@ export type newestLikes = {
   login: string;
 };
 
-export type Post = {
-  title: string;
-  shortDescription: string;
-  content: string;
-  blogId: string;
-  blogName: string;
-  createdAt: Date;
-  deletedAt: Date | null;
-  likeCount: number;
-  dislikeCount: number;
-  newestLikes: newestLikes[];
-};
 export class PostEntity {
   constructor(
     public title: string,
@@ -44,7 +32,7 @@ export class PostEntity {
     newPost.createdAt = new Date();
     return newPost;
   }
-  updatePost(dto: Post, blogName: string) {
+  updatePost(dto: PostEntity, blogName: string) {
     this.title = dto.title;
     this.shortDescription = dto.shortDescription;
     this.content = dto.content;

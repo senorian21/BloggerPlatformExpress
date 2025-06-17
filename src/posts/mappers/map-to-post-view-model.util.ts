@@ -1,14 +1,14 @@
 import { WithId } from "mongodb";
 
-import { Post } from "../domain/post.entity";
 import {
   ExtendedLikesInfoViewModel,
   LikeInfoViewModel,
   PostViewModel,
 } from "../types/post-view-model";
+import { PostEntity } from "../domain/post.entity";
 
 export function mapToPostViewModel(
-  post: WithId<Post>,
+  post: WithId<PostEntity>,
   myStatus: string,
 ): PostViewModel {
   const rawNewest = post.newestLikes ?? [];

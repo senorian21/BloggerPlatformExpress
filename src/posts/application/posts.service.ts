@@ -1,22 +1,12 @@
 import { PostsRepository } from "../repositories/posts.repository";
 import { PostInput } from "../dto/post.input-dto";
 import { BlogsQueryRepositories } from "../../blogs/repositories/blogs.queryRepository";
-import { PostsQueryRepository } from "../repositories/posts.queryRepository";
 import { injectable } from "inversify";
-import {
-  newestLikes,
-  Post,
-  PostEntity,
-  PostModel,
-} from "../domain/post.entity";
-import {
-  LikeCommentModel,
-  LikePostModel,
-  likeStatus,
-} from "../../like/domain/like.entity";
+import { PostEntity, PostModel } from "../domain/post.entity";
+import { LikePostModel, likeStatus } from "../../like/domain/like.entity";
 import { ResultStatus } from "../../core/result/resultCode";
 import { UserRepository } from "../../users/repositories/users.repository";
-import { CommentsRepositories } from "../../comments/repositories/comments.Repository";
+
 @injectable()
 export class PostsService {
   constructor(
@@ -37,7 +27,7 @@ export class PostsService {
     return newPost._id.toString();
   }
 
-  async updatePost(id: string, dto: Post) {
+  async updatePost(id: string, dto: PostEntity) {
     const blog = await this.blogsQueryRepositories.findById(dto.blogId);
     if (!blog) {
       return false;
