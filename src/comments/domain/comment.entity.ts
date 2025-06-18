@@ -1,5 +1,4 @@
 import mongoose, { HydratedDocument, model, Model } from "mongoose";
-import { PostEntity } from "../../posts/domain/post.entity";
 import { commentInput } from "../dto/comment.input-dto";
 import { likeStatus } from "../../like/domain/like.entity";
 

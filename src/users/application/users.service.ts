@@ -3,9 +3,6 @@ import { UserRepository } from "../repositories/users.repository";
 import { Argon2Service } from "../../auth/adapters/argon2.service";
 import { injectable } from "inversify";
 import { UserModel } from "../domain/user.entity";
-import { randomUUID } from "crypto";
-import { add } from "date-fns/add";
-import mongoose from "mongoose";
 
 @injectable()
 export class UserService {
@@ -23,16 +20,7 @@ export class UserService {
 
     const hashedPassword = await this.argon2Service.generateHash(dto.password);
 
-    const newUser = new UserModel();
-    newUser.login = dto.login;
-    newUser.email = dto.email;
-    newUser.passwordHash = hashedPassword;
-    newUser.createdAt = new Date();
-    newUser.emailConfirmation = {
-      confirmationCode: randomUUID(),
-      expirationDate: add(new Date(), { days: 7 }),
-      isConfirmed: false,
-    };
+    const newUser = UserModel.createUser(dto, hashedPassword);
 
     try {
       await newUser.save();
@@ -50,7 +38,7 @@ export class UserService {
       return false;
     }
 
-    user.deletedAt = new Date();
+    user.softDeleteUser();
     await this.userRepository.save(user);
     return true;
   }

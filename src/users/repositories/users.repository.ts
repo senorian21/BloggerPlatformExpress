@@ -27,7 +27,7 @@ export class UserRepository {
   async save(user: userDocument) {
     await user.save();
   }
-  async findById(id: string) {
+  async findById(id: string): Promise<userDocument | null> {
     const user = await UserModel.findById(id);
     if (!user || user.deletedAt !== null) {
       return null;

@@ -1,4 +1,7 @@
-import mongoose, { HydratedDocument } from "mongoose";
+import mongoose, { HydratedDocument, model, Model } from "mongoose";
+import { randomUUID } from "crypto";
+import { add } from "date-fns/add";
+import { UserInput } from "../dto/user.input-dto";
 
 export type EmailConfirmation = {
   confirmationCode: string;
@@ -6,16 +9,57 @@ export type EmailConfirmation = {
   isConfirmed: boolean;
 };
 
-export type User = {
-  login: string;
-  email: string;
-  passwordHash: string;
-  createdAt: Date;
-  emailConfirmation: EmailConfirmation;
-  deletedAt: Date;
-};
+export class UserEntity {
+  constructor(
+    public login: string,
+    public email: string,
+    public passwordHash: string,
+    public createdAt: Date,
+    public emailConfirmation: EmailConfirmation,
+    public deletedAt: Date,
+  ) {}
+  static createUser(dto: UserInput, hashedPassword: string) {
+    const newUser = new UserModel();
+    newUser.login = dto.login;
+    newUser.email = dto.email;
+    newUser.passwordHash = hashedPassword;
+    newUser.createdAt = new Date();
+    newUser.emailConfirmation = {
+      confirmationCode: randomUUID(),
+      expirationDate: add(new Date(), { days: 7 }),
+      isConfirmed: false,
+    };
+    return newUser;
+  }
+  softDeleteUser() {
+    this.deletedAt = new Date();
+  }
+  registrationConfirmationUser() {
+    this.emailConfirmation.isConfirmed = true;
+  }
+  updateCodeAndExpirationDate(
+    newConfirmationCode: string,
+    newExpirationDate: Date,
+  ) {
+    this.emailConfirmation.confirmationCode = newConfirmationCode;
+    this.emailConfirmation.expirationDate = newExpirationDate;
+  }
+  updatePassword(hashedPassword: string) {
+    this.passwordHash = hashedPassword;
+  }
+}
 
-export type userDocument = HydratedDocument<User>;
+interface userMethods {
+  softDeleteUser(): void;
+  registrationConfirmationUser(): void;
+  updatePassword(hashedPassword: string): void;
+}
+
+type userStatic = typeof UserEntity;
+
+type userModelType = Model<UserEntity, {}, userMethods> & userStatic;
+
+export type userDocument = HydratedDocument<UserEntity, userMethods>;
 
 const emailConfirmationSchema = new mongoose.Schema<EmailConfirmation>({
   confirmationCode: {
@@ -32,7 +76,7 @@ const emailConfirmationSchema = new mongoose.Schema<EmailConfirmation>({
   },
 });
 
-const userSchema = new mongoose.Schema<User>({
+const userSchema = new mongoose.Schema<UserEntity>({
   login: {
     type: String,
     required: true,
@@ -58,4 +102,6 @@ const userSchema = new mongoose.Schema<User>({
   deletedAt: { type: Date, default: null },
 });
 
-export const UserModel = mongoose.model("user", userSchema);
+userSchema.loadClass(UserEntity);
+
+export const UserModel = model<UserEntity, userModelType>("user", userSchema);

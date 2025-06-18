@@ -1,9 +1,9 @@
 import { WithId } from "mongodb";
 import { userViewModel } from "../types/user-view-model";
-import { User } from "../domain/user.entity";
+import { UserEntity } from "../domain/user.entity";
 
 export function mapToUserListPaginatedOutput(
-  users: WithId<User>[],
+  users: WithId<UserEntity>[],
   meta: { pageNumber: number; pageSize: number; totalCount: number },
 ): {
   pagesCount: number;

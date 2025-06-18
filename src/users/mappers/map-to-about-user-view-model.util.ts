@@ -1,9 +1,9 @@
 import { WithId } from "mongodb";
 import { aboutUserViewModel } from "../types/about-user-view-model";
-import { User } from "../domain/user.entity";
+import { UserEntity } from "../domain/user.entity";
 
 export function mapToAboutUserViewModel(
-  user: WithId<User>,
+  user: WithId<UserEntity>,
 ): aboutUserViewModel {
   return {
     userId: user._id.toString(),

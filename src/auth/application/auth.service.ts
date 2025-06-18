@@ -92,7 +92,6 @@ export class AuthService {
         existSession.ip = ip;
         await this.authRepositories.save(existSession);
       } else {
-        // Создаем новую сессию
         const newSession = new SessionModel();
         newSession.userId = userId;
         newSession.createdAt = new Date(verifiedToken.iat);
@@ -187,16 +186,11 @@ export class AuthService {
 
     const passwordHash = await this.argon2Service.generateHash(password);
 
-    const newUser = new UserModel();
-    newUser.login = login;
-    newUser.email = email;
-    newUser.passwordHash = passwordHash;
-    newUser.createdAt = new Date();
-    newUser.emailConfirmation = {
-      confirmationCode: randomUUID(),
-      expirationDate: add(new Date(), { days: 7 }),
-      isConfirmed: false,
-    };
+    const newUser = UserModel.createUser(
+      { login, email, password },
+      passwordHash,
+    );
+
     await this.userRepository.save(newUser);
 
     this.nodemailerService
@@ -243,7 +237,7 @@ export class AuthService {
         ],
       };
     }
-    user.emailConfirmation.isConfirmed = true;
+    user.registrationConfirmationUser();
     this.userRepository.save(user);
 
     return {
@@ -291,8 +285,7 @@ export class AuthService {
 
     const newConfirmationCode = randomUUID();
     const newExpirationDate = add(new Date(), { days: 7 });
-    user.emailConfirmation.confirmationCode = newConfirmationCode;
-    user.emailConfirmation.expirationDate = newExpirationDate;
+    user.updateCodeAndExpirationDate(newConfirmationCode, newExpirationDate);
 
     await this.userRepository.save(user);
 
@@ -428,8 +421,7 @@ export class AuthService {
     const newConfirmationCode = randomUUID();
     const newExpirationDate = add(new Date(), { days: 7 });
 
-    user.emailConfirmation.confirmationCode = newConfirmationCode;
-    user.emailConfirmation.expirationDate = newExpirationDate;
+    user.updateCodeAndExpirationDate(newConfirmationCode, newExpirationDate);
 
     await this.userRepository.save(user);
 
@@ -459,7 +451,7 @@ export class AuthService {
       };
     }
     const newPasswordHash = await this.argon2Service.generateHash(newPassword);
-    user.passwordHash = newPasswordHash;
+    user.updatePassword(newPasswordHash);
     await this.userRepository.save(user);
     return {
       status: ResultStatus.Success,
