@@ -3,6 +3,7 @@ import { RefreshToken } from "../../auth/types/tokens";
 import { JwtService } from "../../auth/adapters/jwt.service";
 import { AuthRepositories } from "../../auth/repositories/auth.Repository";
 import { injectable } from "inversify";
+import { SessionModel } from "../../auth/domain/session.entity";
 
 @injectable()
 export class SecurityService {
@@ -57,7 +58,7 @@ export class SecurityService {
       };
     }
 
-    foundSession.deletedAt = new Date();
+    foundSession.deleteSession();
     await this.authRepositories.save(foundSession);
 
     return {
@@ -94,7 +95,7 @@ export class SecurityService {
       };
     }
 
-    await this.authRepositories.deleteDevice(deviceId, userId);
+    SessionModel.deleteOtherDevices(userId, deviceId);
 
     return {
       status: ResultStatus.Success,

@@ -10,7 +10,7 @@ import { UserRepository } from "../../users/repositories/users.repository";
 import { Argon2Service } from "../adapters/argon2.service";
 import { NodemailerService } from "../adapters/nodemailer.service";
 import { injectable } from "inversify";
-import { session, SessionModel } from "../domain/session.entity";
+import { SessionModel } from "../domain/session.entity";
 import { UserModel } from "../../users/domain/user.entity";
 
 @injectable()
@@ -87,18 +87,17 @@ export class AuthService {
             data: null,
           };
         }
-        existSession.createdAt = new Date(verifiedToken.iat);
-        existSession.expiresAt = new Date(verifiedToken.exp);
-        existSession.ip = ip;
+        existSession.updateSession(verifiedToken.iat, verifiedToken.exp);
         await this.authRepositories.save(existSession);
       } else {
-        const newSession = new SessionModel();
-        newSession.userId = userId;
-        newSession.createdAt = new Date(verifiedToken.iat);
-        newSession.expiresAt = new Date(verifiedToken.exp);
-        newSession.deviceId = verifiedToken.deviceId;
-        newSession.deviceName = userAgent;
-        newSession.ip = ip;
+        const newSession = SessionModel.createSession(
+          userId,
+          verifiedToken.iat,
+          verifiedToken.exp,
+          verifiedToken.deviceId,
+          ip,
+          userAgent,
+        );
 
         await this.authRepositories.save(newSession);
       }
@@ -314,7 +313,6 @@ export class AuthService {
         extensions: [],
       };
     }
-
     const refreshTokenPayload = payload as RefreshToken;
     const { userId, deviceName, deviceId } = refreshTokenPayload;
 
@@ -352,11 +350,7 @@ export class AuthService {
       newRefreshToken,
     )) as RefreshToken;
 
-    const newIssuedAt = new Date(token.iat);
-    const newExpiresAt = new Date(token.exp);
-
-    sessionExists.createdAt = newIssuedAt;
-    sessionExists.expiresAt = newExpiresAt;
+    sessionExists.updateSession(token.iat, token.exp);
 
     await this.authRepositories.save(sessionExists);
 
@@ -397,7 +391,7 @@ export class AuthService {
         extensions: [],
       };
     }
-    sessionExists.deletedAt = new Date();
+    sessionExists.deleteSession();
     await this.authRepositories.save(sessionExists);
 
     return {

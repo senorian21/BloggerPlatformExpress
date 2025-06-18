@@ -54,8 +54,8 @@ export const refreshTokenGuard = async (
       return;
     }
 
-    const tokenIat = new Date(payload.iat).getTime(); // Получаем timestamp
-    const sessionCreatedAt = new Date(foundSession.createdAt).getTime(); // Получаем timestamp
+    const tokenIat = new Date(payload.iat * 1000).getTime(); // если iat в секундах
+    const sessionCreatedAt = new Date(foundSession.createdAt).getTime();
 
     if (tokenIat !== sessionCreatedAt) {
       res.sendStatus(HttpStatus.Unauthorized);
@@ -67,6 +67,7 @@ export const refreshTokenGuard = async (
 
     next();
   } catch (error) {
+    console.error("Token verification failed:", error);
     res.sendStatus(HttpStatus.Unauthorized);
     return;
   }
