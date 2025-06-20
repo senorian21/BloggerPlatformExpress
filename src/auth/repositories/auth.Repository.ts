@@ -18,16 +18,4 @@ export class AuthRepositories {
 
     return await SessionModel.findOne(query);
   }
-
-  async deleteDevice(deviceId: string, userId: string) {
-    await SessionModel.updateMany(
-      {
-        $and: [{ userId: userId }, { deviceId: { $ne: deviceId } }],
-      },
-      { deletedAt: new Date() },
-    );
-  }
-  async save(session: sessionDocument) {
-    await session.save();
-  }
 }
