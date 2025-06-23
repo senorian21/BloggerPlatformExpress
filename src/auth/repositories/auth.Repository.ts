@@ -18,4 +18,7 @@ export class AuthRepositories {
 
     return await SessionModel.findOne(query);
   }
+  async save(session: sessionDocument) {
+    await session.save()
+  }
 }
